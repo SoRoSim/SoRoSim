@@ -593,9 +593,9 @@ if Tr.nCLj>0
         JA    = dinamico_Adjoint(ginv(Tr.gACLj{ii}))*JA;
         JB    = dinamico_Adjoint(ginv(Tr.gBCLj{ii}))*JB; %moving to CLj frame
 
-        gCLjAB = ginv(gCLjA)*gCLjB;
+        gCLjAB = ginv(gCLjA)*gCLjB; %transformation from A to B
         Ad_gCLjAB_inv = dinamico_Adjoint(ginv(gCLjAB));
-        JA     = Ad_gCLjAB_inv*JA;
+        JA     = Ad_gCLjAB_inv*JA; %JA in B frame
         JdA    = Ad_gCLjAB_inv*JdA;
 
         A(k:k+size(Bp,2)-1,:)  = Bp'*(JA-JB); %change

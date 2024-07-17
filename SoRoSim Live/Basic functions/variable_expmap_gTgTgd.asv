@@ -24,13 +24,18 @@ adjGammad4 = adjGammad3*adjGamma+adjGammap3*adjGammad;
 if (theta<=1e-2)
     g  = [1 0 0 0;0 1 0 0;0 0 1 0;0 0 0 1]+Gammahat+Gammahatp2/2+Gammahatp3/6;
     
-    f1 = 1/2;
-    f2 = 1/6;
-    f3 = 1/24;
-    f4 = 1/120;
+    f(1) = 1/2;
+    f(2) = 1/6;
+    f(3) = 1/24;
+    f(4) = 1/120;
     
-    Tg  = [1 0 0 0 0 0;0 1 0 0 0 0;0 0 1 0 0 0;0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1]+f1*adjGamma+f2*adjGammap2+f3*adjGammap3+f4*adjGammap4;
-    Tgd = f1*adjGammad+f2*adjGammad2+f3*adjGammad3+f4*adjGammad4;
+    T  = [1 0 0 0 0 0;0 1 0 0 0 0;0 0 1 0 0 0;0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1]+f(1)*adjGamma+f(2)*adjOmegap(7:12,:)+f(3)*adjOmegap(13:18,:)+f(4)*adjOmegap(19:24,:);
+    Td = f(1)*adjOmegapd(1:6,:)+f(2)*adjOmegapd(7:12,:)+f(3)*adjOmegapd(13:18,:)+f(4)*adjOmegapd(19:24,:);
+else
+if (theta<=1e-6)
+    g   = [1 0 0 0;0 1 0 0;0 0 1 0;0 0 0 1]+Gammahat;
+    Tg  = [1 0 0 0 0 0;0 1 0 0 0 0;0 0 1 0 0 0;0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1]+0.5*adjGamma;
+    Tgd = 0.5*adjGammad;
 else
 
     tp2        = theta*theta;

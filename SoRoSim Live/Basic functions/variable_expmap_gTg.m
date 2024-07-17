@@ -6,16 +6,23 @@ theta  = norm(k);
 Gammahat  = dinamico_hat(Gamma);
 adjGamma  = dinamico_adj(Gamma);
 
-if (theta<=1e-6)
-    g   = [1 0 0 0;0 1 0 0;0 0 1 0;0 0 0 1]+Gammahat;
-    Tg  = [1 0 0 0 0 0;0 1 0 0 0 0;0 0 1 0 0 0;0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1]+0.5*adjGamma;
-else
-    Gammahatp2 = Gammahat*Gammahat;
-    Gammahatp3 = Gammahatp2*Gammahat;
+Gammahatp2 = Gammahat*Gammahat;
+Gammahatp3 = Gammahatp2*Gammahat;
+
+adjGammap2 = adjGamma*adjGamma;
+adjGammap3 = adjGammap2*adjGamma;
+adjGammap4 = adjGammap3*adjGamma;
+
+if (theta<=1e-2)
+    g  = [1 0 0 0;0 1 0 0;0 0 1 0;0 0 0 1]+Gammahat+Gammahatp2/2+Gammahatp3/6;
     
-    adjGammap2 = adjGamma*adjGamma;
-    adjGammap3 = adjGammap2*adjGamma;
-    adjGammap4 = adjGammap3*adjGamma;
+    f1 = 1/2;
+    f2 = 1/6;
+    f3 = 1/24;
+    f4 = 1/120;
+    
+    Tg  = [1 0 0 0 0 0;0 1 0 0 0 0;0 0 1 0 0 0;0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1]+f1*adjGamma+f2*adjGammap2+f3*adjGammap3+f4*adjGammap4;
+else
     
     tp2        = theta*theta;
     tp3        = tp2*theta;
