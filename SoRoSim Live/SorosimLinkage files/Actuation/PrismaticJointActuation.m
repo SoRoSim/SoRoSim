@@ -34,7 +34,7 @@ if ~Update
                 case 'Yes'
 
                     n_Pact   = n_Pact+1;
-                    i_Pact   = [i_Pact;i];
+                    i_Pact   = [i_Pact i];
                     i_Pactq  = [i_Pactq;dofi];
                     B1(dofi) = 1;
                     BqP      = [BqP,B1];

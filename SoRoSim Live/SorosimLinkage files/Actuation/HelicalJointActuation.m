@@ -34,7 +34,7 @@ if ~Update
                 case 'Yes'
 
                     n_Hact   = n_Hact+1;
-                    i_Hact   = [i_Hact;i];
+                    i_Hact   = [i_Hact i];
                     i_Hactq  = [i_Hactq;dofi];
                     B1(dofi) = 1;
                     BqH      = [BqH,B1];
