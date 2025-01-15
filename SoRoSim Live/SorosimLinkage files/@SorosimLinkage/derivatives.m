@@ -623,7 +623,7 @@ if Tr.Damped
 else
     D = 0;
 end
-K = Tr.K;
+K = Tr.K; %findK(Tr)
 
 if Tr.nCLj>0
     T   = Tr.T_BS;
@@ -644,7 +644,7 @@ if Tr.nCLj>0
             end
         end
 
-        if rank(MA)<(Tr.ndof+Tr.CLprecompute.nCLp) %MA singular
+        if rank(MA)<(Tr.ndof+size(A,1)) %MA singular
             qdd_lambda = pinv(MA)*(BqA*u+FA-KA*q-CDA*qd);
         else
             qdd_lambda = MA\(BqA*u+FA-KA*q-CDA*qd);

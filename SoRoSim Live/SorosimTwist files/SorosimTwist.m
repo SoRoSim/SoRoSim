@@ -738,7 +738,7 @@ classdef SorosimTwist < handle
             end
         end
         function Add_more_X(T)
-            for k=1:size(T.Xadd)
+            for k=1:length(T.Xadd)
                 X1 = T.Xadd(k);
                 if ~any(T.Xs==X1) %if already present don't add
                     iv = find(T.Xs>X1);
