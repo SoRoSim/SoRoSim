@@ -1,4 +1,5 @@
 function xci=piecewise_logmap(g)
+
 x=1;
 theta = acos(trace(g)/2-1);
 

@@ -1,4 +1,4 @@
-function [Omega,Z,g,T,S,f,fd,adjOmegap] = SoftJointKinematics_Z2(h,Phi_Z,xi_star,q)
+function [Omega,Z,g,T,S,f,fd,adjOmegap] = SoftJointKinematics_Z2(h,Phi_Z,xi_star,q) %very close to RigidJointKinematics
     
     if isempty(q)
         xi_Z    = xi_star;

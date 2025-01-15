@@ -2,27 +2,38 @@
 %Last modified by Anup Teejo Mathew 02.03.2022
 function [q,u,lambda]=statics(Linkage,qul0,uq,staticsOptions) %qul0_user is initial guess of qul0 arranged like this: [q_u0;u_u0;l0]. uq_user is actuation input like this: [u_k;q_k]
 
-uq = zeros(Linkage.nact,1); %uq has q_k in indexes of of u_u
-if Linkage.Actuated
-    n_k = Linkage.ActuationPrecompute.n_k; %number of known values of q (for joint controlled systems)
-    %Actuation input
-    if nargin <= 2 || isempty(uq) 
-        if ~Linkage.CAS
-            uq_temp(1:Linkage.n_jact) = InputJointUQ0(Linkage); %Rigid Joints. Here q_k is in the indices of u_u
-            for i=Linkage.n_jact+1:Linkage.nact %Soft Actuators
-                prompt = ['Enter actuation force of the soft actuator ',num2str(i-Linkage.n_jact),' (N):'];
-                answer = input(prompt, 's');
-                uq_temp(i)  = eval(answer);
+%Actuation input
+if nargin <= 2 || isempty(uq)
+    uq = zeros(Linkage.nact,1); %uq has q_k in indexes of of u_u
+    if Linkage.Actuated
+        n_k = Linkage.ActuationPrecompute.n_k; %number of known values of q (for joint controlled systems)
+        %Actuation input
+        if nargin <= 2 || isempty(uq) 
+            if ~Linkage.CAS
+                uq_temp(1:Linkage.n_jact) = InputJointUQ0(Linkage); %Rigid Joints. Here q_k is in the indices of u_u
+                for i=Linkage.n_jact+1:Linkage.nact %Soft Actuators
+                    prompt = ['Enter actuation force of the soft actuator ',num2str(i-Linkage.n_jact),' (N):'];
+                    answer = input(prompt, 's');
+                    uq_temp(i)  = eval(answer);
+                end
+                uq = uq_temp;
+                uq(1:Linkage.nact-n_k) = uq_temp(Linkage.ActuationPrecompute.index_u_k);
+                uq(Linkage.nact-n_k+1:Linkage.nact) = uq_temp(Linkage.ActuationPrecompute.index_u_u);
+            else
+                uq = CustomActuatorStrength(Tr,0);
             end
-            uq = uq_temp;
-            uq(1:Linkage.nact-n_k) = uq_temp(Linkage.ActuationPrecompute.index_u_k);
-            uq(Linkage.act-n_k+1:Linkage.nact) = uq_temp(Linkage.ActuationPrecompute.index_u_u);
-        else
-            uq = CustomActuatorStrength(Tr,0);
         end
+    else
+        uq = [];
+        n_k = 0;
     end
 else
-    n_k = 0;
+    if Linkage.Actuated
+        n_k = Linkage.ActuationPrecompute.n_k;
+    else
+        uq = [];
+        n_k = 0;
+    end
 end
 
 
@@ -51,7 +62,7 @@ if nargin == 1 || isempty(qul0)
     end
 
     % Common input dialog handling
-    dlgtitle = 'Initial condition';
+    dlgtitle = 'Initial Guess';
     opts.Interpreter = 'latex';
     answer = inputdlg(prompt, dlgtitle, [1, 75], definput, opts);
 
@@ -81,15 +92,17 @@ toc
 
 %% save and plot
 
-q = qul(Linkage.ndof,1);
+q = qul(1:Linkage.ndof,1);
 u = uq;
 lambda = qul(Linkage.ndof+1:end);
 
 
 if Linkage.Actuated
 
-    q(Linkage.ActuationPrecompute.index_q_k) = uq(Linkage.ActuationPrecompute.index_u_u);
-    u(Linkage.ActuationPrecompute.index_u_u) = qul(Linkage.ActuationPrecompute.index_q_k);
+    q(Linkage.ActuationPrecompute.index_q_u) = qul(1:Linkage.ndof-n_k);
+    q(Linkage.ActuationPrecompute.index_q_k) = uq(end-n_k+1:end);
+    u(Linkage.ActuationPrecompute.index_u_k) = uq(1:Linkage.nact-n_k);
+    u(Linkage.ActuationPrecompute.index_u_u) = qul(Linkage.ndof-n_k+1:Linkage.ndof);
 
 end
 

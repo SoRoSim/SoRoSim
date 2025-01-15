@@ -580,7 +580,9 @@ function UpdateIntegration(R,varargin) %user input is nGauss or nGausse dependin
             R.UpdatePhis();
             R.UpdateXi_star();
             R.UpdateMEG();
-            R.UpdateEGJoint();
+            if isempty(R.div)
+                R.UpdateEGJoint();
+            end
         end
 
         function UpdatePreCompute(R)
@@ -596,7 +598,9 @@ function UpdateIntegration(R,varargin) %user input is nGauss or nGausse dependin
                 R.UpdateWeights(); %weights will change if lenght is changed
                 R.UpdatePhis(); %scaling factor will change
                 R.UpdateMEG(); %rod cross section dimentions or material properties
-                R.UpdateEGJoint(); %when Kj or Dj changes
+                if isempty(R.div)
+                    R.UpdateEGJoint(); %when Kj or Dj changes
+                end
             end
         end
 

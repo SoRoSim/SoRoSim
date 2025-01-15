@@ -45,8 +45,13 @@ function Linkage = ClosedLoopRedundancyPrecompute(Linkage)
         [~,T_OmegaBA] = variable_expmap_gTg_mex(OmegaBA); %Tangent operator of the twist vector
     
         de_dq_CLj   = Phi_p'*(T_OmegaBA\diffJAB); %Jacobian of e
-
-        [~,iRows] = LIRows(de_dq_CLj); %Linearly independent rows
+        
+        if Linkage.Actuated
+            [~,iRows] = LIRows(de_dq_CLj(Linkage.ActuationPrecompute.index_q_u)); %Linearly independent rows
+        else
+            [~,iRows] = LIRows(de_dq_CLj); %Linearly independent rows
+        end
+        
         Phi_p = Phi_p(:,iRows);
         Linkage.CLprecompute.Phi_p{iCLj} = Phi_p;
         nCLp = nCLp+size(Phi_p,2);
