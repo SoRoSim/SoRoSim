@@ -55,7 +55,7 @@ classdef SorosimLinkage
         nact          %Total number of actuators
 
         %Joint actuation parameters
-        Bj1                 %Pre-computed actuation base for joints with dof = 1
+        Bqj1                %Pre-computed actuation base for joints with dof = 1
         N_jact              %Total number of links whos joints are actuated
         n_jact              %Total number of joint actuators (eg. 3 for a spherical joint)
         i_jact              %Array of index of links whos joints are actuated
@@ -179,7 +179,9 @@ classdef SorosimLinkage
                 opts.Interpreter = 'tex';
                 ans_act          = inputdlg(prompt,dlgtitle,[1 75],definput,opts);
                 N                = str2double(ans_act{1});
-
+    
+    
+                % Assigning values to properties of the class
                 Linkage.VLinks = VLinks;
                 Linkage.N = 0;
                 Linkage.PlotParameters.Lscale = 1;
@@ -282,7 +284,7 @@ classdef SorosimLinkage
                 
                 save('LinkageProgress.mat','Linkage')
     
-                %% closed loop joints
+                %% closed loop
     
                 prompt           = {'Enter number of independent closed chain joints:'};
                 dlgtitle         = 'Closed Chain';
@@ -330,7 +332,13 @@ classdef SorosimLinkage
     
                     end
     
+                    % nCLp = 0;
+                    % for iCLj=1:Linkage.nCLj
+                    %     nCLp = nCLp+size(Phi_p{iCLj},2); % can pre compute
+                    % end
                     Linkage.CLprecompute.Phi_p  = Phi_p; %Perpendicular basis of the closed loop joint
+                    % Linkage.CLprecompute.nCLp   = nCLp; % ndof of Bp
+                    %sig point of tip of A and sig point of tip of B will be computed later after point load
                     Linkage.T_BS                = 0.01; %desired settling time constant (Baumgart)
 
                     %index corresponding to the start of lambda
@@ -340,7 +348,9 @@ classdef SorosimLinkage
                 Linkage.plotq0;
     
                 save('LinkageProgress.mat','Linkage')
-                %% Gravity
+                %% External Force Vector F(q)
+    
+                % Gravity
     
                 quest  = 'Is the system subjected to gravity?';
                 FG_ANS = questdlg(quest,'Gravity','Yes','No','Yes');
@@ -377,8 +387,10 @@ classdef SorosimLinkage
     
                 close all
                 Linkage.plotq0;
-                %% Concentrated Point Force Fp 
-
+                %%
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                % Concentrated Point Force Fp  
+    
                 prompt           = {'Number of point forces/moments (wrenches)'};
                 dlgtitle         = 'Number';
                 definput         = {'0'};
@@ -459,7 +471,7 @@ classdef SorosimLinkage
                     Linkage.np=Linkage.np+1;
 
                 end
-                Linkage.Fp_sig = PointWrenchPoints(Linkage);
+                Linkage.Fp_sig=PointWrenchPoints(Linkage);
 
                 save('LinkageProgress.mat','Linkage')
 
@@ -484,14 +496,14 @@ classdef SorosimLinkage
                         end
                         n_sact=0;
     
-                        [n_jact,i_jact,i_jactq,WrenchControlled,Bj1] = JointActuation(Linkage,false);
+                        [n_jact,i_jact,i_jactq,WrenchControlled,Bqj1] = JointActuation(Linkage,false);
     
                         Linkage.n_jact            = n_jact;
                         Linkage.i_jact            = i_jact;
                         Linkage.N_jact            = length(i_jact);
                         Linkage.i_jactq           = i_jactq;
                         Linkage.WrenchControlled  = WrenchControlled;
-                        Linkage.Bj1              = Bj1;
+                        Linkage.Bqj1              = Bqj1;
                         Linkage.Actuated          = true;
 
                         [n_k,index_q_u,index_q_k,index_u_k,index_u_u] = JointConstraintPrecompute(Linkage);
@@ -566,7 +578,7 @@ classdef SorosimLinkage
                 save('LinkageProgress.mat','Linkage')
                 %% Miscellaneous precomputations
                 
-                %Computational point index precomputations for closed chain joints
+                %Computational point index precomputations for closed chain joints (depends on Fp_loc)
                 i_sigA   = zeros(Linkage.nCLj,1);
                 i_sigB   = zeros(Linkage.nCLj,1);
     
@@ -601,19 +613,20 @@ classdef SorosimLinkage
                 Linkage.CLprecompute.i_sigB = i_sigB;
     
     
-                % total number of computational points and virtual rigid joints
+                % total number of computational points
                 [nsig,nj]    = find_nsig_nj(Linkage);
                 Linkage.nsig = nsig;
                 Linkage.nj   = nj;
 
-                %To avoid redundant constraitns
-                Linkage = ClosedLoopRedundancyPrecompute(Linkage); 
+                Linkage = ClosedLoopRedundancyPrecompute(Linkage);
                 
                 Linkage.CEF        = false;  %No custom external force by default
                 Linkage.UnderWater = false;  %Enable if it is an underwater simulation (default logical 0)
                 Linkage.Rho_water  = 1000;   %Water density by default 1000 kg/m^3
                 Linkage.M_added    = zeros(6*nsig,6);  %Added mass for fluid simulations (by default zeros(6*nsig,6))
                 Linkage.DL         = zeros(6*nsig,6);  %Drag-Lift Matrix (by default zeros(6*nsig,6))
+    
+                save('LinkageProgress.mat','Linkage')
     
                 % Damping matrix (D)
                 D   = findD(Linkage);
@@ -625,8 +638,6 @@ classdef SorosimLinkage
                 Linkage.K = K;
                 
                 Linkage.Z_order = 4; %the value should be 2 or 4
-
-                save('LinkageProgress.mat','Linkage')
     
                 %% Plot parameters
                 PlotParameters.Lscale         = Lscale;
@@ -647,8 +658,6 @@ classdef SorosimLinkage
                 Linkage.PlotParameters = PlotParameters;
                 close all
                 Linkage.plotq0;
-
-                save('LinkageProgress.mat','Linkage')
     
                 %%
                 if exist('Temp_LinkageAssembly.mat', 'file')
@@ -680,7 +689,7 @@ classdef SorosimLinkage
         C       = GeneralizedCoriolisMatrix(S,q,qd) %to get the generalized coriolis matrix
         F       = GeneralizedExternalForce(S,q,qd,t)  %to get the generalized external force matrix
         [t,qqd] = dynamics(S,qqd0,odetype,dt);             %for dynamic simulation
-        [q,u,lambda] = statics(S,qu0,magnifier)            %for static simulation
+        [q,u]   = statics(S,qu0,magnifier)            %for static simulation
 
         plotq0(S,Lh,Dh,CLh);     %to plot the free body diagram of the linkage
         plotq(S,q);              %to plot the state of the linkage for a given q
@@ -738,9 +747,9 @@ classdef SorosimLinkage
             Linkage.K = findK(Linkage);
 
             [Linkage.nsig,Linkage.nj] = find_nsig_nj(Linkage);
-            [~,~,i_jactq_new,~,Bj1_new] = JointActuation(Linkage,true);
+            [~,~,i_jactq_new,~,Bqj1_new] = JointActuation(Linkage,true);
             Linkage.i_jactq = i_jactq_new;
-            Linkage.Bj1    = Bj1_new;
+            Linkage.Bqj1    = Bqj1_new;
 
             [n_k,index_q_u,index_q_k,index_u_k,index_u_u] = JointConstraintPrecompute(Linkage);
             ij_act = ActuatedJointIndex(Linkage);
