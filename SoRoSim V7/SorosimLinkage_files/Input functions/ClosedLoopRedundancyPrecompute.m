@@ -47,7 +47,7 @@ function Linkage = ClosedLoopRedundancyPrecompute(Linkage)
         de_dq_CLj   = Phi_p'*(T_OmegaBA\diffJAB); %Jacobian of e
         
         if Linkage.Actuated
-            [~,iRows] = LIRows(de_dq_CLj(Linkage.ActuationPrecompute.index_q_u)); %Linearly independent rows
+            [~,iRows] = LIRows(de_dq_CLj(:,Linkage.ActuationPrecompute.index_q_u)); %Linearly independent rows
         else
             [~,iRows] = LIRows(de_dq_CLj); %Linearly independent rows
         end

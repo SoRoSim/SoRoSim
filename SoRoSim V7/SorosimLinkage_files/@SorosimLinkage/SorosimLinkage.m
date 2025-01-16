@@ -497,11 +497,11 @@ classdef SorosimLinkage
                         [n_k,index_q_u,index_q_k,index_u_k,index_u_u] = JointConstraintPrecompute(Linkage);
                         ij_act = ActuatedJointIndex(Linkage);
 
-                        Linkage.ActuationPrecompute.n_k = n_k;
+                        Linkage.ActuationPrecompute.n_k = n_k; %for length controlled soft also (future version)
                         Linkage.ActuationPrecompute.index_q_u = index_q_u;
                         Linkage.ActuationPrecompute.index_q_k = index_q_k;
-                        Linkage.ActuationPrecompute.index_u_k = index_u_k;
-                        Linkage.ActuationPrecompute.index_u_u = index_u_u;
+                        Linkage.ActuationPrecompute.index_u_k = index_u_k; %change when soft actuators are added
+                        Linkage.ActuationPrecompute.index_u_u = index_u_u; %for length controlled soft also (future version)
                         Linkage.ActuationPrecompute.ij_act = ij_act;
     
                         if n_jact>0
@@ -559,6 +559,7 @@ classdef SorosimLinkage
     
                         Linkage.n_sact = n_sact;
                         Linkage.nact   = n_jact+n_sact;
+                        Linkage.ActuationPrecompute.index_u_k = [Linkage.ActuationPrecompute.index_u_k, Linkage.n_jact+1:Linkage.nact]; %including index of known soft actuator input force
                 end
                 Linkage.CA  = false; %custom internal actuation force
                 Linkage.CAS = false; %custom actuation strength

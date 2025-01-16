@@ -155,6 +155,7 @@ for i=1:N
         Ad_gi_inv = dinamico_Adjoint(ginv(gi)); %transformation from X=1 of joint or X=Ld of previous division to the X=0 of next division
         J_here  = Ad_gi_inv*J_here;
         Q_Bhere = Ad_gi_inv*Q_Bhere;
+        g_here  = g_here*gi;
 
         g((i_sig-1)*4+1:i_sig*4,:) = g_here;
         J((i_sig-1)*6+1:i_sig*6,:) = J_here;
@@ -202,6 +203,7 @@ for i=1:N
         Ad_gf_inv = dinamico_Adjoint(ginv(gf));
         J_here  = Ad_gf_inv*J_here;
         Q_Bhere = Ad_gf_inv*Q_Bhere;
+        g_here  = g_here*gf;
 
         if ~Linkage.OneBasis
             dof_start = dof_start+dof_here;

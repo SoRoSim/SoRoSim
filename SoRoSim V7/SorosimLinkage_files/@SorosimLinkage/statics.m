@@ -17,8 +17,8 @@ if nargin <= 2 || isempty(uq)
                     uq_temp(i)  = eval(answer);
                 end
                 uq = uq_temp;
-                uq(1:Linkage.nact-n_k-Linkage.n_sact) = uq_temp(Linkage.ActuationPrecompute.index_u_k);
-                uq(Linkage.nact-n_k+1:Linkage.nact) = uq_temp(Linkage.ActuationPrecompute.index_u_u);
+                uq(1:Linkage.nact-n_k) = uq_temp(Linkage.ActuationPrecompute.index_u_k);
+                uq(Linkage.nact-n_k+1:Linkage.nact) = uq_temp([Linkage.ActuationPrecompute.index_u_u,Linkage.n_jact+1:Linkage.nact]);
             else
                 uq = CustomActuatorStrength(Tr,0);
             end
@@ -101,7 +101,7 @@ if Linkage.Actuated
 
     q(Linkage.ActuationPrecompute.index_q_u) = qul(1:Linkage.ndof-n_k);
     q(Linkage.ActuationPrecompute.index_q_k) = uq(end-n_k+1:end);
-    u(Linkage.ActuationPrecompute.index_u_k) = uq(1:Linkage.nact-n_k-Linkage.n_sact);
+    u(Linkage.ActuationPrecompute.index_u_k) = uq(1:Linkage.nact-n_k);
     u(Linkage.ActuationPrecompute.index_u_u) = qul(Linkage.ndof-n_k+1:Linkage.ndof);
 
 end
