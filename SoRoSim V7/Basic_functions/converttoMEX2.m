@@ -44,7 +44,7 @@ codegen SoftJointKinematics_Z2 -args {h,Phi_Z,xi_star,q}
 codegen RigidJointKinematics -args {Phi,xi_star,q} %very close to SoftJointKinematics_Z2
 codegen compute_dSTdqFC_Z4 -args {h, Omega, Phi_Z1, Phi_Z2 ,Z, T, f, fd, adjOmegap, F_C}
 codegen compute_dSTdqFC_Z2R -args {ndof, Omega, Z, f, fd, adjOmegap, F_C}
-% codegen SoftActuator -args {u,dc,dcp,xihat_123}
+codegen SoftActuator -args {u,dc,dcp,xihat_123}
 % codegen SoftActuator_FD -args {u,dc,dcp,xihat_123}
 
 

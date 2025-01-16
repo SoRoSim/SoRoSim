@@ -4,7 +4,7 @@ function [q,u,lambda]=statics(Linkage,qul0,uq,staticsOptions) %qul0_user is init
 
 %Actuation input
 if nargin <= 2 || isempty(uq)
-    uq = zeros(Linkage.nact,1); %uq has q_k in indexes of of u_u
+    uq_temp = zeros(Linkage.nact,1); %uq has q_k in indexes of of u_u
     if Linkage.Actuated
         n_k = Linkage.ActuationPrecompute.n_k; %number of known values of q (for joint controlled systems)
         %Actuation input
@@ -17,7 +17,7 @@ if nargin <= 2 || isempty(uq)
                     uq_temp(i)  = eval(answer);
                 end
                 uq = uq_temp;
-                uq(1:Linkage.nact-n_k) = uq_temp(Linkage.ActuationPrecompute.index_u_k);
+                uq(1:Linkage.nact-n_k-Linkage.n_sact) = uq_temp(Linkage.ActuationPrecompute.index_u_k);
                 uq(Linkage.nact-n_k+1:Linkage.nact) = uq_temp(Linkage.ActuationPrecompute.index_u_u);
             else
                 uq = CustomActuatorStrength(Tr,0);
@@ -101,7 +101,7 @@ if Linkage.Actuated
 
     q(Linkage.ActuationPrecompute.index_q_u) = qul(1:Linkage.ndof-n_k);
     q(Linkage.ActuationPrecompute.index_q_k) = uq(end-n_k+1:end);
-    u(Linkage.ActuationPrecompute.index_u_k) = uq(1:Linkage.nact-n_k);
+    u(Linkage.ActuationPrecompute.index_u_k) = uq(1:Linkage.nact-n_k-Linkage.n_sact);
     u(Linkage.ActuationPrecompute.index_u_u) = qul(Linkage.ndof-n_k+1:Linkage.ndof);
 
 end

@@ -97,7 +97,9 @@ for i=1:N
     Adgstepinv((ij-1)*6+1:6*ij,:) = dinamico_Adjoint(ginv(gstep((ij-1)*4+1:4*ij,:)));
 
     G = Linkage.G;
-    if Linkage.UnderWater %G is reduced by a factor of 1-rho_water/rho_body
+    if ~Linkage.Gravity
+        G = G*0;
+    elseif Linkage.UnderWater %G is reduced by a factor of 1-rho_water/rho_body
         G=G*(1-Linkage.Rho_water/Linkage.VLinks(Linkage.LinkIndex(i)).Rho);
     end
     Q((ij-1)*6+1:6*ij,dofs_here) = -dinamico_adj(dinamico_Adjoint(ginv(g_here))*G)*S((ij-1)*6+1:6*ij,dofs_here);
@@ -340,7 +342,9 @@ for i=N:-1:1 %backwards
     U_S = U_S_tip(6*(i-1)+1:6*i,:);
     
     G = Linkage.G;
-    if Linkage.UnderWater %G is reduced by a factor of 1-rho_water/rho_body
+    if ~Linkage.Gravity
+        G = G*0;
+    elseif Linkage.UnderWater %G is reduced by a factor of 1-rho_water/rho_body
         G=G*(1-Linkage.Rho_water/Linkage.VLinks(Linkage.LinkIndex(i)).Rho);
     end
     
@@ -552,33 +556,33 @@ if Linkage.Actuated
             end
             for j=1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1
                 na_here = length(Linkage.i_sact{i}{j});
-                dof_here = Linkage.CVRods{i}(j+1).dof_here;
+                dof_here = Linkage.CVRods{i}(j+1).dof;
                 dofs_here = dof_start:dof_start+dof_here-1;
                 if ~Linkage.OneBasis
                     dof_start=dof_start+dof_here;
                 end
                 if na_here>0
                     Ws = Linkage.CVRods{i}(j+1).Ws;
+                    B_here = zeros(dof_here,na_here);
+                    dBu_dq_here = zeros(dof_here,dof_here);
                     for ii=1:nip
                         if Ws(ii)>0
                             Phi = Linkage.CVRods{i}(j+1).Phi((ii-1)*6+1:ii*6,:);
                             xi  = Phi*q(dofs_here)+Linkage.CVRods{i}(j+1).xi_star((ii-1)*6+1:ii*6,1);
                             Phi_a = zeros(6,na_here);
-                            B_here = zeros(dof_here,na_here);
                             PHI_AU = zeros(6,6);
-                            dBu_dq_here = zeros(dof_here,dof_here);
                             xihat_123  = [0 -xi(3) xi(2) xi(4);xi(3) 0 -xi(1) xi(5);-xi(2) xi(1) 0 xi(6)];%4th row is avoided to speedup calculation
-                            for ia =Linkage.i_sact{i,j}
+                            for ia =Linkage.i_sact{i}{j}
                                 dc = Linkage.dc{ia,i}{j}(:,ii);
-                                dcp = Linkage.dc{ia,i}{j}(:,ii);
-                                [Phi_a(:,ia),PHI_AU_ia] = SoftActuator_mex(u(n_jact+ia),dc,dcp,xihat_123);
+                                dcp = Linkage.dcp{ia,i}{j}(:,ii);
+                                [Phi_a(:,ia),PHI_AU_ia] = SoftActuator(u(n_jact+ia),dc,dcp,xihat_123);
                                 PHI_AU = PHI_AU+PHI_AU_ia;
                             end
                             B_here = B_here+Ws(ii)*Phi'*Phi_a;
                             dBu_dq_here = dBu_dq_here+Ws(ii)*Phi'*PHI_AU*Phi;
                         end
                     end
-                    B(dofs_here,n_jact+Linkage.i_sact{i,j}) = B_here;
+                    B(dofs_here,n_jact+Linkage.i_sact{i}{j}) = B_here;
                     dtau_dq(dofs_here,dofs_here) = dtau_dq(dofs_here,dofs_here)+dBu_dq_here;
                 end
             end
