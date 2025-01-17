@@ -74,7 +74,7 @@ classdef SorosimLinkage
 
         %Custom actuation
         CA               %logical 1 if custom actation is present 0 if not (default value: 0)
-        CAS              %logical 1 to apply a custom actuator strength (default value: 0)
+        CAI              %logical 1 to apply a custom actuator strength (default value: 0)
 
         %Pre-computed elastic Properties
         K       %Generalized Stiffness matrix
@@ -562,7 +562,7 @@ classdef SorosimLinkage
                         Linkage.ActuationPrecompute.index_u_k = [Linkage.ActuationPrecompute.index_u_k, Linkage.n_jact+1:Linkage.nact]; %including index of known soft actuator input force
                 end
                 Linkage.CA  = false; %custom internal actuation force
-                Linkage.CAS = false; %custom actuation strength
+                Linkage.CAI = false; %custom actuation strength
 
                 save('LinkageProgress.mat','Linkage')
                 %% Miscellaneous precomputations

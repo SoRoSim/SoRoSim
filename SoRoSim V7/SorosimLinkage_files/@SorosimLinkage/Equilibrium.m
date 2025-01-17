@@ -4,28 +4,33 @@
 
 %%%%%%%Create also fwd pass only algorithm using Kane projection%%%%%%%%%
 
-function [Res,Jac]=Equilibrium(Linkage,qul,uq,magnifier) 
-%qul is a vector of unknowns. It has unknown q, unknown u and unknown lambdas. qul = [q_u;u_u;lambda]
-%uq is a vector of known inputs. It has input values of u and q_joint. uq = [u_k;q_k]
+function [Res,Jac]=Equilibrium(Linkage,x,input,magnifier) 
+% x is a vector of unknowns. It has unknown q, unknown u and unknown lambdas. x = [q_u;u_u;lambda]
+% input is a vector of known inputs. It has input values of u and q_joint. input = [u_k;q_k]
 
 N    = Linkage.N;
 ndof = Linkage.ndof;
 nsig = Linkage.nsig; %Total number of computational points
 nj   = Linkage.nj;   %Total number of joints (rigid and virtual soft joints (nip-1))
 
-q = qul(1:ndof);
-lambda = qul(ndof+1:end);
-u = uq;
+q = x(1:ndof);
+lambda = x(ndof+1:end);
+
+if Linkage.CAI
+    [input,dinput_dx] = CustomActuatorStrength(Linkage,x); %x is qul here %%%%%%%%%%%%%%%%%%%%%%THINK about it
+end
+
+u = input;
 
 if Linkage.Actuated
     nact = Linkage.nact;
     n_k  = Linkage.ActuationPrecompute.n_k; %number of q_joint inputs
     %if n_k>0 rearrangemetns are required to compute q and u in the correct format
     if n_k>0
-        q(Linkage.ActuationPrecompute.index_q_u) = qul(1:ndof-n_k);
-        q(Linkage.ActuationPrecompute.index_q_k) = uq(end-n_k+1:end);
-        u(Linkage.ActuationPrecompute.index_u_k) = uq(1:nact-n_k);
-        u(Linkage.ActuationPrecompute.index_u_u) = qul(ndof-n_k+1:ndof);
+        q(Linkage.ActuationPrecompute.index_q_u) = x(1:ndof-n_k);
+        q(Linkage.ActuationPrecompute.index_q_k) = input(end-n_k+1:end);
+        u(Linkage.ActuationPrecompute.index_u_k) = input(1:nact-n_k);
+        u(Linkage.ActuationPrecompute.index_u_u) = x(ndof-n_k+1:ndof);
     end
 end
 
@@ -317,7 +322,7 @@ end
 %% Custom External Force
 
 if Linkage.CEF
-    [Fext,dFext_dq]  = CustomExtForce(Linkage,q,g,J,0,zeros(ndof,1),zeros(6*nsig,1),zeros(6*nsig,ndof));
+    [Fext,dFext_dq]  = CustomExtForce(Linkage,q,g,J,0,zeros(ndof,1),zeros(6*nsig,1),zeros(6*nsig,ndof)); %should be point wrench in local frame and its derivatives
     Fk = Fk+Fext;
     for i_sig=1:Linkage.nsig
         dID_dq = dID_dq-J((i_sig-1)*6+1:i_sig*6,:)'*dFext_dq((i_sig-1)*6+1:i_sig*6,:);
@@ -548,7 +553,7 @@ if Linkage.Actuated
         i_u = i_u+dof_here;
     end
 
-    %cable actuation
+    %cable actuation %combine with FwdKinematics
     if Linkage.n_sact>0
         dof_start = 1;
         for i = 1:N
@@ -612,7 +617,12 @@ if Linkage.nCLj>0 %if there are closed chain joints
     nCLp = Linkage.CLprecompute.nCLp;
     Res = [taumID;e];
     if Linkage.Actuated
-        Jac = [dtaumID_dq(:,Linkage.ActuationPrecompute.index_q_u), B(:,Linkage.ActuationPrecompute.index_u_u), A';de_dq(:,Linkage.ActuationPrecompute.index_q_u),zeros(nCLp,n_k+nCLp)];
+        if Linkage.CAI
+            Jac = [dtaumID_dq(:,Linkage.ActuationPrecompute.index_q_u), B(:,Linkage.ActuationPrecompute.index_u_u), A';de_dq(:,Linkage.ActuationPrecompute.index_q_u),zeros(nCLp,n_k+nCLp)]...
+                 +[B(:,Linkage.ActuationPrecompute.index_u_k), dtaumID_dq(:,Linkage.ActuationPrecompute.index_q_k);zeros(nCLp,n_k), de_dq(:,Linkage.ActuationPrecompute.index_q_k)]*dinput_dx;
+        else
+            Jac = [dtaumID_dq(:,Linkage.ActuationPrecompute.index_q_u), B(:,Linkage.ActuationPrecompute.index_u_u), A';de_dq(:,Linkage.ActuationPrecompute.index_q_u),zeros(nCLp,n_k+nCLp)];
+        end
     else
         Jac = [dtaumID_dq, A';de_dq,zeros(nCLp,nCLp)];
     end

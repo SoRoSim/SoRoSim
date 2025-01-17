@@ -1,44 +1,44 @@
 %Function for the static equilibrium function of the linkage
 %Last modified by Anup Teejo Mathew 02.03.2022
-function [q,u,lambda]=statics(Linkage,qul0,uq,staticsOptions) %qul0_user is initial guess of qul0 arranged like this: [q_u0;u_u0;l0]. uq_user is actuation input like this: [u_k;q_k]
+function [q,u,lambda]=statics(Linkage,x0,input,staticsOptions) %x0 is initial guess of unknowns arranged like this: [q_u0;u_u0;l0]. input is actuation input like this: [u_k;q_k]
 
 %Actuation input
-if nargin <= 2 || isempty(uq)
-    uq_temp = zeros(Linkage.nact,1); %uq has q_k in indexes of of u_u
+if nargin <= 2 || isempty(input)
+    input_temp = zeros(Linkage.nact,1); %input_temp has q_k in the indices of u_u
     if Linkage.Actuated
         n_k = Linkage.ActuationPrecompute.n_k; %number of known values of q (for joint controlled systems)
         %Actuation input
-        if nargin <= 2 || isempty(uq) 
+        if nargin <= 2 || isempty(input) 
             if ~Linkage.CAS
-                uq_temp(1:Linkage.n_jact) = InputJointUQ0(Linkage); %Rigid Joints. Here q_k is in the indices of u_u
+                input_temp(1:Linkage.n_jact) = InputJointUQ0(Linkage); %Rigid Joints. Here q_k is in the indices of u_u
                 for i=Linkage.n_jact+1:Linkage.nact %Soft Actuators
                     prompt = ['Enter actuation force of the soft actuator ',num2str(i-Linkage.n_jact),' (N):'];
                     answer = input(prompt, 's');
-                    uq_temp(i)  = eval(answer);
+                    input_temp(i)  = eval(answer);
                 end
-                uq = uq_temp;
-                uq(1:Linkage.nact-n_k) = uq_temp(Linkage.ActuationPrecompute.index_u_k);
-                uq(Linkage.nact-n_k+1:Linkage.nact) = uq_temp([Linkage.ActuationPrecompute.index_u_u,Linkage.n_jact+1:Linkage.nact]);
+                input = input_temp;
+                input(1:Linkage.nact-n_k) = input_temp(Linkage.ActuationPrecompute.index_u_k);
+                input(Linkage.nact-n_k+1:Linkage.nact) = input_temp([Linkage.ActuationPrecompute.index_u_u,Linkage.n_jact+1:Linkage.nact]);
             else
-                uq = CustomActuatorStrength(Tr,0);
+                input = zeros(Linkage.nact,1);
             end
         end
     else
-        uq = [];
+        input = [];
         n_k = 0;
     end
 else
     if Linkage.Actuated
         n_k = Linkage.ActuationPrecompute.n_k;
     else
-        uq = [];
+        input = [];
         n_k = 0;
     end
 end
 
 
 %initial guess definition
-if nargin == 1 || isempty(qul0)
+if nargin == 1 || isempty(x0)
     
     q_u0 = zeros(1,Linkage.ndof - n_k);
     u_u0 = zeros(1,n_k);
@@ -66,8 +66,8 @@ if nargin == 1 || isempty(qul0)
     opts.Interpreter = 'latex';
     answer = inputdlg(prompt, dlgtitle, [1, 75], definput, opts);
 
-    % Construct qul0 based on input
-    qul0 = eval(['[', strjoin(answer, ' '), ']'])';
+    % Construct x0 based on user input of initial guess
+    x0 = eval(['[', strjoin(answer, ' '), ']'])';
 
 end
 
@@ -78,31 +78,31 @@ end
 
 if staticsOptions.Jacobian
     options = optimoptions('fsolve','Algorithm','trust-region-dogleg','Display','iter','Jacobian','on','MaxFunctionEvaluations',1e7); % Algorithm: 'trust-region-dogleg' (default), 'trust-region', and 'levenberg-marquardt'.
-    Func    = @(qul) Equilibrium(Linkage,qul,uq,staticsOptions.magnifier);
+    Func    = @(x) Equilibrium(Linkage,x,input,staticsOptions.magnifier);
 else
     options = optimoptions('fsolve','Algorithm','trust-region-dogleg','Display','iter','MaxFunctionEvaluations',1e7); % Algorithm: 'trust-region-dogleg' (default), 'trust-region', and 'levenberg-marquardt'.
-    Func    = @(qul) EquilibriumResidue(Linkage,qul,uq,staticsOptions.magnifier); %single pass algorithm only computes Residue
+    Func    = @(x) EquilibriumResidue(Linkage,x,input,staticsOptions.magnifier); %write single pass algorithm only computes Residue
 end
 
 disp('Solving Static Equilibrium')
 
 tic
-qul = fsolve(Func,qul0,options);
+x = fsolve(Func,x0,options);
 toc
 
 %% save and plot
 
-q = qul(1:Linkage.ndof,1);
-u = uq;
-lambda = qul(Linkage.ndof+1:end);
+q = x(1:Linkage.ndof,1);
+u = input;
+lambda = x(Linkage.ndof+1:end);
 
 
 if Linkage.Actuated
 
-    q(Linkage.ActuationPrecompute.index_q_u) = qul(1:Linkage.ndof-n_k);
-    q(Linkage.ActuationPrecompute.index_q_k) = uq(end-n_k+1:end);
-    u(Linkage.ActuationPrecompute.index_u_k) = uq(1:Linkage.nact-n_k);
-    u(Linkage.ActuationPrecompute.index_u_u) = qul(Linkage.ndof-n_k+1:Linkage.ndof);
+    q(Linkage.ActuationPrecompute.index_q_u) = x(1:Linkage.ndof-n_k);
+    q(Linkage.ActuationPrecompute.index_q_k) = input(end-n_k+1:end);
+    u(Linkage.ActuationPrecompute.index_u_k) = input(1:Linkage.nact-n_k);
+    u(Linkage.ActuationPrecompute.index_u_u) = x(Linkage.ndof-n_k+1:Linkage.ndof);
 
 end
 
