@@ -629,7 +629,12 @@ if Linkage.nCLj>0 %if there are closed chain joints
 else
     Res = taumID;
     if Linkage.Actuated
-        Jac = [dtaumID_dq(:,Linkage.ActuationPrecompute.index_q_u), B(:,Linkage.ActuationPrecompute.index_u_u)];
+        if Linkage.CAI
+            Jac = [dtaumID_dq(:,Linkage.ActuationPrecompute.index_q_u), B(:,Linkage.ActuationPrecompute.index_u_u)]...
+                 +[B(:,Linkage.ActuationPrecompute.index_u_k), dtaumID_dq(:,Linkage.ActuationPrecompute.index_q_k)]*dinput_dx;
+        else
+            Jac = [dtaumID_dq(:,Linkage.ActuationPrecompute.index_q_u), B(:,Linkage.ActuationPrecompute.index_u_u)];
+        end
     else
         Jac = dtaumID_dq;
     end

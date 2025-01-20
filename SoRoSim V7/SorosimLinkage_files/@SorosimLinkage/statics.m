@@ -74,13 +74,14 @@ end
 if nargin<=3
     staticsOptions.magnifier = true;
     staticsOptions.Jacobian = true;
+    staticsOptions.Algorithm = 'trust-region-dogleg'; % Algorithm: 'trust-region-dogleg' (default), 'trust-region', and 'levenberg-marquardt'.
 end
 
 if staticsOptions.Jacobian
-    options = optimoptions('fsolve','Algorithm','trust-region-dogleg','Display','iter','Jacobian','on','MaxFunctionEvaluations',1e7); % Algorithm: 'trust-region-dogleg' (default), 'trust-region', and 'levenberg-marquardt'.
+    options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display','iter','Jacobian','on','MaxFunctionEvaluations',1e7);
     Func    = @(x) Equilibrium(Linkage,x,input,staticsOptions.magnifier);
 else
-    options = optimoptions('fsolve','Algorithm','trust-region-dogleg','Display','iter','MaxFunctionEvaluations',1e7); % Algorithm: 'trust-region-dogleg' (default), 'trust-region', and 'levenberg-marquardt'.
+    options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display','iter','MaxFunctionEvaluations',1e7); 
     Func    = @(x) EquilibriumResidue(Linkage,x,input,staticsOptions.magnifier); %write single pass algorithm only computes Residue
 end
 
