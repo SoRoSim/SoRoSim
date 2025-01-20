@@ -17,7 +17,7 @@ q = x(1:ndof);
 lambda = x(ndof+1:end);
 
 if Linkage.CAI
-    [input,dinput_dx] = CustomActuatorStrength(Linkage,x); %x is qul here %%%%%%%%%%%%%%%%%%%%%%THINK about it
+    [input,dinput_dx] = CustomActuatorInput(Linkage,x); %x is qul here %%%%%%%%%%%%%%%%%%%%%%THINK about it
 end
 
 u = input;

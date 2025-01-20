@@ -9,7 +9,7 @@ if nargin <= 2 || isempty(input)
         n_k = Linkage.ActuationPrecompute.n_k; %number of known values of q (for joint controlled systems)
         %Actuation input
         if nargin <= 2 || isempty(input) 
-            if ~Linkage.CAS
+            if ~Linkage.CAI
                 input_temp(1:Linkage.n_jact) = InputJointUQ0(Linkage); %Rigid Joints. Here q_k is in the indices of u_u
                 for i=Linkage.n_jact+1:Linkage.nact %Soft Actuators
                     prompt = ['Enter actuation force of the soft actuator ',num2str(i-Linkage.n_jact),' (N):'];
