@@ -1,8 +1,9 @@
-function staticsOptions = initializeStaticsOptions(userOptions)
+function staticsOptions = initializeDynamicsOptions(userOptions)
     % Default values
     defaultOptions.magnifier = true;
     defaultOptions.magnifierValue = 1e6;
     defaultOptions.Jacobian = true;
+    defaultOptions.displayProgress = true;
     defaultOptions.Algorithm = 'trust-region-dogleg';
 
     % Check if userOptions is provided

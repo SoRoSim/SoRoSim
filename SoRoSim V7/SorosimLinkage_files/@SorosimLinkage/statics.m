@@ -78,10 +78,10 @@ staticsOptions = initializeStaticsOptions(userOptions);
 
 if staticsOptions.Jacobian
     options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display','iter','Jacobian','on','MaxFunctionEvaluations',1e7);
-    Func    = @(x) Equilibrium(Linkage,x,input,staticsOptions.magnifier); %two pass RNEA algorithm
+    Func    = @(x) Equilibrium(Linkage,x,input,staticsOptions); %two pass RNEA algorithm
 else
     options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display','iter','MaxFunctionEvaluations',1e7); 
-    Func    = @(x) EquilibriumResidue(Linkage,x,input,staticsOptions.magnifier); %write single pass algorithm only computes Residue
+    Func    = @(x) EquilibriumResidue(Linkage,x,input,staticsOptions); %write single pass algorithm only computes Residue
 end
 
 disp('Solving Static Equilibrium')

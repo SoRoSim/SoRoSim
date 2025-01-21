@@ -4,7 +4,7 @@
 
 %%%%%%%Create also fwd pass only algorithm using Kane projection%%%%%%%%%
 
-function [Res,Jac]=Equilibrium(Linkage,x,input,magnifier) 
+function [Res,Jac]=Equilibrium(Linkage,x,input,staticsOptions) 
 % x is a vector of unknowns. It has unknown q, unknown u and unknown lambdas. x = [q_u;u_u;lambda]
 % input is a vector of known inputs. It has input values of u and q_joint. input = [u_k;q_k]
 
@@ -641,9 +641,9 @@ else
     end
 end
 
-if magnifier
-    Res = Res*1e6;
-    Jac = Jac*1e6;
+if staticsOptions.magnifier
+    Res = Res*staticsOptions.magnifierValue;
+    Jac = Jac*staticsOptions.magnifierValue;
 end
 
 end

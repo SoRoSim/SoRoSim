@@ -1,7 +1,7 @@
 %Single pass algorithm using D'Alembert-Kane method
 %Last modified by Anup Teejo Mathew 20.01.2025
 
-function Res=EquilibriumResidue(Linkage,x,input,magnifier) 
+function Res=EquilibriumResidue(Linkage,x,input,staticsOptions) 
 % x is a vector of unknowns. It has unknown q, unknown u and unknown lambdas. x = [q_u;u_u;lambda]
 % input is a vector of known inputs. It has input values of u and q_joint. input = [u_k;q_k]
 
@@ -407,8 +407,8 @@ else
     Res = taupF;
 end
 
-if magnifier
-    Res = Res*1e6;
+if staticsOptions.magnifier
+    Res = Res*staticsOptions.magnifierValue;
 end
 
 end
