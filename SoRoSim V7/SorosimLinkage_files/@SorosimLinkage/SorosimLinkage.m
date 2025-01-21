@@ -495,7 +495,7 @@ classdef SorosimLinkage
                         Linkage.Actuated          = true;
 
                         [n_k,index_q_u,index_q_k,index_u_k,index_u_u] = JointConstraintPrecompute(Linkage);
-                        ij_act = ActuatedJointIndex(Linkage);
+                        [ij_act,i_sig_act] = ActuatedJointIndex(Linkage);
 
                         Linkage.ActuationPrecompute.n_k = n_k; %for length controlled soft also (future version)
                         Linkage.ActuationPrecompute.index_q_u = index_q_u;
@@ -503,6 +503,7 @@ classdef SorosimLinkage
                         Linkage.ActuationPrecompute.index_u_k = index_u_k; %change when soft actuators are added
                         Linkage.ActuationPrecompute.index_u_u = index_u_u; %for length controlled soft also (future version)
                         Linkage.ActuationPrecompute.ij_act = ij_act;
+                        Linkage.ActuationPrecompute.i_sig_act = i_sig_act;
     
                         if n_jact>0
                             close all
@@ -681,7 +682,7 @@ classdef SorosimLinkage
         C       = GeneralizedCoriolisMatrix(S,q,qd) %to get the generalized coriolis matrix
         F       = GeneralizedExternalForce(S,q,qd,t)  %to get the generalized external force matrix
         [t,qqd] = dynamics(S,qqd0,odetype,dt);             %for dynamic simulation
-        [q,u,lambda] = statics(S,qu0,magnifier)            %for static simulation
+        [q,u,lambda] = statics(S,x0,input,userOptions)            %for static simulation
 
         plotq0(S,Lh,Dh,CLh);     %to plot the free body diagram of the linkage
         plotq(S,q);              %to plot the state of the linkage for a given q
@@ -744,7 +745,7 @@ classdef SorosimLinkage
             Linkage.Bj1    = Bj1_new;
 
             [n_k,index_q_u,index_q_k,index_u_k,index_u_u] = JointConstraintPrecompute(Linkage);
-            ij_act = ActuatedJointIndex(Linkage);
+            [ij_act,i_sig_act] = ActuatedJointIndex(Linkage);
 
             Linkage.ActuationPrecompute.n_k = n_k;
             Linkage.ActuationPrecompute.index_q_u = index_q_u;
@@ -752,6 +753,7 @@ classdef SorosimLinkage
             Linkage.ActuationPrecompute.index_u_k = index_u_k;
             Linkage.ActuationPrecompute.index_u_u = index_u_u;
             Linkage.ActuationPrecompute.ij_act = ij_act;
+            Linkage.ActuationPrecompute.i_sig_act = i_sig_act;
 
             Linkage.Fp_sig=PointWrenchPoints(Linkage);
 

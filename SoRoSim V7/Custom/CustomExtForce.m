@@ -1,8 +1,9 @@
-%Function to calculate the custom external force Make sure to edit
-%CustomExtPointForce.m file too
+%Function to calculate the custom external force (point force in local
+%frame, if distributed multiply with quadrature weight)
+
 %Last modified by Anup Teejo Mathew 11/12/2024
 
-function Fext=CustomExtForce(Linkage,q,g,J,t,qd,eta,Jdot)
+function [Fext,dFext_dq]=CustomExtForce(Linkage,q,g,J,t,qd,eta,Jdot)
 
 %%%%NOTE%%%%
 %Tr: Linkage element,
@@ -25,6 +26,7 @@ function Fext=CustomExtForce(Linkage,q,g,J,t,qd,eta,Jdot)
 
 nsig    = Linkage.nsig; %everything except rigid joints
 Fext = zeros(6*nsig,1);
+dFext_dq = zeros(6*nsig,Linkage.ndof);
 
 %make changes from here
 

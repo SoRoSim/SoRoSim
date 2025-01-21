@@ -1,6 +1,6 @@
 %Function for the static equilibrium function of the linkage
 %Last modified by Anup Teejo Mathew 02.03.2022
-function [q,u,lambda]=statics(Linkage,x0,input,staticsOptions) %x0 is initial guess of unknowns arranged like this: [q_u0;u_u0;l0]. input is actuation input like this: [u_k;q_k]
+function [q,u,lambda]=statics(Linkage,x0,input,userOptions) %x0 is initial guess of unknowns arranged like this: [q_u0;u_u0;l0]. input is actuation input like this: [u_k;q_k]
 
 %Actuation input
 if nargin <= 2 || isempty(input)
@@ -71,15 +71,14 @@ if nargin == 1 || isempty(x0)
 
 end
 
-if nargin<=3
-    staticsOptions.magnifier = true;
-    staticsOptions.Jacobian = true;
-    staticsOptions.Algorithm = 'trust-region-dogleg'; % Algorithm: 'trust-region-dogleg' (default), 'trust-region', and 'levenberg-marquardt'.
+if nargin<=3||isempty(userOptions)
+    userOptions = [];
 end
+staticsOptions = initializeStaticsOptions(userOptions);
 
 if staticsOptions.Jacobian
     options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display','iter','Jacobian','on','MaxFunctionEvaluations',1e7);
-    Func    = @(x) Equilibrium(Linkage,x,input,staticsOptions.magnifier);
+    Func    = @(x) Equilibrium(Linkage,x,input,staticsOptions.magnifier); %two pass RNEA algorithm
 else
     options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display','iter','MaxFunctionEvaluations',1e7); 
     Func    = @(x) EquilibriumResidue(Linkage,x,input,staticsOptions.magnifier); %write single pass algorithm only computes Residue
@@ -107,7 +106,7 @@ if Linkage.Actuated
 
 end
 
-varsToSave = {'q'};
+varsToSave = {'q','x'};
 if Linkage.Actuated
     varsToSave{end+1} = 'u';
 end

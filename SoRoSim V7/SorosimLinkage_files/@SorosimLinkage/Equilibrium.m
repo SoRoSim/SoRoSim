@@ -107,6 +107,7 @@ for i=1:N
     elseif Linkage.UnderWater %G is reduced by a factor of 1-rho_water/rho_body
         G=G*(1-Linkage.Rho_water/Linkage.VLinks(Linkage.LinkIndex(i)).Rho);
     end
+    
     Q((ij-1)*6+1:6*ij,dofs_here) = -dinamico_adj(dinamico_Adjoint(ginv(g_here))*G)*S((ij-1)*6+1:6*ij,dofs_here);
     
     % from 0 to 1 of rigid joint

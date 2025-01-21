@@ -22,7 +22,11 @@ for i=1:6
             Phi(i,k+2) = 3*Xc^2-2*Xc^3;
             Phi(i,k+3) = -Xc^2+Xc^3;
         end
-        k = k+2;
+        if j==nele
+            k = k+3;
+        else
+            k = k+2;
+        end
         a = a+w;
     end
         
