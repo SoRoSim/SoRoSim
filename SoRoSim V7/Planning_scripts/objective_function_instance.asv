@@ -1,0 +1,9 @@
+function [E, dE] = objective_function_instance(S1, x, g_desired)
+    q = x(1:S1.ndof);
+    gs = S1.FwdKinematics(q);
+    g_platform = gs(4*(length(S1.CVRods{1}(2).Xs)+2)+1:4*(length(S1.CVRods{1}(2).Xs)+3),:);
+    E = norm(piecewise_logmap(ginv(g_desired)*g_platform));
+
+    dE = zeros(1,length(x));
+    
+end
