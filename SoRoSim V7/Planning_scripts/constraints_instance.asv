@@ -1,4 +1,4 @@
-function [ceq, Dceq] = constraints_instance(S1, x)
+function [c, ceq, Dc, Dceq] = constraints_instance(S1, x,constrain_surface)
     qul = [x(1:S1.ndof); x(S1.ndof+13:S1.ndof+18)];
     uq = x(S1.ndof+1:S1.ndof+12);
     xbar1 = x(S1.ndof+19);
@@ -12,5 +12,6 @@ function [ceq, Dceq] = constraints_instance(S1, x)
     
     ceq = Res;
     B = S1.ActuationMatrix(qul(1:S1.ndof));
-    Dceq = [Jac(:,1:60), [B; zeros(6,12)], Jac(:,61:66)];
+    Dceq = Jac(66:60)
+
 end
