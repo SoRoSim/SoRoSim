@@ -1,0 +1,37 @@
+site_name: SoroSim
+nav:
+    - Home: index.md
+    - Installation: Installation.md
+    - User guide:
+        - SorosimLink: SorosimLink.md
+        - SorosimTwists: SorosimTwists.md
+        - SorosimLinkage: SorosimLinkage.md 
+    # - Example problems:
+    
+    - Function definitions:
+        - Basic functions: Basic functions.md
+        - Analytical derivatives: Analytical derivatives functions.md
+    - Theory:
+        - Screw theory recap: Screw theory recap.md
+        - Geometric variable strain: geometric variable strain.md
+        - Strain parametrisation: strain parametrisation.md
+        - Analytical derivatives: Analytical derivatives.md
+
+theme: readthedocs
+plugins:
+    - search
+    - autorefs
+markdown_extensions: 
+  - pymdownx.arithmatex
+  - admonition
+  - def_list
+  - pymdownx.tasklist:
+        custom_checkbox: true
+    #   generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+
+

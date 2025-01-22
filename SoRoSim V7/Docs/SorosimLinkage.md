@@ -13,28 +13,29 @@ This leads the user to a GUI that allows the definition of relative position and
 |      | N                |          | Total number of links                                                                                   |
 |      | ndof             |          | Total number of dofs                                                                                    |
 |      | nsig             |          | Total number of points at which computation is performed  \(N +N_{rigid} +\sum(N_{soft_{div}}*n_gauss\) |
-|      | VLinks           |          | Vector of unique links                                                                                                        |
-|      | LinkIndex        |          | Array of indices corresponding to each link.                                                                                                        |
-|      | CVTwists         |          | Cell vector of twists for each link.                                                                                                        |
-|      | iLpre            |          | Array corresponding to the link index of the link that the ith link is connected to.                                                                                                       |
-|      | g_ini            |          | Homogenous transformation matrix of links with respect to the tip of the previous link.                                                                                                        |
-|      | Z_order          |          | Order of zannah collocation.                                                                                                        |
+|      | nj               |          | Total number of virtual joints (rigid joints plus virtual joints of all soft rods)                      |
+|      | VLinks           |          | Vector of unique links                                                                                  |
+|      | LinkIndex        |          | Array of indices corresponding to each link.                                                            |
+|      | CVTwists         |          | Cell vector of twists for each link.                                                                    |
+|      | iLpre            |          | Array corresponding to the link index of the link that the ith link is connected to.                    |
+|      | g_ini            |          | Homogenous transformation matrix of links with respect to the tip of the previous link.                 |
+|      | Z_order          |          | Order of zannah collocation.                                                                            |
 |      |                  |          |                                                                                                         |
-|      | nCLj             |          | Number of closed loop joints.                                                                                                        |
-|      | iACL             |          | Array corresponding to the index of link A                                                                                                        |
-|      | iCLB             |          | Array corresponding to the index of link B.                                                                                                        |
-|      | VTwistsCLj       |          | Array of twist vectors corresponding to each closed loop joint.                                                                                                       |
+|      | nCLj             |          | Number of closed loop joints.                                                                           |
+|      | iACL             |          | Array corresponding to the index of link A                                                              |
+|      | iCLB             |          | Array corresponding to the index of link B.                                                             |
+|      | VTwistsCLj       |          | Array of twist vectors corresponding to each closed loop joint.                                         |
 |      | gACLj            |          |                                                                                                         |
 |      | gBCLj            |          |                                                                                                         |
 |      | CLprecompute     |          |                                                                                                         |
 |      | T_BS             |          |                                                                                                         |
 |      |                  |          |                                                                                                         |
-|      | Gravity          |          | Boolean value of 1 if gravity is present, 0 if it is not present                                                                                                         |
-|      | G                |          | (6x1) vector of the value of acceleration due to gravity                                                                                                        |
+|      | Gravity          |          | Boolean value of 1 if gravity is present, 0 if it is not present                                        |
+|      | G                |          | (6x1) vector of the value of acceleration due to gravity                                                |
 |      |                  |          |                                                                                                         |
-|      | PointForce       |          | Boolean 1 if point force is present, 0 if it is not present                                                                                                       |
-|      | FollowerForce    |          | Boolean 1 if the force is defined in the local frame and 0 if it is defined in the global frame                                                                                                        |
-|      | np               |          | Number of point forces.                                                                                                        |
+|      | PointForce       |          | Boolean 1 if point force is present, 0 if it is not present                                             |
+|      | FollowerForce    |          | Boolean 1 if the force is defined in the local frame and 0 if it is defined in the global frame         |
+|      | np               |          | Number of point forces.                                                                                 |
 |      | Fp_loc           |          |                                                                                                         |
 |      | Fp_vec           |          |                                                                                                         |
 |      |                  |          |                                                                                                         |
