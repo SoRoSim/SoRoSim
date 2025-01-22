@@ -15,9 +15,9 @@ if Tr.Actuated
     Bq             = zeros(ndof,nact);
     
     %revolute, prismatic, helical joints
-    Bqj1           = Tr.Bqj1;
-    n_1dof         = size(Bqj1,2);
-    Bq(:,1:n_1dof) = Tr.Bqj1;
+    Bj1           = Tr.Bj1;
+    n_1dof         = size(Bj1,2);
+    Bq(:,1:n_1dof) = Tr.Bj1;
     
     %for other joints
     i_jact  = Tr.i_jact;
@@ -31,10 +31,10 @@ if Tr.Actuated
         dof_start = 1;
         for ii=1:i-1
             i_sig = i_sig+1;
-            dof_start = dof_start+Tr.CVTwists{ii}(1).dof; %joint
+            dof_start = dof_start+Tr.CVRods{ii}(1).dof; %joint
             for j=1:Tr.VLinks(Tr.LinkIndex(ii)).npie-1
-                i_sig = i_sig+Tr.CVTwists{ii}(j+1).nip;
-                dof_start = dof_start+Tr.CVTwists{ii}(j+1).dof;
+                i_sig = i_sig+Tr.CVRods{ii}(j+1).nip;
+                dof_start = dof_start+Tr.CVRods{ii}(j+1).dof;
             end
             if Tr.VLinks(Tr.LinkIndex(ii)).linktype=='r'
                 i_sig = i_sig+1;
@@ -42,14 +42,14 @@ if Tr.Actuated
         end
 
         if Tr.VLinks(Tr.LinkIndex(i)).jointtype=='C'
-            dof_here = dof_start+Tr.CVTwists{i}(1).dof;
+            dof_here = dof_start+Tr.CVRods{i}(1).dof;
             Bq(i_jactq(i_u:i_u+dof_here-1),i_u:i_u+dof_here-1) = [1 0;0 1];
             i_u = i_u+2;
         else 
-            dof_here = Tr.CVTwists{i}(1).dof;
+            dof_here = Tr.CVRods{i}(1).dof;
             J_here = J((i_sig-1)*6+1:i_sig*6,:);
             S_here = J_here(:,i_jactq(i_u:i_u+dof_here-1));
-            B_here = Tr.CVTwists{i}(1).B;
+            B_here = Tr.CVRods{i}(1).Phi;
 
             Bq(i_jactq(i_u:i_u+dof_here-1),i_u:i_u+dof_here-1) = S_here'*B_here;
             i_u = i_u+dof_here;
@@ -76,12 +76,12 @@ if Tr.Actuated
 
             for i=1:Tr.N
 
-                dof_start = dof_start+Tr.CVTwists{i}(1).dof;
+                dof_start = dof_start+Tr.CVRods{i}(1).dof;
 
                 for j=1:Tr.VLinks(Tr.LinkIndex(i)).npie-1
 
-                    dof_here  = Tr.CVTwists{i}(j+1).dof;
-                    VTwists  = Tr.CVTwists{i};
+                    dof_here  = Tr.CVRods{i}(j+1).dof;
+                    VRods  = Tr.CVRods{i};
 
                     if j>=Sdivii(i)&&j<=Edivii(i)
 
@@ -89,10 +89,10 @@ if Tr.Actuated
                         dcpd = dcpii{i}{j};
 
                         q_here  = q(dof_start:dof_start+dof_here-1);
-                        xi_star = VTwists(j+1).xi_star;
+                        xi_star = VRods(j+1).xi_star;
                         ld      = Tr.VLinks(Tr.LinkIndex(i)).lp{j};
-                        Ws      = VTwists(j+1).Ws;
-                        nip     = VTwists(j+1).nip;
+                        Ws      = VRods(j+1).Ws;
+                        nip     = VRods(j+1).nip;
 
                         %scaling of quantities
                         Lscale       = ld;
@@ -104,7 +104,7 @@ if Tr.Actuated
                                 xi_here = xi_star(6*(k-1)+1:6*k,1);
                                 xi_here(1:3) = xi_here(1:3)*Lscale; %scaling using the formula: Lscale m = 1 unit
 
-                                dBqdq_here = VTwists(j+1).B((k-1)*6+1:k*6,:);
+                                dBqdq_here = VRods(j+1).Phi((k-1)*6+1:k*6,:);
                                 if dof_here>0
                                     xi_here    = dBqdq_here*q_here+xi_here;
                                 end
@@ -129,7 +129,7 @@ if Tr.Actuated
             dof_start = 1;
             for i=1:Tr.N
     
-                dof_start = dof_start+Tr.CVTwists{i}(1).dof;
+                dof_start = dof_start+Tr.CVRods{i}(1).dof;
                 i_sig    = i_sig+1;
                 if Tr.VLinks(Tr.LinkIndex(i)).linktype=='r'
                     i_sig = i_sig+1;
@@ -138,8 +138,8 @@ if Tr.Actuated
 
                 for j=1:Tr.VLinks(Tr.LinkIndex(i)).npie-1
 
-                    dof_here = Tr.CVTwists{i}(j+1).dof; 
-                    nip = Tr.CVTwists{i}(j+1).nip;
+                    dof_here = Tr.CVRods{i}(j+1).dof; 
+                    nip = Tr.CVRods{i}(j+1).nip;
 
                     if j==Sdiv(i)
                         dof_act_start = dof_start;
