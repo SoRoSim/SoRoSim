@@ -18,10 +18,10 @@ function qdqdd = derivatives(Linkage,t,qqd,dynamicAction,GUI_actionInput,dynamic
 
     if Linkage.Actuated&&(~Linkage.CAI)
 
-        if GUI_actionInput %if action input is from GUI
+        nact = Linkage.nact;
+        n_k  = Linkage.ActuationPrecompute.n_k;
 
-            nact = Linkage.nact;
-            n_k  = Linkage.ActuationPrecompute.n_k;
+        if GUI_actionInput %if action input is from GUI
     
             action = zeros(nact,1);
             q_k = zeros(n_k,1);
