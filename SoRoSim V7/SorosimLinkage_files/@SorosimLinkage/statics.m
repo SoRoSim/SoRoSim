@@ -1,37 +1,35 @@
 %Function for the static equilibrium function of the linkage
 %Last modified by Anup Teejo Mathew 02.03.2022
-function [q,u,lambda]=statics(Linkage,x0,input,userOptions) %x0 is initial guess of unknowns arranged like this: [q_u0;u_u0;l0]. input is actuation input like this: [u_k;q_k]
+function [q,u,lambda]=statics(Linkage,x0,action,userOptions) %x0 is initial guess of unknowns arranged like this: [q_u0;u_u0;l0]. input is actuation input like this: [u_k;q_k]
 
 %Actuation input
-if nargin <= 2 || isempty(input)
+if nargin <= 2 || isempty(action)
     input_temp = zeros(Linkage.nact,1); %input_temp has q_k in the indices of u_u
     if Linkage.Actuated
         n_k = Linkage.ActuationPrecompute.n_k; %number of known values of q (for joint controlled systems)
         %Actuation input
-        if nargin <= 2 || isempty(input) 
-            if ~Linkage.CAI
-                input_temp(1:Linkage.n_jact) = InputJointUQ0(Linkage); %Rigid Joints. Here q_k is in the indices of u_u
-                for i=Linkage.n_jact+1:Linkage.nact %Soft Actuators
-                    prompt = ['Enter actuation force of the soft actuator ',num2str(i-Linkage.n_jact),' (N):'];
-                    answer = input(prompt, 's');
-                    input_temp(i)  = eval(answer);
-                end
-                input = input_temp;
-                input(1:Linkage.nact-n_k) = input_temp(Linkage.ActuationPrecompute.index_u_k);
-                input(Linkage.nact-n_k+1:Linkage.nact) = input_temp([Linkage.ActuationPrecompute.index_u_u,Linkage.n_jact+1:Linkage.nact]);
-            else
-                input = zeros(Linkage.nact,1);
+        if ~Linkage.CAI
+            input_temp(1:Linkage.n_jact) = InputJointUQ0(Linkage); %Rigid Joints. Here q_k is in the indices of u_u
+            for i=Linkage.n_jact+1:Linkage.nact %Soft Actuators
+                prompt = ['Enter actuation force of the soft actuator ',num2str(i-Linkage.n_jact),' (N):'];
+                answer = input(prompt, 's');
+                input_temp(i)  = eval(answer);
             end
+            action = input_temp;
+            action(1:Linkage.nact-n_k) = input_temp(Linkage.ActuationPrecompute.index_u_k);
+            action(Linkage.nact-n_k+1:Linkage.nact) = input_temp(Linkage.ActuationPrecompute.index_u_u);
+        else
+            action = zeros(Linkage.nact,1);
         end
     else
-        input = [];
+        action = [];
         n_k = 0;
     end
 else
     if Linkage.Actuated
         n_k = Linkage.ActuationPrecompute.n_k;
     else
-        input = [];
+        action = [];
         n_k = 0;
     end
 end
@@ -78,10 +76,10 @@ staticsOptions = initializeStaticsOptions(userOptions);
 
 if staticsOptions.Jacobian
     options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display','iter','Jacobian','on','MaxFunctionEvaluations',1e7);
-    Func    = @(x) Equilibrium(Linkage,x,input,staticsOptions); %two pass RNEA algorithm
+    Func    = @(x) Equilibrium(Linkage,x,action,staticsOptions); %two pass RNEA algorithm
 else
     options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display','iter','MaxFunctionEvaluations',1e7); 
-    Func    = @(x) EquilibriumResidue(Linkage,x,input,staticsOptions); %write single pass algorithm only computes Residue
+    Func    = @(x) EquilibriumResidue(Linkage,x,action,staticsOptions); %write single pass algorithm only computes Residue
 end
 
 disp('Solving Static Equilibrium')
@@ -93,15 +91,15 @@ toc
 %% save and plot
 
 q = x(1:Linkage.ndof,1);
-u = input;
+u = action;
 lambda = x(Linkage.ndof+1:end);
 
 
 if Linkage.Actuated
 
     q(Linkage.ActuationPrecompute.index_q_u) = x(1:Linkage.ndof-n_k);
-    q(Linkage.ActuationPrecompute.index_q_k) = input(end-n_k+1:end);
-    u(Linkage.ActuationPrecompute.index_u_k) = input(1:Linkage.nact-n_k);
+    q(Linkage.ActuationPrecompute.index_q_k) = action(end-n_k+1:end);
+    u(Linkage.ActuationPrecompute.index_u_k) = action(1:Linkage.nact-n_k);
     u(Linkage.ActuationPrecompute.index_u_u) = x(Linkage.ndof-n_k+1:Linkage.ndof);
 
 end

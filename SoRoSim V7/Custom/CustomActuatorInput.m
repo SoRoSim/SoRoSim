@@ -2,7 +2,7 @@
 % input = [u_k;q_k]
 %Last modified 17/01/2025
 
-function [input,dinput_dx] = CustomActuatorStrength(Linkage,x,t)
+function [input,dinput_dx] = CustomActuatorInput(Linkage,x,t)
 
 % x is a vector of unknowns for statics x = [q_u;u_u;lambda], x is [q_u;qd_u;u_u;lambda] for dynamics
 % input = [u_k;q_k] is the input to the model (refer to sorosim language)

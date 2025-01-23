@@ -1,0 +1,171 @@
+%Function for the dynamic simulation of the linkage
+%Last modified by Anup Teejo Mathew 23/05/2021
+function [t,qqd] = dynamics(Linkage,x0,dynamicAction,userOptions) %x0 = [q0;qd0], dynamicAction(t) = [0 0 u_k;q_k,qd_k,qdd_k]
+
+ndof  = Linkage.ndof;
+GUI_actionInput = false;
+%Actuation input
+if nargin <= 2 || isempty(dynamicAction)
+    if Linkage.Actuated
+        GUI_actionInput = true; %in this case dynamicAction is a cell of nact elements. For soft and wrench controlled joints each element is a function of time
+                          %for joint coordinate controlled joints each element is a cell of 3 elements denoting q_k, qd_k and qdd_k
+        dynamicAction_temp = cell(Linkage.nact,1); %dynamicAction_temp has q_k and its derivatives in the indices of u_u
+        n_k = Linkage.ActuationPrecompute.n_k; %number of known values of q (for joint controlled systems)
+
+        if ~Linkage.CAI
+            dynamicAction_temp(1:Linkage.n_jact) = InputJointUQt(Linkage); %Rigid Joints. Here q_k is in the indices of u_u
+            for ia=Linkage.n_jact+1:Linkage.nact %Soft Actuators
+                prompt = ['Enter actuation force of the soft actuator ',num2str(ia-Linkage.n_jact),' (N):'];
+                answer = input(prompt, 's');
+                dynamicAction_temp(ia)  = eval(answer);
+            end
+            dynamicAction = dynamicAction_temp; % to convert to u_k, q_k form
+            dynamicAction(1:Linkage.nact-n_k) = dynamicAction_temp(Linkage.ActuationPrecompute.index_u_k);
+            dynamicAction(Linkage.nact-n_k+1:Linkage.nact) = dynamicAction_temp(Linkage.ActuationPrecompute.index_u_u);
+            
+        else
+            dynamicAction = [];
+        end
+    else
+        dynamicAction = [];
+        n_k = 0;
+    end
+else
+    
+    if Linkage.Actuated
+        n_k = Linkage.ActuationPrecompute.n_k;
+        [action,q_k,qd_k] = dynamicAction(0);
+        if length(q_k)==n_k||length(qd_k)==n_k||length(action)==Linkage.nact
+            error('Output dimension mismatch for dynamicActionInput(0)');
+        end
+    else
+        dynamicAction = [];
+        n_k = 0;
+    end
+end
+
+
+
+%initial guess definition: reference configuration
+if nargin==1||isempty(x0)%if initial condition is not given
+    q0                 = zeros(1,ndof);
+    ndof               = Linkage.ndof;
+    qd0                = zeros(1,ndof);
+    
+    if Linkage.Actuated&&n_k>0
+        q0(Linkage.ActuationPrecompute.index_q_k)  = [];
+        qd0(Linkage.ActuationPrecompute.index_q_k) = [];
+        prompt = {'$\mathbf{q}_{u0}$','$\dot{\mathbf{q}}_{u0}$'};
+    else
+        prompt = {'$\mathbf{q}_{0}$','$\dot{\mathbf{q}}_{0}$'};
+    end
+    
+    dlgtitle         = 'Initial condition';
+    definput         = {num2str(q0),num2str(qd0)};
+    opts.Interpreter = 'latex';
+    answer           = inputdlg(prompt,dlgtitle,[1 75],definput,opts);
+
+    q0   = eval(['[',answer{1},']'])';
+    qd0  = eval(['[',answer{2},']'])';
+
+else
+    n0 = Linkage.ndof;
+    if Linkage.Actuated
+        n0=n0-Linkage.ActuationPrecompute-n_k;
+    end
+    if ~(length(x0)==2*n0)
+        error('Incorrect dimention for initial guess');
+    end
+end
+
+if nargin<=3||isempty(userOptions)
+    userOptions = [];
+end
+dynamicsOptions = initializeDynamicsOptions(userOptions);
+
+if Linkage.Actuated
+    q0_pass          = zeros(ndof,1);
+    qd0_pass         = zeros(ndof,1);
+
+    q0_pass(Linkage.ActuationPrecompute.index_q_u)  = q0;
+    qd0_pass(Linkage.ActuationPrecompute.index_q_u) = qd0;
+
+    q0  = q0_pass;
+    qd0 = qd0_pass;
+
+    for ia=Linkage.nact-n_k+1:Linkage.nact
+        if GUI_actionInput
+            q0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact))  = dynamicAction{ia}{1}(0);
+            qd0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact)) = dynamicAction{ia}{2}(0);
+        else
+            [~,q_k0,qd_k0] = dynamicAction(0);
+            q0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact))  = q_k0;
+            qd0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact)) = qd_k0;
+        end
+    end
+end
+x0 = [q0;qd0];
+
+if userOptions.t_end==0
+    prompt           = 'Simulation time (s)';
+    dlgtitle         = 'Initial condition';
+    definput         = {'5'};
+    opts.Interpreter = 'tex';
+    answer           = inputdlg(prompt,dlgtitle,[1 50],definput,opts);
+    
+    tmax = eval(answer{1});
+end
+
+
+dt = dynamicsOptions.dt;
+if dynamicsOptions.Jacobian
+    options = odeset('OutputFcn',@(t,y,flag) odeprogress(t,y,flag,Linkage,dynamicsOptions.plotProgress),'RelTol',1e-3,'AbsTol',1e-6,'Jacobian',@(t,qqd) ODEJacobian(S1,t,qqd,FDL_SoRoSim(S1,t,qqd)));% CHANGE NAMES
+else
+    options = odeset('OutputFcn',@(t,y,flag) odeprogress(t,y,flag,Linkage,dynamicsOptions.plotProgress),'RelTol',1e-3,'AbsTol',1e-6);% default values'RelTol',1e-3,'AbsTol',1e-6
+end
+
+ODEFn = @(t,x) Linkage.derivatives(t,x,dynamicAction,GUI_actionInput,dynamicsOptions); %ODE function which computes [qd;qdd]
+
+switch dynamicsOptions.Integrator
+    case 'ode45'
+        tic
+        [t,qqd] = ode45(ODEFn,0:dt:tmax,x0,options);
+        toc
+    case 'ode23'
+        tic
+        [t,qqd] = ode23(ODEFn,0:dt:tmax,x0,options);
+        toc
+    case 'ode113'
+        tic
+        [t,qqd] = ode113(ODEFn,0:dt:tmax,x0,options);
+        toc
+    case 'ode23s'  
+        tic
+        [t,qqd] = ode23s(ODEFn,0:dt:tmax,x0,options);
+        toc
+    case 'ode15s'
+        tic
+        [t,qqd] = ode15s(ODEFn,0:dt:tmax,x0,options);
+        toc
+    case 'ode1'
+        tic
+        qqd = ode1(ODEFn,0:dt:tmax,x0);
+        toc
+        t=0:dt:tmax;
+    case 'ode2'
+        tic
+        qqd = ode2(ODEFn,0:dt:tmax,x0);
+        toc
+        t=0:dt:tmax;
+end
+
+save('DynamicsSolution.mat','t','qqd');
+
+answer = questdlg('Generate output video of the simulation?','Grapical Output','Yes','No','Yes');
+if strcmp('Yes',answer)
+    plotqqd(Linkage,t,qqd);
+end
+
+
+end
+

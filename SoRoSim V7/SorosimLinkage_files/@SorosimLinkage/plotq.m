@@ -1,14 +1,14 @@
-function plotq(S,q)
+function plotq(Linkage,q)
 
 if nargin==1
-    q=zeros(S.ndof,1);
+    q=zeros(Linkage.ndof,1);
 end
 
 if isrow(q)
     q=q';
 end
 
-PlotParameters = S.PlotParameters;
+PlotParameters = Linkage.PlotParameters;
 
 if PlotParameters.ClosePrevious
     close all
@@ -48,11 +48,11 @@ set(gca,'FontSize',12)
 axis ([PlotParameters.XLim PlotParameters.YLim PlotParameters.ZLim]);
 
 %Forward Kinematics: (Product of exponentials)
-N         = S.N;
+N         = Linkage.N;
 dof_start = 1;
-g_ini     = S.g_ini;
+g_ini     = Linkage.g_ini;
 g_Ltip    = repmat(eye(4),N,1);
-iLpre     = S.iLpre;
+iLpre     = Linkage.iLpre;
 
 for i=1:N
     
@@ -63,10 +63,10 @@ for i=1:N
     end
     
     %Rigid link or joint
-    dof_here   = S.CVRods{i}(1).dof;
+    dof_here   = Linkage.CVRods{i}(1).dof;
     q_here     = q(dof_start:dof_start+dof_here-1);
-    Phi_here   = S.CVRods{i}(1).Phi;
-    xi_star    = S.CVRods{i}(1).xi_star;
+    Phi_here   = Linkage.CVRods{i}(1).Phi;
+    xi_star    = Linkage.CVRods{i}(1).xi_star;
     
     if dof_here == 0 %fixed joint (N)
         g_joint = eye(4);
@@ -76,25 +76,25 @@ for i=1:N
     end
     g_here      = g_here*g_joint;
     
-    n_r   = S.VLinks(S.LinkIndex(i)).n_r;
-    if S.VLinks(S.LinkIndex(i)).CS=='R'
+    n_r   = Linkage.VLinks(Linkage.LinkIndex(i)).n_r;
+    if Linkage.VLinks(Linkage.LinkIndex(i)).CS=='R'
         n_r=5;
     end
 
-    n_l   = S.VLinks(S.LinkIndex(i)).n_l;
-    color = S.VLinks(S.LinkIndex(i)).color;
-    alpha = S.VLinks(S.LinkIndex(i)).alpha;
+    n_l   = Linkage.VLinks(Linkage.LinkIndex(i)).n_l;
+    color = Linkage.VLinks(Linkage.LinkIndex(i)).color;
+    alpha = Linkage.VLinks(Linkage.LinkIndex(i)).alpha;
 
-    if S.VLinks(S.LinkIndex(i)).L>0
-    if S.VLinks(S.LinkIndex(i)).linktype=='r'
+    if Linkage.VLinks(Linkage.LinkIndex(i)).L>0
+    if Linkage.VLinks(Linkage.LinkIndex(i)).linktype=='r'
         
-        L       = S.VLinks(S.LinkIndex(i)).L;
-        gi      = S.VLinks(S.LinkIndex(i)).gi;
+        L       = Linkage.VLinks(Linkage.LinkIndex(i)).L;
+        gi      = Linkage.VLinks(Linkage.LinkIndex(i)).gi;
         g_here  = g_here*gi;
         
-        if ~S.VLinks(S.LinkIndex(i)).CPF
+        if ~Linkage.VLinks(Linkage.LinkIndex(i)).CPF
             Xr      = linspace(0,L,n_l);
-            g_hereR = g_here*[eye(3) [-S.VLinks(S.LinkIndex(i)).cx;0;0];0 0 0 1];
+            g_hereR = g_here*[eye(3) [-Linkage.VLinks(Linkage.LinkIndex(i)).cx;0;0];0 0 0 1];
             dx      = Xr(2)-Xr(1);
 
             Xpatch  = zeros(n_r,(n_r-1)*(n_l-2)+2);
@@ -102,7 +102,7 @@ for i=1:N
             Zpatch  = zeros(n_r,(n_r-1)*(n_l-2)+2);
             i_patch = 1;
 
-            [y,z] = computeBoundaryYZ(S.VLinks(S.LinkIndex(i)),0);
+            [y,z] = computeBoundaryYZ(Linkage.VLinks(Linkage.LinkIndex(i)),0);
             pos  = [zeros(1,n_r);y;z;ones(1,n_r)]; %homogeneous positions in local frame 4xn_r
 
             pos_here = g_hereR*pos;
@@ -122,7 +122,7 @@ for i=1:N
 
             for ii=2:n_l
 
-                [y,z] = computeBoundaryYZ(S.VLinks(S.LinkIndex(i)),Xr(ii)/L);
+                [y,z] = computeBoundaryYZ(Linkage.VLinks(Linkage.LinkIndex(i)),Xr(ii)/L);
                 pos  = [zeros(1,n_r);y;z;ones(1,n_r)]; %homogeneous positions in local frame 4xn_r
 
                 g_hereR  = g_hereR*[eye(3) [dx;0;0];0 0 0 1];
@@ -156,28 +156,28 @@ for i=1:N
         else
             CustomShapePlot(g_here);
         end
-        gf     = S.VLinks(S.LinkIndex(i)).gf;
+        gf     = Linkage.VLinks(Linkage.LinkIndex(i)).gf;
         g_here = g_here*gf;
     end
     end
 
-    if ~S.OneBasis
+    if ~Linkage.OneBasis
         dof_start = dof_start+dof_here;
     end
     
     %=============================================================================
     %Soft link pieces
-    for j=1:(S.VLinks(S.LinkIndex(i)).npie)-1
+    for j=1:(Linkage.VLinks(Linkage.LinkIndex(i)).npie)-1
         
-        dof_here   = S.CVRods{i}(j+1).dof;
-        Type       = S.CVRods{i}(j+1).Type;
+        dof_here   = Linkage.CVRods{i}(j+1).dof;
+        Type       = Linkage.CVRods{i}(j+1).Type;
         q_here     = q(dof_start:dof_start+dof_here-1);
-        xi_starfn  = S.CVRods{i}(j+1).xi_starfn;
-        gi         = S.VLinks(S.LinkIndex(i)).gi{j};
-        Phi_dof    = S.CVRods{i}(j+1).Phi_dof;
-        Phi_odr    = S.CVRods{i}(j+1).Phi_odr;
-        Phi_h      = S.CVRods{i}(j+1).Phi_h;
-        ld         = S.VLinks(S.LinkIndex(i)).ld{j};
+        xi_starfn  = Linkage.CVRods{i}(j+1).xi_starfn;
+        gi         = Linkage.VLinks(Linkage.LinkIndex(i)).gi{j};
+        Phi_dof    = Linkage.CVRods{i}(j+1).Phi_dof;
+        Phi_odr    = Linkage.CVRods{i}(j+1).Phi_odr;
+        Phi_h      = Linkage.CVRods{i}(j+1).Phi_h;
+        ld         = Linkage.VLinks(Linkage.LinkIndex(i)).ld{j};
 
         g_here = g_here*gi;
 
@@ -192,7 +192,7 @@ for i=1:N
         i_patch = 1;
         
         %cross sectional shape Circular, Rectangular, and Ellipsoidal
-        [y,z] = computeBoundaryYZ(S.VLinks(S.LinkIndex(i)),0,j);
+        [y,z] = computeBoundaryYZ(Linkage.VLinks(Linkage.LinkIndex(i)),0,j);
         pos  = [zeros(1,n_r);y;z;ones(1,n_r)]; %homogeneous positions in local frame 4xn_r
         
         pos_here = g_here*pos;
@@ -211,7 +211,7 @@ for i=1:N
         
         for ii=1:n_l-1
             %cross sectional shape Circular, Rectangular, and Ellipsoidal
-            [y,z] = computeBoundaryYZ(S.VLinks(S.LinkIndex(i)),Xs(ii+1),j);
+            [y,z] = computeBoundaryYZ(Linkage.VLinks(Linkage.LinkIndex(i)),Xs(ii+1),j);
             pos  = [zeros(1,n_r);y;z;ones(1,n_r)]; %homogeneous positions in local frame 4xn_r
             
             X = Xs(ii);
@@ -222,7 +222,7 @@ for i=1:N
             
             if ~isempty(q_here)
                 if strcmp(Type,'FEM Like')
-                    SubClass  = S.CVRods{i}(j+1).SubClass;
+                    SubClass  = Linkage.CVRods{i}(j+1).SubClass;
                     xi_Zhere  = xi_Zhere+Phi_Scale*Phi_h(X_Z,Phi_dof,Phi_odr,SubClass)*q_here;
                 elseif strcmp(Type,'Custom Independent')
                     xi_Zhere  = xi_Zhere+Phi_Scale*Phi_h(X_Z)*q_here;
@@ -263,10 +263,10 @@ for i=1:N
         patch(Xpatch,Ypatch,Zpatch,color,'EdgeColor','none','FaceAlpha',alpha);
         
         %updating g, Jacobian, Jacobian_dot and eta at X=L
-        gf     = S.VLinks(S.LinkIndex(i)).gf{j};
+        gf     = Linkage.VLinks(Linkage.LinkIndex(i)).gf{j};
         g_here = g_here*gf;
 
-        if ~S.OneBasis
+        if ~Linkage.OneBasis
             dof_start = dof_start+dof_here;
         end
     end

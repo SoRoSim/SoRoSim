@@ -3,7 +3,7 @@
 
 %Last modified by Anup Teejo Mathew 11/12/2024
 
-function [Fext,dFext_dq]=CustomExtForce(Linkage,q,g,J,t,qd,eta,Jdot)
+function [Fext,dFext_dq]=CustomExtForce(Linkage,q,g,J,t,qd,Jdot)
 
 %%%%NOTE%%%%
 %Tr: Linkage element,

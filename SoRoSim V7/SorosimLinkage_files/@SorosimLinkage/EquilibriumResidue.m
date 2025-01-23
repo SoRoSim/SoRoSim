@@ -1,7 +1,7 @@
 %Single pass algorithm using D'Alembert-Kane method
 %Last modified by Anup Teejo Mathew 20.01.2025
 
-function Res=EquilibriumResidue(Linkage,x,input,staticsOptions) 
+function Res=EquilibriumResidue(Linkage,x,action,staticsOptions) 
 % x is a vector of unknowns. It has unknown q, unknown u and unknown lambdas. x = [q_u;u_u;lambda]
 % input is a vector of known inputs. It has input values of u and q_joint. input = [u_k;q_k]
 
@@ -13,10 +13,10 @@ q = x(1:ndof);
 lambda = x(ndof+1:end);
 
 if Linkage.CAI
-    input = CustomActuatorInput(Linkage,x); %x is qul here
+    action = CustomActuatorInput(Linkage,x); %x is qul here
 end
 
-u = input;
+u = action;
 
 if Linkage.Actuated
     nact = Linkage.nact;
@@ -24,8 +24,8 @@ if Linkage.Actuated
     %if n_k>0 rearrangemetns are required to compute q and u in the correct format
     if n_k>0
         q(Linkage.ActuationPrecompute.index_q_u) = x(1:ndof-n_k);
-        q(Linkage.ActuationPrecompute.index_q_k) = input(end-n_k+1:end);
-        u(Linkage.ActuationPrecompute.index_u_k) = input(1:nact-n_k);
+        q(Linkage.ActuationPrecompute.index_q_k) = action(end-n_k+1:end);
+        u(Linkage.ActuationPrecompute.index_u_k) = action(1:nact-n_k);
         u(Linkage.ActuationPrecompute.index_u_u) = x(ndof-n_k+1:ndof);
     end
 end
@@ -78,17 +78,14 @@ for i=1:N
     q_here   = q(dofs_here);
     Phi_here = Linkage.CVRods{i}(1).Phi;
     xi_star  = Linkage.CVRods{i}(1).xi_star;
-
+    
+    S_here = zeros(6,ndof);
     if dof_here==0 %fixed joint (N)
         gstep    = eye(4);
-        S_here = zeros(6,ndof);
     else
-        
         xi = Phi_here*q_here+xi_star;
         [gstep,Tg] = variable_expmap_gTg(xi); %mex file is slightly slower for some reason
-        S_here = zeros(6,ndof);
         S_here(:,dofs_here) = Tg*Phi_here;
-
     end
 
     %updating g, Jacobian
@@ -191,7 +188,6 @@ for i=1:N
 
             g((i_sig-1)*4+1:i_sig*4,:) = g_here;
             J((i_sig-1)*6+1:i_sig*6,:) = J_here;
-
             i_sig = i_sig+1;
 
             %integrals evaluation
@@ -296,15 +292,13 @@ F = F+A'*lambda;
 %% Custom External Force
 
 if Linkage.CEF
-    Fext  = CustomExtForce(Linkage,q,g,J,0,zeros(ndof,1),zeros(6*nsig,1),zeros(6*nsig,ndof)); %should be point wrench in local frame and its derivatives
+    Fext  = CustomExtForce(Linkage,q,g,J); %should be point wrench in local frame and its derivatives
     for i_sig=1:Linkage.nsig
         F = F+J((i_sig-1)*6+1:i_sig*6,:)'*Fext;
     end
 end
 
 %% Actuation
-
-%%%%%%%%%%%HERE%%%%%%%%%%%%%%
 
 tau = -Linkage.K*q; %tau = Bu-Kq
 

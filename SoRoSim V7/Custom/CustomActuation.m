@@ -1,4 +1,4 @@
-function [Fact,dFact_dq] = CustomActuation(Linkage,q,g,J,t,qd,eta,Jdot)
+function [Fact,dFact_dq] = CustomActuation(Linkage,q,g,J,t,qd,Jdot)
 
 %q and qd: joint coordinates and their time derivatives, 
 %g, J, Jd, and eta: transformation matrix, Jacobian, time derivative of jacobian, and screw velocity at every significant point of the linkage

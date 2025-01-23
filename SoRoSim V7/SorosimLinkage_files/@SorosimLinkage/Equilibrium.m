@@ -4,7 +4,7 @@
 
 %%%%%%%Create also fwd pass only algorithm using Kane projection%%%%%%%%%
 
-function [Res,Jac]=Equilibrium(Linkage,x,input,staticsOptions) 
+function [Res,Jac]=Equilibrium(Linkage,x,action,staticsOptions) 
 % x is a vector of unknowns. It has unknown q, unknown u and unknown lambdas. x = [q_u;u_u;lambda]
 % input is a vector of known inputs. It has input values of u and q_joint. input = [u_k;q_k]
 
@@ -17,10 +17,10 @@ q = x(1:ndof);
 lambda = x(ndof+1:end);
 
 if Linkage.CAI
-    [input,dinput_dx] = CustomActuatorInput(Linkage,x); %x is qul here %%%%%%%%%%%%%%%%%%%%%%THINK about it
+    [action,dinput_dx] = CustomActuatorInput(Linkage,x); %x is qul here %%%%%%%%%%%%%%%%%%%%%%THINK about it
 end
 
-u = input;
+u = action;
 
 if Linkage.Actuated
     nact = Linkage.nact;
@@ -28,8 +28,8 @@ if Linkage.Actuated
     %if n_k>0 rearrangemetns are required to compute q and u in the correct format
     if n_k>0
         q(Linkage.ActuationPrecompute.index_q_u) = x(1:ndof-n_k);
-        q(Linkage.ActuationPrecompute.index_q_k) = input(end-n_k+1:end);
-        u(Linkage.ActuationPrecompute.index_u_k) = input(1:nact-n_k);
+        q(Linkage.ActuationPrecompute.index_q_k) = action(end-n_k+1:end);
+        u(Linkage.ActuationPrecompute.index_u_k) = action(1:nact-n_k);
         u(Linkage.ActuationPrecompute.index_u_u) = x(ndof-n_k+1:ndof);
     end
 end
@@ -323,7 +323,7 @@ end
 %% Custom External Force
 
 if Linkage.CEF
-    [Fext,dFext_dq]  = CustomExtForce(Linkage,q,g,J,0,zeros(ndof,1),zeros(6*nsig,1),zeros(6*nsig,ndof)); %should be point wrench in local frame and its derivatives
+    [Fext,dFext_dq]  = CustomExtForce(Linkage,q,g,J); %should be point wrench in local frame and its derivatives
     Fk = Fk+Fext;
     for i_sig=1:Linkage.nsig
         dID_dq = dID_dq-J((i_sig-1)*6+1:i_sig*6,:)'*dFext_dq((i_sig-1)*6+1:i_sig*6,:);

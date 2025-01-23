@@ -670,23 +670,23 @@ classdef SorosimLinkage
         end %Class constructor
 
         %% Methods and set-get functions
-        g       = FwdKinematics(S,q,i,j);           %to get the transformation matrix at every significant points (arranged as column array) i: link, j: division (j=0 for joints)
-        J       = Jacobian(S,q,i,j);                %to get the Jacobian at every significant points (arranged as column array)
-        Jd      = Jacobiandot(S,q,qd,i,j);          %to get the derivative of Jacobian at every significant points (arranged as column array)
-        xi      = ScrewStrain(S,q,i,j)              %to get the screw strain at every significant points (arranged as column array)
-        eta     = ScrewVelocity(S,q,qd,i,j);        %to get the screw velocity at every significant points (arranged as column array)
-        D       = findD(S);                    %to compute and get the generalized damping matrix
-        K       = findK(S)                        %to compute and get the generalized stiffness matrix
-        Bq      = ActuationMatrix(S,q);             %to get the generalized actuation matrix (custom actuation not included)
-        M       = GeneralizedMassMatrix(S,q)        %to get the generalized mass matrix
-        C       = GeneralizedCoriolisMatrix(S,q,qd) %to get the generalized coriolis matrix
-        F       = GeneralizedExternalForce(S,q,qd,t)  %to get the generalized external force matrix
-        [t,qqd] = dynamics(S,qqd0,odetype,dt);             %for dynamic simulation
-        [q,u,lambda] = statics(S,x0,input,userOptions)            %for static simulation
+        g       = FwdKinematics(Linkage,q,i,j);           %to get the transformation matrix at every significant points (arranged as column array) i: link, j: division (j=0 for joints)
+        J       = Jacobian(Linkage,q,i,j);                %to get the Jacobian at every significant points (arranged as column array)
+        Jd      = Jacobiandot(Linkage,q,qd,i,j);          %to get the derivative of Jacobian at every significant points (arranged as column array)
+        xi      = ScrewStrain(Linkage,q,i,j)              %to get the screw strain at every significant points (arranged as column array)
+        eta     = ScrewVelocity(Linkage,q,qd,i,j);        %to get the screw velocity at every significant points (arranged as column array)
+        D       = findD(Linkage);                    %to compute and get the generalized damping matrix
+        K       = findK(Linkage)                        %to compute and get the generalized stiffness matrix
+        Bq      = ActuationMatrix(Linkage,q);             %to get the generalized actuation matrix (custom actuation not included)
+        M       = GeneralizedMassMatrix(Linkage,q)        %to get the generalized mass matrix
+        C       = GeneralizedCoriolisMatrix(Linkage,q,qd) %to get the generalized coriolis matrix
+        F       = GeneralizedExternalForce(Linkage,q,qd,t)  %to get the generalized external force matrix
+        [t,qqd] = dynamics(Linkage,x0,dynamicActionopen,userOptions);             %for dynamic simulation
+        [q,u,lambda] = statics(Linkage,x0,action,userOptions)            %for static simulation
 
-        plotq0(S,Lh,Dh,CLh);     %to plot the free body diagram of the linkage
-        plotq(S,q);              %to plot the state of the linkage for a given q
-        plotqqd(S,t,qqd);        %to get dynamic simulation video output for a given t (time array) and qqd (array of joint coordinates and their time derivatives)
+        plotq0(Linkage,Lh,Dh,CLh);     %to plot the free body diagram of the linkage
+        plotq(Linkage,q);              %to plot the state of the linkage for a given q
+        plotqt(Linkage,t,qqd);        %to get dynamic simulation video output for a given t (time array) and qqd (array of joint coordinates and their time derivatives)
 
         %--------------------------------------------------------------------------
         %GET FUNCTIONS FOR DEPENDENT PROPERTIES: Connect the properties of

@@ -1,20 +1,23 @@
-function staticsOptions = initializeDynamicsOptions(userOptions)
+function dynamicsOptions = initializeDynamicsOptions(userOptions)
     % Default values
-    defaultOptions.magnifier = true;
-    defaultOptions.magnifierValue = 1e6;
-    defaultOptions.Jacobian = true;
-    defaultOptions.displayProgress = true;
-    defaultOptions.Algorithm = 'trust-region-dogleg';
+
+    defaultOptions.dt = 0.01;
+    defaultOptions.Jacobian = false;
+    defaultOptions.displayTime = true; %display time
+    defaultOptions.plotProgress = false; %to plot robot configuration as simulation progresses
+    defaultOptions.Integrator = 'ode15s';
+    defaultOptions.t_start = 0;
+    defaultOptions.t_end = 0;
 
     % Check if userOptions is provided
     if nargin < 1 || isempty(userOptions)
-        staticsOptions = defaultOptions; % Use defaults if no user options are provided
+        dynamicsOptions = defaultOptions; % Use defaults if no user options are provided
     else
         % Override defaults with user-provided values
-        staticsOptions = defaultOptions; % Start with defaults
+        dynamicsOptions = defaultOptions; % Start with defaults
         fields = fieldnames(userOptions);
         for i = 1:length(fields)
-            staticsOptions.(fields{i}) = userOptions.(fields{i});
+            dynamicsOptions.(fields{i}) = userOptions.(fields{i});
         end
     end
 end
