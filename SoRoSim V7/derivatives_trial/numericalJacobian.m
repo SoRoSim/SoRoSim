@@ -1,4 +1,4 @@
-function [J, diff] = numericalJacobian(func, x, epsilon)
+function [J, J_ana] = numericalJacobian(func, x, epsilon)
     if nargin < 3
         epsilon = 1e-6; % Default step size
     end
@@ -12,5 +12,4 @@ function [J, diff] = numericalJacobian(func, x, epsilon)
         J(:, i) = (func(x_forward) - func(x_backward)) / (2 * epsilon);
     end
     [~,J_ana] =  func(x);
-    diff = J_ana - J';
 end
