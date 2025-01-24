@@ -27,7 +27,7 @@ g_des_initial = [0.0000         0   1.0000    0.3
 qu_uq_l0 = zeros(78,1);
 constraints_handle = @(x)con1(S1, x);
 options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-10,'StepTolerance',1e-15 ,'MaxFunctionEvaluations',2e6,'Algorithm', 'sqp', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true);%,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
-qu_uq_l_final = fmincon(@(qu_uq_l)eq2(S1, qu_uq_l, g_des_final), qu_uq_l0, [],[],[],[],[],[],constraints_handle,options);
+qu_uq_l_final = fmincon(@(qu_uq_l)ob2(S1, qu_uq_l, g_des_final), qu_uq_l0, [],[],[],[],[],[],constraints_handle,options);
 
 %%
 qu_uq_l0 = zeros(80,1);
