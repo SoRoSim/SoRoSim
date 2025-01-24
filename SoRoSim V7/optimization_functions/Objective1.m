@@ -1,4 +1,4 @@
-function [eq2, deq2] = eq2(S1, x, g_des)
+function [eq2, deq2] = Objective1(S1, x, g_des)
 %% This is correct
     qT = x(1:S1.ndof);
     gT = S1.FwdKinematics(qT);

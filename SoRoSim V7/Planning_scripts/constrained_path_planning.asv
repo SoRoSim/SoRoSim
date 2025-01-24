@@ -10,7 +10,7 @@ S1 = S1.Update;
 %%
 g_des_final = [0.0000         0   1.0000    0.3
                 0    1.0000         0         0
-                -1.0000         0    0.0000    -0.533
+                -1.0000         0    0.0000    -0.433
                 0         0         0    1.0000];
 
 g_des_initial = [0.0000         0   1.0000    0.3
@@ -55,7 +55,7 @@ figure
 S1.plotq(qu_uq_l_final(1:S1.ndof))
 hold on
 plot_constraint(constraint_surface)
-plotTransforms(se3(g_des_final),'FrameSize',0.05)
+plotTransforms(se3())
 
 
 
