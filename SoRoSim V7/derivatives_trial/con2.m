@@ -2,17 +2,8 @@ function [con2, dcon2] = con2(S1, x_opt, constraint_surface)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
     xbar1 = x_opt(79);
-    % V = [ones(length(Xs),1) Xs Xs.^2];
     Xs = S1.CVTwists{1}(2).Xs;
     g = S1.FwdKinematics(x_opt(1:S1.ndof));
-
-    % x1 = g(4+1:4:4*(length(S1.CVTwists{1}(2).Xs)+1),4);
-    % y1 = g(4+2:4:4*(length(S1.CVTwists{1}(2).Xs)+1),4);
-    % z1 = g(4+3:4:4*(length(S1.CVTwists{1}(2).Xs)+1),4);
-    % poly_x = (V'*V)\V'*x1;
-    % poly_y = (V'*V)\V'*y1;
-    % poly_z = (V'*V)\V'*z1;
-    % xh1 = [poly_x'*[1; xbar1; xbar1^2] poly_y'*[1; xbar1; xbar1^2] poly_z'*[1; xbar1; xbar1^2]];
     %% Screw interpolation
     index = find(Xs>=xbar1,1);
     alpha = (xbar1 - Xs(index-1))/(Xs(index)- Xs(index - 1));
