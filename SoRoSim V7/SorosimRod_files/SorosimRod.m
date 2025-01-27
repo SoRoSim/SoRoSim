@@ -60,7 +60,7 @@ classdef SorosimRod < handle %pass by reference (no copy of memory is made)
                 Rod.Phi_odr = Phi_odr;
 %% Compute/Input number of Gauss quadrature point for spatial integration and DOF of the Rod
                 
-                nGauss_min = 5; %minimum number of Gauss quadrature point per rod
+                nGauss_min = 10; %minimum number of Gauss quadrature point per rod
 
                 if any(strcmp(Type,{'Monomial','Legendre Polynomial','Chebychev','Fourier','Custom Basis'})) % all global basis
                         

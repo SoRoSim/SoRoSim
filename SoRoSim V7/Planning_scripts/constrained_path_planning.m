@@ -19,19 +19,14 @@ g_des_initial = [0.0000         0   1.0000    0.3
                 0    1.0000         0         0
                 -1.0000         0    0.0000    -0.35
                 0         0         0    1.0000];
-% theta = 15*pi/180;
-% rotation_y = eul2tform([theta theta 0], 'ZYX');
-% T_translate = eye(4);
-% T_translate(1:3,4) = [(constraint_surface.hole_1 + constraint_surface.hole_2)/2 constraint_surface.height];
-% Transform = T_translate*rotation_y*ginv(T_translate);
-% g_des_final = Transform*g_des_final;
+
 %% Problem 1:
 % This involves finding the pose of the two tips such that the end-effector
 % achieves the desired pose anywhere in sapce without considering the hole
 % constraints.
 qu_uq_l0 = zeros(78,1);
 constraints_handle = @(qu_uq_l)constraints1(S1, qu_uq_l);
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-10,'StepTolerance',1e-15 ,'MaxFunctionEvaluations',2e6,'Algorithm', 'active-set', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true);%,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
+options = optimoptions('fmincon','Display','iter', 'OptimalityTolerance',1e-10,'StepTolerance',1e-15 ,'MaxFunctionEvaluations',2e6,'Algorithm', 'active-set', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true);%,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 qu_uq_l_final = fmincon(@(qu_uq_l)Objective1(S1, qu_uq_l, g_des_initial), qu_uq_l0, [],[],[],[],[],[],constraints_handle,options);
 
 %% Find a constraining surface that is feasible
@@ -49,13 +44,14 @@ qu_uq_l0 = [qu_uq_l_final; root1; root2];
 [c, ceq, ~, ~] = Constraints2(S1, qu_uq_l0, constraint_surface)
 %%
 constraints_handle = @(qu_uq_l)Constraints2(S1, qu_uq_l, constraint_surface);
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-10,'StepTolerance',1e-15 ,'MaxFunctionEvaluations',2e6,'Algorithm', 'sqp', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true);%,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
+options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-10,'StepTolerance',1e-15 ,'MaxFunctionEvaluations',2e6,'Algorithm', 'sqp');%, 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true);%,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 lb(1:78) = -inf;
 lb(79:80) = 0;
 ub(1:78) = inf;
 ub(79:80) = 1;
 
-qu_uq_l_final2 = fmincon(@(qu_uq_l)Objective2(S1, qu_uq_l, g_des_initial), qu_uq_l0, [],[],[],[],lb,ub,constraints_handle,options);
+qu_uq_l_final1 = fmincon(@(qu_uq_l)Objective2(S1, qu_uq_l, g_des_initial), qu_uq_l0, [],[],[],[],lb,ub,constraints_handle,options);
+qu_uq_l_final2 = fmincon(@(qu_uq_l)Objective2(S1, qu_uq_l, g_des_final), qu_uq_l0, [],[],[],[],lb,ub,constraints_handle,options);
 
 %% Plot the results
 figure
@@ -73,12 +69,15 @@ n_x_t = ndof+18;
 total_time = 1;
 n_points = 10;
 dt = total_time/(n_points-1);
-initial_guess = zeros(n_points*n_x_t,1);
+initial_guess = zeros(n_x_t, n_points);
 
-
+for i = 1:n_x_t
+    initial_guess(i,:) = linspace(qu_uq_l_final1(i), qu_uq_l_final2(i), n_points);
+end
+initial_guess = initial_guess(:);
 
 constraints_handle = @(qu_uq_l)Constraint3(S1, qu_uq_l, n_points, g_des_initial);
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-20,'StepTolerance',1e-14 ,'MaxFunctionEvaluations',2e10, 'DiffMinChange', 1e-5,'Algorithm','sqp','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
+options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-20,'StepTolerance',1e-14 ,'MaxFunctionEvaluations',2e10, 'DiffMinChange', 1e-5,'Algorithm','active-set','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 
 qu_uq_l_con = fmincon(@(qu_uq_l)Objective3(S1, qu_uq_l,g_des_final),initial_guess, [],[],[],[],[],[],constraints_handle,options);
 save("Datafiles/zy_rotation_neg15_degs.mat","qu_uq_l_con")

@@ -27,11 +27,8 @@ function g_interpolated = Screw_interpolate(Linkage,xbar, q,Linkindex)
     % Find the two nearest points t_i and t_{i+1}
     idx = find(T <= xbar, 1, 'last');
     g = Linkage.Fwdkinematics(q);
-    
-    t_i = T(idx);
-    t_next = T(idx + 1);
-    g_i = g(4*idx-3:4*idx,:);
-    g_next = g(4*(idx+1)-3:4*(idx+1),:);
+    g_i = g((i-1)*4);
+    g_next = G{idx + 1};
 
     % Compute interpolation parameter alpha
     alpha = (t - t_i) / (t_next - t_i);
@@ -40,13 +37,13 @@ function g_interpolated = Screw_interpolate(Linkage,xbar, q,Linkindex)
     g_rel = g_i \ g_next; % Equivalent to inv(g_i) * g_next
 
     % Logarithmic map
-    xi = piecewise_logmap(g_rel);
+    xi = logm(g_rel);
 
     % Scale the twist
     xi_alpha = alpha * xi;
 
     % Exponential map
-    g_alpha = variable_expmap_g(xi_alpha);
+    g_alpha = expm(xi_alpha);
 
     % Interpolated transformation
     g_interpolated = g_i * g_alpha;

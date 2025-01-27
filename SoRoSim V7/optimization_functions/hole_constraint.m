@@ -21,5 +21,5 @@ function [c, dc] = hole_constraint(Linkage, x,constraint_surface)
     c = [c; eq2 - (constraint_surface.radius + 0.01)^2];
 
     dc(80,2) = -2*([constraint_surface.hole_2 constraint_surface.height]' - xh2)'*g_xbar2(1:3,1:3)*xi_xbar2(4:6);
-
+    %% This does not consider dr_dq
 end
