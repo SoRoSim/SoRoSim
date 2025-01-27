@@ -123,7 +123,7 @@ end
 
 dt = dynamicsOptions.dt;
 if dynamicsOptions.Jacobian
-    options = odeset('OutputFcn',@(t,y,flag) odeprogress(t,y,flag,Linkage,dynamicsOptions.plotProgress),'RelTol',1e-3,'AbsTol',1e-6,'Jacobian',@(t,qqd) ODEJacobian(S1,t,qqd,FDL_SoRoSim(S1,t,qqd)));% CHANGE NAMES
+    options = odeset('OutputFcn',@(t,y,flag) odeprogress(t,y,flag,Linkage,dynamicsOptions.plotProgress),'RelTol',1e-3,'AbsTol',1e-6,'Jacobian',@(t,x) ODEJacobian(Linkage,t,x,dynamicAction,GUI_actionInput));% CHANGE NAMES
 else
     options = odeset('OutputFcn',@(t,y,flag) odeprogress(t,y,flag,Linkage,dynamicsOptions.plotProgress),'RelTol',1e-3,'AbsTol',1e-6);% default values'RelTol',1e-3,'AbsTol',1e-6
 end

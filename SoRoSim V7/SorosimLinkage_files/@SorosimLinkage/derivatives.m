@@ -47,7 +47,7 @@ function qdqdd = derivatives(Linkage,t,qqd,dynamicAction,GUI_actionInput,dynamic
         action = [];
     end
     
-    y = dynamicsSolver(Linkage,t,q,qd,action); %solves for x = [qdd_u; u_u; lambda], for a given t, q, qd, and action
+    y = dynamicsSolver(Linkage,t,[q;qd],action); %solves for x = [qdd_u; u_u; lambda], for a given t, q, qd, and action
     qdd = y(1:ndof);
 
     if Linkage.Actuated

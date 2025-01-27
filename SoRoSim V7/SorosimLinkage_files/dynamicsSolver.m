@@ -1,15 +1,18 @@
 %Function to compute [qdd_u (unknown); u_u; lambda] for given q,qd,[u_k,qdd_k]
 %Single pass algorithm using D'Alembert-Kane method
 %Last modified by Anup Teejo Mathew 21.01.2024
-function y = dynamicsSolver(Linkage,t,q,qd,action) %x is [qdd_u (unknown); u_u; lambda], action is [u_k,qdd_k]
+function [y,C,B_action,action] = dynamicsSolver(Linkage,t,qqd,action) %x is [qdd_u (unknown); u_u; lambda], action is [u_k,qdd_k]
 
 ndof = Linkage.ndof;
 N    = Linkage.N;
 nsig = Linkage.nsig;
 
 if Linkage.CAI
-    action = CustomActuatorInput(Linkage,[q;qd],t); %x is qqd here
+    action = CustomActuatorInput(Linkage,qqd,t); %x is qqd here
 end
+
+q  = qqd(1:Linkage.ndof);
+qd = qqd(Linkage.ndof+1:2*Linkage.ndof);
 
 M = zeros(ndof,ndof); %Generalized Mass Matrix
 F = zeros(ndof,1); %External and Coriolis force
@@ -85,10 +88,10 @@ for i=1:N
     %updating g, Jacobian, Jacobian_dot and eta 0 to 1 of joint
     g_here         = g_here*gstep;
     Ad_g_joint_inv = dinamico_Adjoint(ginv(gstep));
-    J_here         = Ad_g_joint_inv*(J_here+S_here);
-    Jd_here        = Ad_g_joint_inv*(Jd_here+Sd_here+dinamico_adj(eta_here)*S_here);
+    J_here         = Ad_g_joint_inv*(J_here+S_here); 
     eta_here       = Ad_g_joint_inv*(eta_here+S_here(:,dofs_here)*qd_here);
-    psi_here       = Ad_g_joint_inv*(psi_here+Sd_here(:,dofs_here)*qd_here);
+    Jd_here        = Ad_g_joint_inv*(Jd_here+Sd_here+dinamico_adj(eta_here)*S_here); 
+    psi_here       = Ad_g_joint_inv*(psi_here+(Sd_here(:,dofs_here)+dinamico_adj(eta_here)*S_here(:,dofs_here))*qd_here);
 
     if Linkage.VLinks(Linkage.LinkIndex(i)).linktype=='r'
 
@@ -250,9 +253,9 @@ for i=1:N
             g_here     = g_here*gstep;
             Ad_gh_inv  = dinamico_Adjoint(ginv(gstep));
             J_here     = Ad_gh_inv*(J_here+S_here); %full
-            Jd_here    = Ad_gh_inv*(Jd_here+Sd_here+dinamico_adj(eta_here)*S_here); %full
             eta_here   = Ad_gh_inv*(eta_here+S_here(:,dofs_here)*qd_here);
-            psi_here   = Ad_g_joint_inv*(psi_here+Sd_here(:,dofs_here)*qd_here);
+            Jd_here    = Ad_gh_inv*(Jd_here+Sd_here+dinamico_adj(eta_here)*S_here); %full
+            psi_here   = Ad_g_joint_inv*(psi_here+(Sd_here(:,dofs_here)+dinamico_adj(eta_here)*S_here(:,dofs_here))*qd_here);
             
             g((i_sig-1)*4+1:i_sig*4,:)  = g_here;
             J((i_sig-1)*6+1:i_sig*6,:)  = J_here;
@@ -499,20 +502,23 @@ if Linkage.nCLj>0 %if there are closed chain joints
     T_BS = Linkage.T_BS;
 
     if Linkage.Actuated
+        B_action = [B(:,Linkage.ActuationPrecompute.index_u_k), -M(:,Linkage.ActuationPrecompute.index_q_k);zeros(nCLp,Linkage.nact-Linkage.ActuationPrecompute.n_k), -A(:,Linkage.ActuationPrecompute.index_q_k)];
         C = [M(:,Linkage.ActuationPrecompute.index_q_u), -B(:,Linkage.ActuationPrecompute.index_u_u), -A';A(:,Linkage.ActuationPrecompute.index_q_u), zeros(nCLp,Linkage.ActuationPrecompute.n_k+nCLp)];
-        b = [B(:,Linkage.ActuationPrecompute.index_u_k), -M(:,Linkage.ActuationPrecompute.index_q_k);zeros(nCLp,Linkage.nact-Linkage.ActuationPrecompute.n_k), -A(:,Linkage.ActuationPrecompute.index_q_k)]*action...
-           +[tau+F;-Ad*qd-(2/T_BS)*A*qd-(1/T_BS^2)*e];
+        b = B_action*action+[tau+F;-Ad*qd-(2/T_BS)*A*qd-(1/T_BS^2)*e];
     else
         C = [M, -A';A, zeros(nCLp,nCLp)];
+        B_action = [];
         b = [tau+F;-Ad*qd-(2/T_BS)*A*qd-(1/T_BS^2)*e];
     end
 else
 
     if Linkage.Actuated
+        B_action = [B(:,Linkage.ActuationPrecompute.index_u_k), -M(:,Linkage.ActuationPrecompute.index_q_k)];
         C = [M(:,Linkage.ActuationPrecompute.index_q_u), -B(:,Linkage.ActuationPrecompute.index_u_u)];
-        b = [B(:,Linkage.ActuationPrecompute.index_u_k), -M(:,Linkage.ActuationPrecompute.index_q_k)]*action+tau+F;
+        b = B_action*action+tau+F;
     else
         C = M;
+        B_action = [];
         b = tau+F;
     end
 

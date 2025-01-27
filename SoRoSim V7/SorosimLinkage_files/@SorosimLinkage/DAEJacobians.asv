@@ -1,41 +1,47 @@
-%Evaluates the static equilibrium equation for fsolve. Using RNEA: fwd
-%kinematic pass and backward pass to project forces to generalized coordinates
-%Last modified by Anup Teejo Mathew 15.01.2025
+function [ID,tau,e,dID_dq,dID_dqd,dID_dqdd,dID_dlambda,dtau_dq,dtau_dqd,dtau_du,de_dq,de_dqd,de_dqdd,daction_dq,daction_dqd] = DAEJacobians(Linkage,q,qd,qdd,u,lambda,index)
 
-%%%%%%%Create also fwd pass only algorithm using Kane projection%%%%%%%%%
-
-function [Res,Jac]=Equilibrium(Linkage,x,action,staticsOptions) 
-% x is a vector of unknowns. It has unknown q, unknown u and unknown lambdas. x = [q_u;u_u;lambda]
-% input is a vector of known inputs. It has input values of u and q_joint. input = [u_k;q_k]
+%For index 1 DAE e=e(q,qd,qdd). For index 3 DAE e=e(q)
 
 N    = Linkage.N;
 ndof = Linkage.ndof;
 nsig = Linkage.nsig; %Total number of computational points
 nj   = Linkage.nj;   %Total number of joints (rigid and virtual soft joints (nip-1))
 
-q = x(1:ndof);
-lambda = x(ndof+1:end);
-
-if Linkage.CAI
-    [action,daction_dx] = CustomActuatorInput(Linkage,x); %x is qul here %%%%%%%%%%%%%%%%%%%%%%THINK about it
-end
-
-u = action;
-
 if Linkage.Actuated
     nact = Linkage.nact;
-    n_k  = Linkage.ActuationPrecompute.n_k; %number of q_joint inputs
-    %if n_k>0 rearrangemetns are required to compute q and u in the correct format
-    if n_k>0
-        q(Linkage.ActuationPrecompute.index_q_u) = x(1:ndof-n_k);
-        q(Linkage.ActuationPrecompute.index_q_k) = action(end-n_k+1:end);
-        u(Linkage.ActuationPrecompute.index_u_k) = action(1:nact-n_k);
-        u(Linkage.ActuationPrecompute.index_u_u) = x(ndof-n_k+1:ndof);
+    if Linkage.CAI
+        [~,daction_dx] = CustomActuatorInput(Linkage,[q;qd]); %x is qqd
+        daction_dq  = daction_dx(:,1:ndof);
+        daction_dqd = daction_dx(:,ndof+1:2*ndof);
+    else
+        daction_dq  = 0; %0 is better than zeros(nact,ndof)
+        daction_dqd = 0;
     end
 end
 
-ID = zeros(ndof,1); %in statics ID = -F 
-dID_dq = zeros(ndof,ndof);
+ID          = zeros(ndof,1);
+dID_dq      = zeros(ndof,ndof);
+dID_dqd     = zeros(ndof,ndof);
+dID_dqdd    = zeros(ndof,ndof); %same as M
+
+tau         = zeros(ndof,1);
+dtau_dq     = zeros(ndof,ndof);
+dtau_dqd    = zeros(ndof,ndof);
+dtau_du     = zeros(ndof,nact); %same as B
+
+if Linkage.nCLj>1
+    nCLp = Linkage.CLprecompute.nCLp;
+
+    dID_dlambda = zeros(ndof,nCLp); %same as -A'
+
+    e       = zeros(nCLp,1);
+    de_dq   = zeros(nCLp,ndof);
+    de_dqd  = zeros(nCLp,ndof);
+    de_dqdd = zeros(nCLp,ndof); %A
+else
+    e = []; de_dq = []; de_dqd = []; de_dqdd = [];
+end
+
 Fk = zeros(6*nsig,1); %External point force at every significant point
 
 %% Forward kinematic pass: evaluate kinematic, and derivatives terms at every virtual joint and significant points
@@ -46,20 +52,47 @@ Z = zeros(6*nj,ndof);       %Joint basis. Z=Phi for rigid joints (sparse matrix,
 gstep = zeros(4*nj,4);      %Linkageansformation from X_alpha to X_alpha+1 (0 to 1 for rigid joints)
 Adgstepinv = zeros(6*nj,6); %As the name says!
 T = zeros(6*nj,6);          %Tangent vector at each joint (T(Omega))
-S = zeros(6*nj,ndof);       %S is joint motion subspace (sparse matrix for a reason)
-Q = zeros(6*nj,ndof);       %gravity derivative at joint (sparse matrix for a reason)
+
+S = zeros(6*nj,ndof);         %S is joint motion subspace (sparse matrix for a reason)
+Sd = zeros(6*nj,ndof);        %Sd is time derivative of joint motion subspace (sparse matrix for a reason)
+dS_dq_qd = zeros(6*nj,ndof);  %as the name says (sparse matrix for a reason)
+dS_dq_qdd = zeros(6*nj,ndof); %as the name says (sparse matrix for a reason)
+dSd_dq_qd = zeros(6*nj,ndof); %as the name says (sparse matrix for a reason)
+
+R = zeros(6*nj,ndof); %relative joint velocity gradient wrt q (sparse matrix for a reason)
+L = zeros(6*nj,ndof); %relative joint acceleration gradient wrt q (sparse matrix for a reason)
+Q = zeros(6*nj,ndof); %L - gravity gravity derivative wrt q at joint (sparse matrix for a reason)
+Y = zeros(6*nj,ndof); %relative joint acceleration gradient wrt qdot R+(.) (sparse matrix for a reason)
+
 f = zeros(4,nj);            %function of theta, required for the computations of Tangent operator
 fd = zeros(4,nj);           %required for the derivative of Tangent operator
 adjOmegap = zeros(24*nj,6); %Powers of adjOmega (1-4), used later
 
-J = zeros(6*nsig,ndof);   %Jacobian (J is S_B)
-Q_B = zeros(6*nsig,ndof); %Gravity derivatives
-g = zeros(4*nsig,4);      %Fwd kinematics
+g = zeros(4*nsig,4);    %Fwd kinematics
+
+J    = zeros(6*nsig,ndof); %Jacobian (J is S_B)
+eta  = zeros(6*nsig,1);    %velocity twist
+Jd   = zeros(6*nsig,ndof); %Jacobian dot (Jd is Sd_B)
+etad = zeros(6*nsig,1);    %acceleration twist
+
+R_B = zeros(6*nsig,ndof); %Joint velocity gradient wrt q
+L_B = zeros(6*nsig,ndof); %Joint acceleration gradient wrt q
+Q_B = zeros(6*nsig,ndof); %L_B - gravity gradient wrt q
+Y_B = zeros(6*nsig,ndof); %Joint acceleration gradient wrt qd, Y_B = Jd+R_B
 
 %For branched chain computation
-g_tip  = repmat(eye(4),N,1);
-J_tip  = zeros(N*6,ndof);
+g_tip = repmat(eye(4),N,1);
+
+J_tip    = zeros(N*6,ndof);
+eta_tip  = zeros(N*6,1);
+Jd_tip   = zeros(N*6,ndof);
+etad_tip = zeros(N*6,1);
+
+R_Btip = zeros(N*6,ndof);
+L_Btip = zeros(N*6,ndof);
 Q_Btip = zeros(N*6,ndof);
+Y_Btip = zeros(N*6,ndof);
+
 
 dof_start = 1; %starting dof of current rod
 i_sig = 1;     %current computational point index
@@ -70,24 +103,54 @@ g_ini = Linkage.g_ini;
 
 for i=1:N
 
+    G = Linkage.G;
+    if ~Linkage.Gravity
+        G = G*0;
+    elseif Linkage.UnderWater %G is reduced by a factor of 1-rho_water/rho_body
+        G = G*(1-Linkage.Rho_water/Linkage.VLinks(Linkage.LinkIndex(i)).Rho);
+    end
+
     if iLpre(i)>0
         g_here = g_tip((iLpre(i)-1)*4+1:iLpre(i)*4,:)*g_ini((i-1)*4+1:i*4,:);
         Ad_g_ini_inv = dinamico_Adjoint(ginv(g_ini((i-1)*4+1:i*4,:)));
-        J_here  = Ad_g_ini_inv*J_tip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
+
+        J_here    = Ad_g_ini_inv*J_tip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
+        eta_here  = Ad_g_ini_inv*eta_tip((iLpre(i)-1)*6+1:iLpre(i)*6);
+        Jd_here   = Ad_g_ini_inv*Jd_tip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
+        etad_here = Ad_g_ini_inv*etad_tip((iLpre(i)-1)*6+1:iLpre(i)*6);
+
+        R_Bhere = Ad_g_ini_inv*R_Btip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
+        L_Bhere = Ad_g_ini_inv*L_Btip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
         Q_Bhere = Ad_g_ini_inv*Q_Btip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
+        Y_Bhere = Ad_g_ini_inv*Q_Btip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
     else
-        g_here   = g_ini((i-1)*4+1:i*4,:);
-        J_here   = zeros(6,ndof);
-        Q_Bhere  = zeros(6,ndof);
+        g_here = g_ini((i-1)*4+1:i*4,:);
+
+        J_here    = zeros(6,ndof);
+        eta_here  = zeros(6,1);
+        Jd_here   = zeros(6,ndof);
+        etad_here = zeros(6,1);
+
+        R_Bhere = zeros(6,ndof);
+        L_Bhere = zeros(6,ndof);
+        Q_Bhere = zeros(6,ndof);
+        Y_Bhere = zeros(6,ndof);
     end
 
     %Joint
 
     %0 of joint
-    
-    J((i_sig-1)*6+1:6*i_sig,:) = J_here;
-    Q_B((i_sig-1)*6+1:6*i_sig,:) = Q_Bhere;
     g((i_sig-1)*4+1:4*i_sig,:) = g_here;
+
+    J((i_sig-1)*6+1:6*i_sig,:)    = J_here;
+    eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
+    Jd((i_sig-1)*6+1:6*i_sig,:)   = Jd_here;
+    etad((i_sig-1)*6+1:6*i_sig,:) = etad_here;
+
+    L_B((i_sig-1)*6+1:6*i_sig,:) = L_Bhere;
+    R_B((i_sig-1)*6+1:6*i_sig,:) = R_Bhere;
+    Q_B((i_sig-1)*6+1:6*i_sig,:) = Q_Bhere;
+    Y_B((i_sig-1)*6+1:6*i_sig,:) = Y_Bhere;
 
     dof_here  = Linkage.CVRods{i}(1).dof;
     dofs_here = dof_start:dof_start+dof_here-1;
@@ -96,24 +159,35 @@ for i=1:N
     xi_star  = Linkage.CVRods{i}(1).xi_star;
     h(ij) = 1;
 
-    %computation of kinematic quantities at the rigid joint
+    %computation of kinematic and differential kinematic quantities at the rigid joint
+    %[Omega,Z,g,T,S,Sd,f,fd,adjOmegap,dSdq_qd,dSdq_qdd,dSddq_qd]=RigidJointDifferentialKinematics(Phi,xi_star,q,qd,qdd)
     [Omega(:,ij),Z((ij-1)*6+1:6*ij,dofs_here),gstep((ij-1)*4+1:4*ij,:),T((ij-1)*6+1:6*ij,:),S((ij-1)*6+1:6*ij,dofs_here),...
-              f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:)] = RigidJointKinematics_mex(Phi_here,xi_star,q(dofs_here)); %
+     Sd((ij-1)*6+1:6*ij,dofs_here),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),dS_dq_qd((ij-1)*6+1:6*ij,dofs_here),...
+     dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here),dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)] = RigidJointDifferentialKinematics_mex(Phi_here,xi_star,q(dofs_here),qd(dofs_here),qdd(dofs_here));
     Adgstepinv((ij-1)*6+1:6*ij,:) = dinamico_Adjoint(ginv(gstep((ij-1)*4+1:4*ij,:)));
 
-    G = Linkage.G;
-    if ~Linkage.Gravity
-        G = G*0;
-    elseif Linkage.UnderWater %G is reduced by a factor of 1-rho_water/rho_body
-        G=G*(1-Linkage.Rho_water/Linkage.VLinks(Linkage.LinkIndex(i)).Rho);
-    end
+    eta_plus_here  = eta_here+S((ij-1)*6+1:6*ij,dofs_here)*qd(dofs_here);
+    etad_plus_here = etad_here+S((ij-1)*6+1:6*ij,dofs_here)*qdd(dofs_here)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here)*qd(dofs_here)+Sd((ij-1)*6+1:6*ij,dofs_here)*qd(dofs_here);
     
-    Q((ij-1)*6+1:6*ij,dofs_here) = -dinamico_adj(dinamico_Adjoint(ginv(g_here))*G)*S((ij-1)*6+1:6*ij,dofs_here);
+    R((ij-1)*6+1:6*ij,dofs_here) = dinamico_adj(eta_plus_here)*S((ij-1)*6+1:6*ij,dofs_here)+dS_dq_qd((ij-1)*6+1:6*ij,dofs_here);
+    L((ij-1)*6+1:6*ij,dofs_here) = dinamico_adj(etad_plus_here)*S((ij-1)*6+1:6*ij,dofs_here)+dinamico_adj(eta_plus_here)*R((ij-1)*6+1:6*ij,dofs_here)...
+                                  +dinamico_adj(eta_here)*dS_dq_qd((ij-1)*6+1:6*ij,dofs_here)+dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)+dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here); % L is Q without gravity
+    Q((ij-1)*6+1:6*ij,dofs_here) = L((ij-1)*6+1:6*ij,dofs_here)-dinamico_adj(dinamico_Adjoint(ginv(g_here))*G)*S((ij-1)*6+1:6*ij,dofs_here);
+    Y((ij-1)*6+1:6*ij,dofs_here) = R((ij-1)*6+1:6*ij,dofs_here)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here)+Sd((ij-1)*6+1:6*ij,dofs_here);
     
     % from 0 to 1 of rigid joint
-    J_here  = Adgstepinv((ij-1)*6+1:6*ij,:)*(J_here+S((ij-1)*6+1:6*ij,:));
-    Q_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(Q_Bhere+Q((ij-1)*6+1:6*ij,:));
     g_here  = g_here*gstep((ij-1)*4+1:4*ij,:);
+
+    J_here    = Adgstepinv((ij-1)*6+1:6*ij,:)*(J_here+S((ij-1)*6+1:6*ij,:));
+    eta_here  = Adgstepinv((ij-1)*6+1:6*ij,:)*(eta_plus_here);
+    Jd_here   = Adgstepinv((ij-1)*6+1:6*ij,:)*(Jd_here+Sd((ij-1)*6+1:6*ij,:)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here));
+    etad_here = Adgstepinv((ij-1)*6+1:6*ij,:)*(etad_plus_here);
+
+    R_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(R_Bhere+R((ij-1)*6+1:6*ij,:));
+    L_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(L_Bhere+L((ij-1)*6+1:6*ij,:));
+    Q_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(Q_Bhere+Q((ij-1)*6+1:6*ij,:));
+    Y_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(Y_Bhere+Y((ij-1)*6+1:6*ij,:));
+    
     
     ij = ij+1;
     i_sig = i_sig+1;
@@ -124,26 +198,51 @@ for i=1:N
     if Linkage.VLinks(Linkage.LinkIndex(i)).linktype=='r'
         %joint to CM
         gi = Linkage.VLinks(Linkage.LinkIndex(i)).gi;
-
         Ad_gi_inv = dinamico_Adjoint(ginv(gi));
-        J_here  = Ad_gi_inv*J_here;
-        Q_Bhere = Ad_gi_inv*Q_Bhere;
+        
         g_here  = g_here*gi;
 
+        J_here    = Ad_gi_inv*J_here;
+        eta_here  = Ad_gi_inv*eta_here;
+        Jd_here   = Ad_gi_inv*Jd_here;
+        etad_here = Ad_gi_inv*etad_here;
+    
+        R_Bhere = Ad_gi_inv*R_Bhere;
+        L_Bhere = Ad_gi_inv*L_Bhere;
+        Q_Bhere = Ad_gi_inv*Q_Bhere;
+        Y_Bhere = Ad_gi_inv*Y_Bhere;
+        
+
         %CM is a significant point
-        J((i_sig-1)*6+1:6*i_sig,:)   = J_here;
+        g((i_sig-1)*4+1:4*i_sig,:) = g_here;
+
+        J((i_sig-1)*6+1:6*i_sig,:)    = J_here;
+        eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
+        Jd((i_sig-1)*6+1:6*i_sig,:)   = Jd_here;
+        etad((i_sig-1)*6+1:6*i_sig,:) = etad_here;
+    
+        L_B((i_sig-1)*6+1:6*i_sig,:) = L_Bhere;
+        R_B((i_sig-1)*6+1:6*i_sig,:) = R_Bhere;
         Q_B((i_sig-1)*6+1:6*i_sig,:) = Q_Bhere;
-        g((i_sig-1)*4+1:4*i_sig,:)   = g_here;
+        Y_B((i_sig-1)*6+1:6*i_sig,:) = Y_Bhere;
 
         i_sig = i_sig+1;
 
         %CM to tip
         gf = Linkage.VLinks(Linkage.LinkIndex(i)).gf; 
-
         Ad_gf_inv = dinamico_Adjoint(ginv(gf));
-        J_here  = Ad_gf_inv*J_here;
-        Q_Bhere = Ad_gf_inv*Q_Bhere;
+
         g_here  = g_here*gf;
+
+        J_here    = Ad_gf_inv*J_here;
+        eta_here  = Ad_gf_inv*eta_here;
+        Jd_here   = Ad_gf_inv*Jd_here;
+        etad_here = Ad_gf_inv*etad_here;
+    
+        R_Bhere = Ad_gf_inv*R_Bhere;
+        L_Bhere = Ad_gf_inv*L_Bhere;
+        Q_Bhere = Ad_gf_inv*Q_Bhere;
+        Y_Bhere = Ad_gf_inv*Y_Bhere;
     end
 
     for j=1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1 %will run only if npie>1, ie for soft links
@@ -151,25 +250,43 @@ for i=1:N
         dof_here  = Linkage.CVRods{i}(j+1).dof;
         dofs_here = dof_start:dof_start+dof_here-1;
         
-        gi = Linkage.VLinks(Linkage.LinkIndex(i)).gi{j}; %X=1 of joint to first quadrature point at X=0 of the rod
+        
         ld = Linkage.VLinks(Linkage.LinkIndex(i)).ld{j};
         xi_star = Linkage.CVRods{i}(j+1).xi_star;
         Xs      = Linkage.CVRods{i}(j+1).Xs;
         nip     = Linkage.CVRods{i}(j+1).nip;
         h(ij:ij+nip-2) = (Xs(2:end)-Xs(1:end-1))*ld;
-
+        
+        gi = Linkage.VLinks(Linkage.LinkIndex(i)).gi{j}; %X=1 of joint to first quadrature point at X=0 of the rod
         Ad_gi_inv = dinamico_Adjoint(ginv(gi)); %transformation from X=1 of joint or X=Ld of previous division to the X=0 of next division
-        J_here  = Ad_gi_inv*J_here;
-        Q_Bhere = Ad_gi_inv*Q_Bhere;
+        
         g_here  = g_here*gi;
 
-        g((i_sig-1)*4+1:i_sig*4,:) = g_here;
-        J((i_sig-1)*6+1:i_sig*6,:) = J_here;
-        Q_B((i_sig-1)*6+1:i_sig*6,:) = Q_Bhere;
+        J_here    = Ad_gi_inv*J_here;
+        eta_here  = Ad_gi_inv*eta_here;
+        Jd_here   = Ad_gi_inv*Jd_here;
+        etad_here = Ad_gi_inv*etad_here;
+    
+        R_Bhere = Ad_gi_inv*R_Bhere;
+        L_Bhere = Ad_gi_inv*L_Bhere;
+        Q_Bhere = Ad_gi_inv*Q_Bhere;
+        Y_Bhere = Ad_gi_inv*Y_Bhere;
+
+        g((i_sig-1)*4+1:4*i_sig,:) = g_here;
+
+        J((i_sig-1)*6+1:6*i_sig,:)    = J_here;
+        eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
+        Jd((i_sig-1)*6+1:6*i_sig,:)   = Jd_here;
+        etad((i_sig-1)*6+1:6*i_sig,:) = etad_here;
+    
+        L_B((i_sig-1)*6+1:6*i_sig,:) = L_Bhere;
+        R_B((i_sig-1)*6+1:6*i_sig,:) = R_Bhere;
+        Q_B((i_sig-1)*6+1:6*i_sig,:) = Q_Bhere;
+        Y_B((i_sig-1)*6+1:6*i_sig,:) = Y_Bhere;
 
         i_sig  = i_sig+1;
 
-        for ii=1:nip-1
+        for ii=1:nip-1 %%%%%%%%%%%%HERE
             
             if Linkage.Z_order==4
                 xi_star_Z1 = xi_star(6*(ii-1)+1:6*ii,2);
@@ -177,27 +294,54 @@ for i=1:N
                 Phi_Z1 = Linkage.CVRods{i}(j+1).Phi_Z1(6*(ii-1)+1:6*ii,:);
                 Phi_Z2 = Linkage.CVRods{i}(j+1).Phi_Z2(6*(ii-1)+1:6*ii,:);
 
+                %[Omega,Z,g,T,S,Sd,f,fd,adjOmegap,dSdq_qd,dSdq_qdd,dSddq_qd]=SoftJointDifferentialKinematics_Z4(h,Phi_Z1,Phi_Z2,xi_star_Z1,xi_star_Z2,q,qd,qdd)
                 [Omega(:,ij),Z((ij-1)*6+1:6*ij,dofs_here),gstep((ij-1)*4+1:4*ij,:),T((ij-1)*6+1:6*ij,:),S((ij-1)*6+1:6*ij,dofs_here),...
-                f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:)] = SoftJointKinematics_Z4_mex(h(ij),Phi_Z1,Phi_Z2,xi_star_Z1,xi_star_Z2,q(dofs_here));
-                Adgstepinv((ij-1)*6+1:6*ij,:)  = dinamico_Adjoint(ginv(gstep((ij-1)*4+1:4*ij,:)));       
+                 Sd((ij-1)*6+1:6*ij,dofs_here),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),dS_dq_qd((ij-1)*6+1:6*ij,dofs_here),...
+                 dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here),dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)] = SoftJointDifferentialKinematics_Z4_mex(h(ij),Phi_Z1,Phi_Z2,xi_star_Z1,xi_star_Z2,q(dofs_here),qd(dofs_here),qdd(dofs_here));
+                Adgstepinv((ij-1)*6+1:6*ij,:) = dinamico_Adjoint(ginv(gstep((ij-1)*4+1:4*ij,:)));
             else % order 2
                 xi_star_Z  = xi_star(6*(ii-1)+1:6*ii,4);
                 Phi_Z = Linkage.CVRods{i}(j+1).Phi_Z(6*(ii-1)+1:6*ii,:);
-
+                
+                %[Omega,Z,g,T,S,Sd,f,fd,adjOmegap,dSdq_qd,dSdq_qdd,dSddq_qd]=SoftJointDifferentialKinematics_Z2(h,Phi_Z,xi_star_Z,q,qd,qdd)
                 [Omega(:,ij),Z((ij-1)*6+1:6*ij,dofs_here),gstep((ij-1)*4+1:4*ij,:),T((ij-1)*6+1:6*ij,:),S((ij-1)*6+1:6*ij,dofs_here),...
-                f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:)] = SoftJointKinematics_Z2_mex(h(ij),Phi_Z,xi_star_Z,q(dofs_here));
-                Adgstepinv((ij-1)*6+1:6*ij,:)  = dinamico_Adjoint(ginv(gstep((ij-1)*4+1:4*ij,:)));
+                 Sd((ij-1)*6+1:6*ij,dofs_here),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),dS_dq_qd((ij-1)*6+1:6*ij,dofs_here),...
+                 dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here),dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)] = SoftJointDifferentialKinematics_Z4_mex(h(ij),Phi_Z,xi_star_Z,q(dofs_here),qd(dofs_here),qdd(dofs_here));
+                Adgstepinv((ij-1)*6+1:6*ij,:) = dinamico_Adjoint(ginv(gstep((ij-1)*4+1:4*ij,:)));
             end
            
-            Q((ij-1)*6+1:6*ij,dofs_here) = -dinamico_adj(dinamico_Adjoint(ginv(g_here))*G)*S((ij-1)*6+1:6*ij,dofs_here);
+            eta_plus_here  = eta_here+S((ij-1)*6+1:6*ij,dofs_here)*qd(dofs_here);
+            etad_plus_here = etad_here+S((ij-1)*6+1:6*ij,dofs_here)*qdd(dofs_here)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here)*qd(dofs_here)+Sd((ij-1)*6+1:6*ij,dofs_here)*qd(dofs_here);
             
-            J_here  = Adgstepinv((ij-1)*6+1:6*ij,:)*(J_here+S((ij-1)*6+1:6*ij,:));
-            Q_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(Q_Bhere+Q((ij-1)*6+1:6*ij,:));
-            g_here = g_here*gstep((ij-1)*4+1:4*ij,:);
+            R((ij-1)*6+1:6*ij,dofs_here) = dinamico_adj(eta_plus_here)*S((ij-1)*6+1:6*ij,dofs_here)+dS_dq_qd((ij-1)*6+1:6*ij,dofs_here);
+            L((ij-1)*6+1:6*ij,dofs_here) = dinamico_adj(etad_plus_here)*S((ij-1)*6+1:6*ij,dofs_here)+dinamico_adj(eta_plus_here)*R((ij-1)*6+1:6*ij,dofs_here)...
+                                          +dinamico_adj(eta_here)*dS_dq_qd((ij-1)*6+1:6*ij,dofs_here)+dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)+dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here); % L is Q without gravity
+            Q((ij-1)*6+1:6*ij,dofs_here) = L((ij-1)*6+1:6*ij,dofs_here)-dinamico_adj(dinamico_Adjoint(ginv(g_here))*G)*S((ij-1)*6+1:6*ij,dofs_here);
+            Y((ij-1)*6+1:6*ij,dofs_here) = R((ij-1)*6+1:6*ij,dofs_here)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here)+Sd((ij-1)*6+1:6*ij,dofs_here);
+            
+            g_here  = g_here*gstep((ij-1)*4+1:4*ij,:);
 
-            J((i_sig-1)*6+1:6*i_sig,:) = J_here;
-            Q_B((i_sig-1)*6+1:6*i_sig,:) = Q_Bhere;
+            J_here    = Adgstepinv((ij-1)*6+1:6*ij,:)*(J_here+S((ij-1)*6+1:6*ij,:));
+            eta_here  = Adgstepinv((ij-1)*6+1:6*ij,:)*(eta_plus_here);
+            Jd_here   = Adgstepinv((ij-1)*6+1:6*ij,:)*(Jd_here+Sd((ij-1)*6+1:6*ij,:)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here));
+            etad_here = Adgstepinv((ij-1)*6+1:6*ij,:)*(etad_plus_here);
+        
+            R_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(R_Bhere+R((ij-1)*6+1:6*ij,:));
+            L_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(L_Bhere+L((ij-1)*6+1:6*ij,:));
+            Q_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(Q_Bhere+Q((ij-1)*6+1:6*ij,:));
+            Y_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(Y_Bhere+Y((ij-1)*6+1:6*ij,:));
+
             g((i_sig-1)*4+1:4*i_sig,:) = g_here;
+
+            J((i_sig-1)*6+1:6*i_sig,:)    = J_here;
+            eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
+            Jd((i_sig-1)*6+1:6*i_sig,:)   = Jd_here;
+            etad((i_sig-1)*6+1:6*i_sig,:) = etad_here;
+        
+            L_B((i_sig-1)*6+1:6*i_sig,:) = L_Bhere;
+            R_B((i_sig-1)*6+1:6*i_sig,:) = R_Bhere;
+            Q_B((i_sig-1)*6+1:6*i_sig,:) = Q_Bhere;
+            Y_B((i_sig-1)*6+1:6*i_sig,:) = Y_Bhere;
 
             ij = ij+1;
             i_sig = i_sig+1;
@@ -205,11 +349,19 @@ for i=1:N
         end
 
         gf = Linkage.VLinks(Linkage.LinkIndex(i)).gf{j};
-
         Ad_gf_inv = dinamico_Adjoint(ginv(gf));
-        J_here  = Ad_gf_inv*J_here;
-        Q_Bhere = Ad_gf_inv*Q_Bhere;
+
         g_here  = g_here*gf;
+
+        J_here    = Ad_gf_inv*J_here;
+        eta_here  = Ad_gf_inv*eta_here;
+        Jd_here   = Ad_gf_inv*Jd_here;
+        etad_here = Ad_gf_inv*etad_here;
+    
+        R_Bhere = Ad_gf_inv*R_Bhere;
+        L_Bhere = Ad_gf_inv*L_Bhere;
+        Q_Bhere = Ad_gf_inv*Q_Bhere;
+        Y_Bhere = Ad_gf_inv*Y_Bhere;
 
         if ~Linkage.OneBasis
             dof_start = dof_start+dof_here;
@@ -217,6 +369,9 @@ for i=1:N
     end
 
     g_tip((i-1)*4+1:i*4,:) = g_here;
+
+    J_tip((i-1)*6+1:i*6,:) = J_here;
+    eta_tip((i-1)*6+1:i*6,:) = eta_here;
     J_tip((i-1)*6+1:i*6,:) = J_here;
     Q_Btip((i-1)*6+1:i*6,:) = Q_Bhere;
 

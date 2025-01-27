@@ -40,8 +40,11 @@ qdd = coder.typeof(zeros(max_ndof, 1), [max_ndof, 1], [1, 0]); % ndof x 1 with v
 % codegen JointQuantities_FD -args {h,Phi_Z1,Phi_Z2,xi_star_Z1,xi_star_Z2,q,qd}
 % codegen JointQuantitiesR_FD -args {Phi, q, qd}
 codegen SoftJointKinematics_Z4 -args {h,Phi_Z1,Phi_Z2,xi_star_Z1,xi_star_Z2,q}
+codegen SoftJointDifferentialKinematics_Z4 -args {h,Phi_Z1,Phi_Z2,xi_star_Z1,xi_star_Z2,q,qd,qdd}
 codegen SoftJointKinematics_Z2 -args {h,Phi_Z,xi_star,q}
+codegen SoftJointDifferentialKinematics_Z2 -args {h,Phi_Z,xi_star,q,qd,qdd}
 codegen RigidJointKinematics -args {Phi,xi_star,q} %very close to SoftJointKinematics_Z2
+codegen RigidJointDifferentialKinematics -args {Phi,xi_star,q,qd,qdd}
 codegen compute_dSTdqFC_Z4 -args {h, Omega, Phi_Z1, Phi_Z2 ,Z, T, f, fd, adjOmegap, F_C}
 codegen compute_dSTdqFC_Z2R -args {ndof, Omega, Z, f, fd, adjOmegap, F_C}
 codegen SoftActuator -args {u,dc,dcp,xihat_123}

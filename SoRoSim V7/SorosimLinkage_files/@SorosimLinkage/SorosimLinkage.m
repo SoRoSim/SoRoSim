@@ -330,8 +330,8 @@ classdef SorosimLinkage
     
                     end
     
-                    Linkage.CLprecompute.Phi_p  = Phi_p; %Perpendicular basis of the closed loop joint
-                    Linkage.T_BS                = 0.01; %desired settling time constant (Baumgart)
+                    Linkage.CLprecompute.Phi_p = Phi_p; %Perpendicular basis of the closed loop joint
+                    Linkage.T_BS               = 0.01; %desired settling time constant (Baumgart)
 
                     %index corresponding to the start of lambda
     
@@ -789,6 +789,9 @@ classdef SorosimLinkage
             end
             Linkage.CLprecompute.i_sigA = i_sigA;
             Linkage.CLprecompute.i_sigB = i_sigB;
+
+            %To avoid redundant constraitns
+            Linkage = ClosedLoopRedundancyPrecompute(Linkage); 
             
             for ia=1:Linkage.n_sact
                 for i=1:Linkage.N

@@ -2,7 +2,7 @@ function dynamicsOptions = initializeDynamicsOptions(userOptions)
     % Default values
 
     defaultOptions.dt = 0.01;
-    defaultOptions.Jacobian = false;
+    defaultOptions.Jacobian = true;
     defaultOptions.displayTime = true; %display time
     defaultOptions.plotProgress = false; %to plot robot configuration as simulation progresses
     defaultOptions.Integrator = 'ode15s';
@@ -20,4 +20,5 @@ function dynamicsOptions = initializeDynamicsOptions(userOptions)
             dynamicsOptions.(fields{i}) = userOptions.(fields{i});
         end
     end
+    
 end
