@@ -27,7 +27,9 @@ g_des_initial = [0.0000         0   1.0000    0.3
 qu_uq_l0 = zeros(78,1);
 constraints_handle = @(qu_uq_l)constraints1(S1, qu_uq_l);
 options = optimoptions('fmincon','Display','iter', 'OptimalityTolerance',1e-10,'StepTolerance',1e-15 ,'MaxFunctionEvaluations',2e6,'Algorithm', 'active-set', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true);%,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
-qu_uq_l_final = fmincon(@(qu_uq_l)Objective1(S1, qu_uq_l, g_des_initial), qu_uq_l0, [],[],[],[],[],[],constraints_handle,options);
+qu_uq_l_final1 = fmincon(@(qu_uq_l)Objective1(S1, qu_uq_l, g_des_initial), qu_uq_l0, [],[],[],[],[],[],constraints_handle,options);
+qu_uq_l_final2 = fmincon(@(qu_uq_l)Objective1(S1, qu_uq_l, g_des_initial), qu_uq_l0, [],[],[],[],[],[],constraints_handle,options);
+
 
 %% Find a constraining surface that is feasible
 figure
@@ -41,14 +43,13 @@ plot_constraint(constraint_surface);
 
 % qu_uq_l0 = zeros(80,1);
 qu_uq_l0 = [qu_uq_l_final; root1; root2];
-[c, ceq, ~, ~] = Constraints2(S1, qu_uq_l0, constraint_surface)
-%%
 constraints_handle = @(qu_uq_l)Constraints2(S1, qu_uq_l, constraint_surface);
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-10,'StepTolerance',1e-15 ,'MaxFunctionEvaluations',2e6,'Algorithm', 'sqp');%, 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true);%,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
+options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-10,'StepTolerance',1e-15 ,'MaxFunctionEvaluations',2e6,'Algorithm', 'active-set', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true);%,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 lb(1:78) = -inf;
-lb(79:80) = 0;
+lb(79:80) = 0+0.1;
 ub(1:78) = inf;
-ub(79:80) = 1;
+ub(79:80) = 1-0.1;
+
 
 qu_uq_l_final1 = fmincon(@(qu_uq_l)Objective2(S1, qu_uq_l, g_des_initial), qu_uq_l0, [],[],[],[],lb,ub,constraints_handle,options);
 qu_uq_l_final2 = fmincon(@(qu_uq_l)Objective2(S1, qu_uq_l, g_des_final), qu_uq_l0, [],[],[],[],lb,ub,constraints_handle,options);
@@ -79,7 +80,7 @@ initial_guess = initial_guess(:);
 constraints_handle = @(qu_uq_l)Constraint3(S1, qu_uq_l, n_points, g_des_initial);
 options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-20,'StepTolerance',1e-14 ,'MaxFunctionEvaluations',2e10, 'DiffMinChange', 1e-5,'Algorithm','active-set','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 
-qu_uq_l_con = fmincon(@(qu_uq_l)Objective3(S1, qu_uq_l,g_des_final),initial_guess, [],[],[],[],[],[],constraints_handle,options);
+qu_uq_l_con = fmincon(@(qu_uq_l)Objective3(S1, qu_uq_l,g_des_final, n_points),initial_guess, [],[],[],[],[],[],constraints_handle,options);
 save("Datafiles/zy_rotation_neg15_degs.mat","qu_uq_l_con")
 %%
 objective_function(S1, qu_uq_l_con,g_des_final)
