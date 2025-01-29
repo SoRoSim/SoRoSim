@@ -1,4 +1,4 @@
-function [ID,tau,e,dID_dq,dID_dqd,dID_dqdd,dID_dlambda,dtau_dq,dtau_dqd,dtau_du,de_dq,de_dqd,de_dqdd,daction_dq,daction_dqd] = DAEJacobians(Linkage,q,qd,qdd,u,lambda,index)
+function [dID_dq,dID_dqd,dID_dqdd,dID_dlambda,dtau_dq,dtau_dqd,dtau_du,de_dq,de_dqd,de_dqdd,daction_dq,daction_dqd] = DAEonlyJacobians(Linkage,q,qd,qdd,u,lambda,index)
 
 %For index 1 DAE e=e(q,qd,qdd). For index 3 DAE e=e(q)
 
@@ -17,17 +17,15 @@ else
     daction_dqd = 0;
 end
 
-ID       = zeros(ndof,1); %Generalized Inertial+Coriolis-External 
 dID_dq   = zeros(ndof,ndof);
 dID_dqd  = zeros(ndof,ndof);
 dID_dqdd = zeros(ndof,ndof); %same as M
 % dID_dlambda = -A'
 
-%tau, dtau_dq, dtau_dqd, dtau_du (B) are initialized later
+%dtau_dq, dtau_dqd, dtau_du (B) are initialized later
 
 if Linkage.nCLj>1
     nCLp  = Linkage.CLprecompute.nCLp;
-    e = zeros(nCLp,1); %constrain index 1 or 3
     de_dq = zeros(nCLp,ndof);
     if index == 1
         de_dqd  = zeros(nCLp,ndof);
@@ -37,7 +35,7 @@ if Linkage.nCLj>1
         de_dqdd = 0;
     end
 else
-    e = []; de_dq = []; de_dqd = []; de_dqdd = [];
+    de_dq = []; de_dqd = []; de_dqdd = [];
 end
 
 Fk = zeros(6*nsig,1); %External point force at every significant point
@@ -487,7 +485,6 @@ if Linkage.nCLj>0
         diffJAB = JA-JB; %in B frame
 
         A(il_start:il_start+nl-1,:) = Phi_p'*diffJAB;
-        e(il_start:il_start+nl-1) = Phi_p'*OmegaBA;
 
         [~,T_RodBA] = variable_expmap_gTg_mex(OmegaBA); %Tangent operator of the twist vector
         if index==1
@@ -531,7 +528,6 @@ if Linkage.nCLj>0
 
     dID_dlambda = -A';
     if index==1
-        e = A*qdd+(Ad+2/T_BS*A)*qd+1/T_BS^2*e;
         de_dqdd = A;
     end
 
@@ -703,7 +699,6 @@ for i=N:-1:1 %backwards
                 dSTdq_FC_full = zeros(dof_here,ndof);
                 dSTdq_FC_full(:,dofs_here) = dSTdq_FC;
                 
-                ID(dofs_here,:) = ID(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*F_C;
                 dID_dq(dofs_here,:) = dID_dq(dofs_here,:)+dSTdq_FC_full+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*R_B((isig-1)*6+1:6*isig,:)+M_C*Q_B((isig-1)*6+1:6*isig,:)+U_S+P_S);
                 dID_dqd(dofs_here,:) = dID_dqd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*J((isig-1)*6+1:6*isig,:)+M_C*Y_B((isig-1)*6+1:6*isig,:)+V_S);
                 dID_dqdd(dofs_here,:) = dID_dqdd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(M_C*J((isig-1)*6+1:6*isig,:)+W_S);
@@ -784,7 +779,6 @@ for i=N:-1:1 %backwards
         dSTdq_FC_full = zeros(dof_here,ndof);
         dSTdq_FC_full(:,dofs_here) = dSTdq_FC;
     
-        ID(dofs_here,:) = ID(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*F_C;
         dID_dq(dofs_here,:) = dID_dq(dofs_here,:)+dSTdq_FC_full+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*R_B((isig-1)*6+1:6*isig,:)+M_C*Q_B((isig-1)*6+1:6*isig,:)+U_S+P_S);
         dID_dqd(dofs_here,:) = dID_dqd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*J((isig-1)*6+1:6*isig,:)+M_C*Y_B((isig-1)*6+1:6*isig,:)+V_S);
         dID_dqdd(dofs_here,:) = dID_dqdd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(M_C*J((isig-1)*6+1:6*isig,:)+W_S);
@@ -822,7 +816,6 @@ else
     D = 0;
 end
 K = Linkage.K; 
-tau = -K*q-D*qd; %tau = Bu-Kq
 
 dtau_dq = -K; %more to add
 dtau_dqd = -D;
@@ -908,15 +901,13 @@ if Linkage.Actuated
         end
     end
 
-    tau = tau+B*u;
     dtau_du = B;
 end
 %% Custom Soft Actuation
 
 if Linkage.CA
     [Fact,dFact_dq] = CustomActuation(Linkage,q,g,J,0,zeros(ndof,1),zeros(6*nsig,1),zeros(6*nsig,ndof));
-    [tauC,dtauC_dq] = CustomActuation_Qspace(Linkage,Fact,dFact_dq);
-    tau = tau+tauC;
+    [~,dtauC_dq] = CustomActuation_Qspace(Linkage,Fact,dFact_dq);
     dtau_dq = dtau_dq+dtauC_dq;
 end
 

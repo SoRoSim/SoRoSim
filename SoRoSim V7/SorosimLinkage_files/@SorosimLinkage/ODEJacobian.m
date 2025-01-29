@@ -50,8 +50,8 @@ function dxd_dx = ODEJacobian(Linkage,t,x,dynamicAction,GUI_actionInput)
         end
     end
 
-    %[ID,tau,e,dID_dq,dID_dqd,dID_dqdd,dID_dlambda,dtaudq,dtau_dqd,dtau_du,de_dq,de_dqd,de_dqdd,daction_dq,daction_dqd] = DAEJacobians(q,qd,qdd,u,lambda,index); %dIDd_lambda = -A', dtau_du = B, de_dqdd is A
-    [~,~,~,dID_dq,dID_dqd,~,~,dtau_dq,dtau_dqd,~,de_dq,de_dqd,~,daction_dq,daction_dqd] = DAEJacobians(Linkage,q,qd,qdd,u,lambda,1); 
+    %[dID_dq,dID_dqd,dtau_dq,dtau_dqd,de_dq,de_dqd,daction_dq,daction_dqd] = DAEJacobians_qqd_i1(Linkage,q,qd,qdd,u,lambda)
+    [dID_dq,dID_dqd,dtau_dq,dtau_dqd,de_dq,de_dqd,daction_dq,daction_dqd] = DAEi1Jacobians_qqd(Linkage,q,qd,qdd,u,lambda);
   
     dFD_dq = zeros(ndof,ndof);
     dFD_dqd = zeros(ndof,ndof);
