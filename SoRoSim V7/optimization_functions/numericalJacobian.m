@@ -10,7 +10,7 @@ function [J, J_ana] = numericalJacobian(func, x, epsilon)
         x_backward = x;
         x_forward(i) = x_forward(i) + epsilon;
         x_backward(i) = x_backward(i) - epsilon;
-        J(i,:) = (func(x_forward) - func(x_backward)) / (2 * epsilon);
+        J(:,i) = (func(x_forward) - func(x_backward)) / (2 * epsilon);
     end
     [~,J_ana] =  func(x);
 end

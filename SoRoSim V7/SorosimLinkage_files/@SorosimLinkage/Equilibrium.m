@@ -287,7 +287,7 @@ for iCLj=1:Linkage.nCLj
     Adj_gBA = dinamico_Adjoint(gBA);
     diffJAB = Adj_gBA*JA-JB; %in B frame
 
-    [~,T_RodBA] = variable_expmap_gTg_mex(OmegaBA); %Tangent operator of the twist vector
+    [~,T_RodBA] = variable_expmap_gTg(OmegaBA); %Tangent operator of the twist vector
 
     A(il_start:il_start+nl-1,:) = Phi_p'*diffJAB;
     e(il_start:il_start+nl-1) = Phi_p'*OmegaBA;
