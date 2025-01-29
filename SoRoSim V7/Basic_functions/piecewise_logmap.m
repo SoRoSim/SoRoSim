@@ -13,7 +13,7 @@ if theta<1e-2
     xcihat      =f1*diag([1 1 1 1])+f2*g+f3*gp2+f4*gp3;
 else
     
-    t0=x*theta;
+    t0=theta;
     t1=sin(t0);
     t2=cos(t0);
     t3=2*t1*t2;
