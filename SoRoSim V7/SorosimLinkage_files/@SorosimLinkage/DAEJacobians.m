@@ -25,7 +25,7 @@ dID_dqdd = zeros(ndof,ndof); %same as M
 
 %tau, dtau_dq, dtau_dqd, dtau_du (B) are initialized later
 
-if Linkage.nCLj>1
+if Linkage.nCLj>0
     nCLp  = Linkage.CLprecompute.nCLp;
     e = zeros(nCLp,1); %constrain index 1 or 3
     de_dq = zeros(nCLp,ndof);
@@ -167,14 +167,14 @@ for i=1:N
     L((ij-1)*6+1:6*ij,dofs_here) = dinamico_adj(etad_plus_here)*S((ij-1)*6+1:6*ij,dofs_here)+dinamico_adj(eta_plus_here)*R((ij-1)*6+1:6*ij,dofs_here)...
                                   +dinamico_adj(eta_here)*dS_dq_qd((ij-1)*6+1:6*ij,dofs_here)+dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)+dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here); % L is Q without gravity
     Q((ij-1)*6+1:6*ij,dofs_here) = L((ij-1)*6+1:6*ij,dofs_here)-dinamico_adj(dinamico_Adjoint(ginv(g_here))*G)*S((ij-1)*6+1:6*ij,dofs_here);
-    Y((ij-1)*6+1:6*ij,dofs_here) = R((ij-1)*6+1:6*ij,dofs_here)+Sd((ij-1)*6+1:6*ij,:)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here);
+    Y((ij-1)*6+1:6*ij,dofs_here) = R((ij-1)*6+1:6*ij,dofs_here)+Sd((ij-1)*6+1:6*ij,dofs_here)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here);
     
     % from 0 to 1 of rigid joint
     g_here  = g_here*gstep((ij-1)*4+1:4*ij,:);
 
     J_here    = Adgstepinv((ij-1)*6+1:6*ij,:)*(J_here+S((ij-1)*6+1:6*ij,:));
     eta_here  = Adgstepinv((ij-1)*6+1:6*ij,:)*(eta_plus_here);
-    Jd_here   = Adgstepinv((ij-1)*6+1:6*ij,:)*(Jd_here+Sd((ij-1)*6+1:6*ij,:)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here));
+    Jd_here   = Adgstepinv((ij-1)*6+1:6*ij,:)*(Jd_here+Sd((ij-1)*6+1:6*ij,:)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,:));
     etad_here = Adgstepinv((ij-1)*6+1:6*ij,:)*(etad_plus_here);
 
     R_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(R_Bhere+R((ij-1)*6+1:6*ij,:));
@@ -306,13 +306,13 @@ for i=1:N
             L((ij-1)*6+1:6*ij,dofs_here) = dinamico_adj(etad_plus_here)*S((ij-1)*6+1:6*ij,dofs_here)+dinamico_adj(eta_plus_here)*R((ij-1)*6+1:6*ij,dofs_here)...
                                           +dinamico_adj(eta_here)*dS_dq_qd((ij-1)*6+1:6*ij,dofs_here)+dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)+dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here); % L is Q without gravity
             Q((ij-1)*6+1:6*ij,dofs_here) = L((ij-1)*6+1:6*ij,dofs_here)-dinamico_adj(dinamico_Adjoint(ginv(g_here))*G)*S((ij-1)*6+1:6*ij,dofs_here);
-            Y((ij-1)*6+1:6*ij,dofs_here) = R((ij-1)*6+1:6*ij,dofs_here)+Sd((ij-1)*6+1:6*ij,:)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here);
+            Y((ij-1)*6+1:6*ij,dofs_here) = R((ij-1)*6+1:6*ij,dofs_here)+Sd((ij-1)*6+1:6*ij,dofs_here)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here);
             
             g_here  = g_here*gstep((ij-1)*4+1:4*ij,:);
 
             J_here    = Adgstepinv((ij-1)*6+1:6*ij,:)*(J_here+S((ij-1)*6+1:6*ij,:));
             eta_here  = Adgstepinv((ij-1)*6+1:6*ij,:)*(eta_plus_here);
-            Jd_here   = Adgstepinv((ij-1)*6+1:6*ij,:)*(Jd_here+Sd((ij-1)*6+1:6*ij,:)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,dofs_here));
+            Jd_here   = Adgstepinv((ij-1)*6+1:6*ij,:)*(Jd_here+Sd((ij-1)*6+1:6*ij,:)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,:));
             etad_here = Adgstepinv((ij-1)*6+1:6*ij,:)*(etad_plus_here);
         
             R_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(R_Bhere+R((ij-1)*6+1:6*ij,:));
@@ -431,7 +431,7 @@ if Linkage.nCLj>0
                 JdA       = Ad_inv_gA2CLj*Jd((i_sigA-1)*6+1:i_sigA*6,:);
                 deta_dqA  = Ad_inv_gA2CLj*R_B((i_sigA-1)*6+1:i_sigA*6,:); %RB is deta_dq
                 detad_dqA = Ad_inv_gA2CLj*(L_B((i_sigA-1)*6+1:i_sigA*6,:)-dinamico_adj(eta((i_sigA-1)*6+1:i_sigA*6))*R_B((i_sigA-1)*6+1:i_sigA*6,:)); %LB-ad(eta)*RB is detad_dq
-                dpsi_dqdA = Ad_inv_gA2CLj(Y_B((i_sigA-1)*6+1:i_sigA*6,:)-dinamico_adj(eta((i_sigA-1)*6+1:i_sigA*6))*J((i_sigA-1)*6+1:i_sigA*6,:)); %YB-ad(eta)*J is detad_dqd = dpsi_dqd
+                dpsi_dqdA = Ad_inv_gA2CLj*(Y_B((i_sigA-1)*6+1:i_sigA*6,:)-dinamico_adj(eta((i_sigA-1)*6+1:i_sigA*6))*J((i_sigA-1)*6+1:i_sigA*6,:)); %YB-ad(eta)*J is detad_dqd = dpsi_dqd
             end
         else %if ground
             gA = Linkage.gACLj{iCLj};
@@ -462,7 +462,7 @@ if Linkage.nCLj>0
                 JdB       = Ad_inv_gB2CLj*Jd((i_sigB-1)*6+1:i_sigB*6,:);
                 deta_dqB  = Ad_inv_gB2CLj*R_B((i_sigB-1)*6+1:i_sigB*6,:);
                 detad_dqB = Ad_inv_gB2CLj*(L_B((i_sigB-1)*6+1:i_sigB*6,:)-dinamico_adj(eta((i_sigB-1)*6+1:i_sigB*6))*R_B((i_sigB-1)*6+1:i_sigB*6,:));
-                dpsi_dqdB = Ad_inv_gB2CLj(Y_B((i_sigB-1)*6+1:i_sigB*6,:)-dinamico_adj(eta((i_sigB-1)*6+1:i_sigB*6))*J((i_sigB-1)*6+1:i_sigB*6,:));
+                dpsi_dqdB = Ad_inv_gB2CLj*(Y_B((i_sigB-1)*6+1:i_sigB*6,:)-dinamico_adj(eta((i_sigB-1)*6+1:i_sigB*6))*J((i_sigB-1)*6+1:i_sigB*6,:));
             end
         else %if ground
             gB = Linkage.gBCLj{iCLj};
@@ -506,7 +506,7 @@ if Linkage.nCLj>0
             % e = A*qdd+Ad*qd+2/T*A*qd+2/T^2*e = Phi_p'(Adj_gBA*etad_A - etad_B - adj_eta_B*Adj_gBA*eta_A + 2/T*(Adj_gBA*eta_A - eta_B) + 2/T^2*OmegaBA)
             de_dq(il_start:il_start+nl-1,:) = Phi_p'*(-dinamico_adj(etad_A)*diffJAB + diffdetad_dqAB + dinamico_adj(eta_A)*deta_dqB+dinamico_adj(eta_B)*dinamico_adj(eta_A)*diffJAB-dinamico_adj(eta_B)*deta_dqA...
                                              +2/T_BS*(-dinamico_adj(eta_A)*diffJAB+diffdeta_dqAB)...
-                                             +1/T_BS^2*T_RodBA\diffJAB);
+                                             +1/(T_BS^2)*(T_RodBA\diffJAB));
             de_dqd(il_start:il_start+nl-1,:) = Phi_p'*(diffdpsi_dqdAB+dinamico_adj(eta_A)*JB-dinamico_adj(eta_B)*JA+2/T_BS*diffJAB);
         else
             de_dq(il_start:il_start+nl-1,:) = Phi_p'*(T_RodBA\diffJAB);
@@ -704,9 +704,9 @@ for i=N:-1:1 %backwards
                 dSTdq_FC_full(:,dofs_here) = dSTdq_FC;
                 
                 ID(dofs_here,:) = ID(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*F_C;
-                dID_dq(dofs_here,:) = dID_dq(dofs_here,:)+dSTdq_FC_full+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*R_B((isig-1)*6+1:6*isig,:)+M_C*Q_B((isig-1)*6+1:6*isig,:)+U_S+P_S);
-                dID_dqd(dofs_here,:) = dID_dqd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*J((isig-1)*6+1:6*isig,:)+M_C*Y_B((isig-1)*6+1:6*isig,:)+V_S);
-                dID_dqdd(dofs_here,:) = dID_dqdd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(M_C*J((isig-1)*6+1:6*isig,:)+W_S);
+                dID_dq(dofs_here,:) = dID_dq(dofs_here,:)+dSTdq_FC_full+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*R_B((i_sig-1)*6+1:6*i_sig,:)+M_C*Q_B((i_sig-1)*6+1:6*i_sig,:)+U_S+P_S);
+                dID_dqd(dofs_here,:) = dID_dqd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*J((i_sig-1)*6+1:6*i_sig,:)+M_C*Y_B((i_sig-1)*6+1:6*i_sig,:)+V_S);
+                dID_dqdd(dofs_here,:) = dID_dqdd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(M_C*J((i_sig-1)*6+1:6*i_sig,:)+W_S);
     
                 i_sig = i_sig-1;
                 ij = ij-1;
@@ -785,9 +785,9 @@ for i=N:-1:1 %backwards
         dSTdq_FC_full(:,dofs_here) = dSTdq_FC;
     
         ID(dofs_here,:) = ID(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*F_C;
-        dID_dq(dofs_here,:) = dID_dq(dofs_here,:)+dSTdq_FC_full+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*R_B((isig-1)*6+1:6*isig,:)+M_C*Q_B((isig-1)*6+1:6*isig,:)+U_S+P_S);
-        dID_dqd(dofs_here,:) = dID_dqd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*J((isig-1)*6+1:6*isig,:)+M_C*Y_B((isig-1)*6+1:6*isig,:)+V_S);
-        dID_dqdd(dofs_here,:) = dID_dqdd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(M_C*J((isig-1)*6+1:6*isig,:)+W_S);
+        dID_dq(dofs_here,:) = dID_dq(dofs_here,:)+dSTdq_FC_full+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*R_B((i_sig-1)*6+1:6*i_sig,:)+M_C*Q_B((i_sig-1)*6+1:6*i_sig,:)+U_S+P_S);
+        dID_dqd(dofs_here,:) = dID_dqd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(N_C*J((i_sig-1)*6+1:6*i_sig,:)+M_C*Y_B((i_sig-1)*6+1:6*i_sig,:)+V_S);
+        dID_dqdd(dofs_here,:) = dID_dqdd(dofs_here,:)+S((ij-1)*6+1:6*ij,dofs_here)'*(M_C*J((i_sig-1)*6+1:6*i_sig,:)+W_S);
     end
     
     i_sig = i_sig-1;
@@ -914,7 +914,7 @@ end
 %% Custom Soft Actuation
 
 if Linkage.CA
-    [Fact,dFact_dq] = CustomActuation(Linkage,q,g,J,0,zeros(ndof,1),zeros(6*nsig,1),zeros(6*nsig,ndof));
+    [Fact,dFact_dq] = CustomActuation(Linkage,q,g,J,t,qd,Jd);
     [tauC,dtauC_dq] = CustomActuation_Qspace(Linkage,Fact,dFact_dq);
     tau = tau+tauC;
     dtau_dq = dtau_dq+dtauC_dq;

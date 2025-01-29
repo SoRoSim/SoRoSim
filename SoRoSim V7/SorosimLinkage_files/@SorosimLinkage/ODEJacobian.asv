@@ -37,8 +37,8 @@ function dxd_dx = ODEJacobian(Linkage,t,x,dynamicAction,GUI_actionInput)
     end
 
     [y,C,B_action,action] = dynamicsSolver(Linkage,t,[q;qd],action); %solves for x = [qdd_u; u_u; lambda], for a given t, q, qd, and action
-    qdd = y(1:ndof);
-    u   = action;
+    qdd = zeros(ndof,1);
+    u   = zeros(nact,1);
     lambda = y(ndof+1:end);
 
     if Linkage.Actuated
@@ -68,8 +68,9 @@ function dxd_dx = ODEJacobian(Linkage,t,x,dynamicAction,GUI_actionInput)
             end
 
             dFD_dq(Linkage.ActuationPrecompute.index_q_u,Linkage.ActuationPrecompute.index_q_u) = dy_dq(1:ndof-n_k,Linkage.ActuationPrecompute.index_q_u);
-            dFD_dqd(Linkage.ActuationPrecompute.index_q_u,Linkage.ActuationPrecompute.index_q_u) = dy_dqd(1:ndof-n_k,Linkage.ActuationPrecompute.index_q_u);
-
+            dFD_dq(:,Linkage.ActuationPrecompute.index_q_k) = zeros(ndof,n_k);
+            dFD_dqd(Linkage.ActuationPrecompute.index_q_u,:) = dy_dqd(:,1:ndof-n_k);
+            dFD_dqd(:,Linkage.ActuationPrecompute.index_q_k) = zeros(ndof,n_k);
         else
             dy_dq  = C\([dtau_dq-dID_dq;-de_dq]);
             dy_dqd = C\([dtau_dqd-dID_dqd;-de_dqd]);
@@ -88,9 +89,10 @@ function dxd_dx = ODEJacobian(Linkage,t,x,dynamicAction,GUI_actionInput)
                 dy_dqd = C\(dtau_dqd-dID_dqd);
             end
 
-            dFD_dq(Linkage.ActuationPrecompute.index_q_u,Linkage.ActuationPrecompute.index_q_u) = dy_dq(1:ndof-n_k,Linkage.ActuationPrecompute.index_q_u);
-            dFD_dqd(Linkage.ActuationPrecompute.index_q_u,Linkage.ActuationPrecompute.index_q_u) = dy_dqd(1:ndof-n_k,Linkage.ActuationPrecompute.index_q_u);
-
+            dFD_dq(Linkage.ActuationPrecompute.index_q_u,:) = dy_dq(:,1:ndof-n_k);
+            dFD_dq(:,Linkage.ActuationPrecompute.index_q_k) = zeros(ndof,n_k);
+            dFD_dqd(Linkage.ActuationPrecompute.index_q_u,:) = dy_dqd(:,1:ndof-n_k);
+            dFD_dqd(:,Linkage.ActuationPrecompute.index_q_k) = zeros(ndof,n_k);
         else
             dy_dq  = C\(dtau_dq-dID_dq);
             dy_dqd = C\(dtau_dqd-dID_dqd);
