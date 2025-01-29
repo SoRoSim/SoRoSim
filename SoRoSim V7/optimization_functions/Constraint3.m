@@ -1,4 +1,4 @@
-function [c, ceq, dc, dceq] = Constraint3(Linkage, x, n_points, g_des_initial)
+function [c,ceq, dc,dceq] = Constraint3(Linkage, x, n_points, g_des_initial)
     c = [];
     ceq = [];
     dc = [];
