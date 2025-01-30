@@ -4,7 +4,7 @@ function [J, J_ana] = numericalJacobian(func, x, epsilon)
     end
     n = length(x);
     
-    J = zeros(n, length(func(x)));
+    J = zeros(length(func(x)),n);
     for i = 1:n
         x_forward = x;
         x_backward = x;

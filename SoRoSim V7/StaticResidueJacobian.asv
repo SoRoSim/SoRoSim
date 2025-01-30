@@ -4,7 +4,7 @@ N    = Linkage.N;
 ndof = Linkage.ndof;
 nsig = Linkage.nsig; %Total number of computational points
 nj   = Linkage.nj;   %Total number of joints (rigid and virtual soft joints (nip-1))
-nact = Linkage.nact;
+
 
 
 if Linkage.CAI
@@ -610,7 +610,7 @@ if Linkage.nCLj>0 %if there are closed chain joints
 
     Jac_q = [dtaumID_dq;de_dq];
     Jac_l = [A'; zeros(nCLp,nCLp)];
-    Jac_u = [B;zeros(nCLp, nact)];
+    Jac_u = [B]
 else
     Res = taumID;
     if Linkage.Actuated
@@ -625,9 +625,9 @@ else
     end
 end
 
-% if magnifier
-%     Res = Res*1e6;
-%     Jac = Jac*1e6;
-% end
+if magnifier
+    Res = Res*1e6;
+    Jac = Jac*1e6;
+end
 
 end

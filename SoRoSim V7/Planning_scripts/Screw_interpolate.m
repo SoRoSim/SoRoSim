@@ -18,8 +18,10 @@ function [g_interpolated, xi_interpolated, J_interpolated] = Screw_interpolate(L
         J_interpolated = J(6*idx-5:6*idx);
         return;
     end
-    if idx ==7
-    disp(xbar)
+    if idx >=7
+        
+        disp(xbar)
+
     end
 
     t_i = T(idx);
