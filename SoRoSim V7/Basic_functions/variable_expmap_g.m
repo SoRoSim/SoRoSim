@@ -7,7 +7,7 @@ Gammahat  = dinamico_hat(Gamma);
 Gammahatp2 = Gammahat*Gammahat;
 Gammahatp3 = Gammahatp2*Gammahat;
 
-if (theta<=1e-6)
+if (theta<=1e-2)
     g  = [1 0 0 0;0 1 0 0;0 0 1 0;0 0 0 1]+Gammahat+Gammahatp2/2+Gammahatp3/6;
 else
 

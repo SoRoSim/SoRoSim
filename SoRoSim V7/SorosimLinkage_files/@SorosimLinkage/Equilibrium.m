@@ -178,7 +178,7 @@ for i=1:N
                 Phi_Z2 = Linkage.CVRods{i}(j+1).Phi_Z2(6*(ii-1)+1:6*ii,:);
 
                 [Omega(:,ij),Z((ij-1)*6+1:6*ij,dofs_here),gstep((ij-1)*4+1:4*ij,:),T((ij-1)*6+1:6*ij,:),S((ij-1)*6+1:6*ij,dofs_here),...
-                f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:)] = SoftJointKinematics_Z4_mex(h(ij),Phi_Z1,Phi_Z2,xi_star_Z1,xi_star_Z2,q(dofs_here));
+                f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:)] = SoftJointKinematics_Z4(h(ij),Phi_Z1,Phi_Z2,xi_star_Z1,xi_star_Z2,q(dofs_here));
                 Adgstepinv((ij-1)*6+1:6*ij,:)  = dinamico_Adjoint(ginv(gstep((ij-1)*4+1:4*ij,:)));       
             else % order 2
                 xi_star_Z  = xi_star(6*(ii-1)+1:6*ii,4);

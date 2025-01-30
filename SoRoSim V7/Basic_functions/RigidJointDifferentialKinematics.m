@@ -34,27 +34,29 @@ function [Omega,Z,g,T,S,Sd,f,fd,adjOmegap,dSdq_qd,dSdq_qdd,dSddq_qd]=RigidJointD
     adjOmegapd(13:18,:) = adjOmegapd(7:12,:)*adjOmegap(1:6,:)+adjOmegap(7:12,:)*adjOmegapd(1:6,:);
     adjOmegapd(19:24,:) = adjOmegapd(13:18,:)*adjOmegap(1:6,:)+adjOmegap(13:18,:)*adjOmegapd(1:6,:);
 
+    
+
     if (theta<=1e-2)
         g  = [1 0 0 0;0 1 0 0;0 0 1 0;0 0 0 1]+Omegahat+Omegahatp2/2+Omegahatp3/6;
 
         f(1) = 1/2;
         f(2) = 1/6;
         f(3) = 1/24;
-        f(4) = 1/120; %fd is already initialized to 0
+        f(4) = 1/120;
 
         T  = [1 0 0 0 0 0;0 1 0 0 0 0;0 0 1 0 0 0;0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1]+f(1)*adjOmegap(1:6,:)+f(2)*adjOmegap(7:12,:)+f(3)*adjOmegap(13:18,:)+f(4)*adjOmegap(19:24,:);
         Td = f(1)*adjOmegapd(1:6,:)+f(2)*adjOmegapd(7:12,:)+f(3)*adjOmegapd(13:18,:)+f(4)*adjOmegapd(19:24,:);
     else
         
-        tp2        = theta*theta;
-        tp3        = tp2*theta;
-        tp4        = tp3*theta;
-        tp5        = tp4*theta;
-        tp6        = tp5*theta;
-        tp7        = tp6*theta;
+        tp2 = theta*theta;
+        tp3 = tp2*theta;
+        tp4 = tp3*theta;
+        tp5 = tp4*theta;
+        tp6 = tp5*theta;
+        tp7 = tp6*theta;
         
-        sintheta   = sin(theta);
-        costheta   = cos(theta);
+        sintheta = sin(theta);
+        costheta = cos(theta);
         
         t1 = theta*sintheta;
         t2 = theta*costheta;
@@ -103,7 +105,7 @@ function [Omega,Z,g,T,S,Sd,f,fd,adjOmegap,dSdq_qd,dSdq_qdd,dSddq_qd]=RigidJointD
     Zqdd = Z*qdd;
     if (theta<=1e-2)
         for r=1:4 %1st for loop
-            %nothing here as fd and fdd are zero
+        %nothing here
             for u=1:r %2nd for loop
                 
                 if u==1

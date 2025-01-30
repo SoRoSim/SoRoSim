@@ -36,7 +36,10 @@ function [Omega,Z,g,T,S,f,fd,adjOmegap] = SoftJointKinematics_Z4(h,Phi_Z1,Phi_Z2
     adjOmegap(13:18,:) = adjOmegap(7:12,:)*adjOmegap(1:6,:);
     adjOmegap(19:24,:) = adjOmegap(13:18,:)*adjOmegap(1:6,:);
 
+    
+
     if (theta<=1e-2)
+
         g  = [1 0 0 0;0 1 0 0;0 0 1 0;0 0 0 1]+Omegahat+Omegahatp2/2+Omegahatp3/6;
 
         f(1) = 1/2;
@@ -47,14 +50,14 @@ function [Omega,Z,g,T,S,f,fd,adjOmegap] = SoftJointKinematics_Z4(h,Phi_Z1,Phi_Z2
         T  = [1 0 0 0 0 0;0 1 0 0 0 0;0 0 1 0 0 0;0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1]+f(1)*adjOmegap(1:6,:)+f(2)*adjOmegap(7:12,:)+f(3)*adjOmegap(13:18,:)+f(4)*adjOmegap(19:24,:);
     else
  
-        tp2        = theta*theta;
-        tp3        = tp2*theta;
-        tp4        = tp3*theta;
-        tp5        = tp4*theta;
-        tp6        = tp5*theta;
+        tp2 = theta*theta;
+        tp3 = tp2*theta;
+        tp4 = tp3*theta;
+        tp5 = tp4*theta;
+        tp6 = tp5*theta;
         
-        sintheta   = sin(theta);
-        costheta   = cos(theta);
+        sintheta = sin(theta);
+        costheta = cos(theta);
         
         t1 = theta*sintheta;
         t2 = theta*costheta;
