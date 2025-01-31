@@ -1,4 +1,4 @@
-function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, constraint_surface)    
+function [c,ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, constraint_surface)    
     c = [];
     ceq = [];
     num_variables= length(x)/n_points;
@@ -14,6 +14,7 @@ function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, 
         
         [res, jac_q, jac_u, jac_l] = StaticResidueJacobian(Linkage, q, u, l);
         ceq = [ceq; res];
+
         dceq((i-1)*num_variables +1:i*num_variables-2, (i-1)*66+1:i*66) = [jac_q jac_u jac_l]';  %% Remove the 66 and make it general later
 
 
@@ -23,9 +24,8 @@ function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, 
 
         eq1 = norm(constraint_surface.hole_1  - xh1)^2;
 
-        c = [c; eq1 - 0.5*(constraint_surface.radius + 0.01)^2];
+        c = [c; eq1 - 0.4*(constraint_surface.radius + 0.01)^2];
 
-        dc = zeros(length(x), length(c));
         dc((i-1)*num_variables + Linkage.ndof + 19,2*i-1) = -2*(constraint_surface.hole_1 - xh1)'*g_xbar1(1:3,1:3)*xi_xbar1(4:6);
         dc((i-1)*num_variables + 1:(i-1)*num_variables +Linkage.ndof,2*1-1) = -2*(constraint_surface.hole_1 - xh1)'*g_xbar1(1:3,1:3)*J_xbar1(4:6,:);
         
@@ -35,7 +35,7 @@ function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, 
     
         eq2 = norm(constraint_surface.hole_2 - xh2)^2;
     
-        c = [c; eq2 - 0.5*(constraint_surface.radius + 0.01)^2];
+        c = [c; eq2 - 0.4*(constraint_surface.radius + 0.01)^2];
     
         dc((i-1)*num_variables + Linkage.ndof + 20,2*i) = -2*(constraint_surface.hole_2 - xh2)'*g_xbar2(1:3,1:3)*xi_xbar2(4:6);
         dc((i-1)*num_variables + 1:(i-1)*num_variables +Linkage.ndof,2*i) = -2*(constraint_surface.hole_2 - xh2)'*g_xbar2(1:3,1:3)*J_xbar2(4:6,:);

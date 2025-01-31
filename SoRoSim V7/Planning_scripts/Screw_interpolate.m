@@ -19,15 +19,13 @@ function [g_interpolated, xi_interpolated, J_interpolated] = Screw_interpolate(L
         return;
     end
     if idx >=7
-        
         disp(xbar)
-
     end
 
     t_i = T(idx);
     t_next = T(idx + 1);
-    g_i = g(4*idx-3:4*idx,:);
-    g_next = g(4*(idx+1)-3:4*(idx+1),:);
+    g_i = g(4*idx+1:4*(idx+1),:);
+    g_next = g(4*(idx+1)+1:4*(idx+2),:);
 
     % Compute interpolation parameter alpha
     alpha = (xbar - t_i) / (t_next - t_i);
@@ -47,11 +45,11 @@ function [g_interpolated, xi_interpolated, J_interpolated] = Screw_interpolate(L
     % Interpolated transformation
     g_interpolated = g_i * g_alpha;
 
-    xi_index = xi(6*idx + 1: 6*(idx+1));
-    xi_pre_index = xi(6*(idx-1)+1:6*idx);
+    xi_pre_index = xi(6*idx + 1: 6*(idx+1));
+    xi_index = xi(6*(idx+1)+1:6*(idx+2));
     xi_interpolated = (1-alpha)*xi_pre_index + alpha * xi_index;
     
-    J_index = J(6*idx + 1: 6*(idx+1),:);
-    J_pre_index = J(6*(idx-1)+1:6*idx,:);
+    J_pre_index = J(6*idx + 1: 6*(idx+1),:);
+    J_index = J(6*(idx+1)+1:6*(idx+2),:);
     J_interpolated = (1-alpha)*J_pre_index + alpha * J_index;
 end
