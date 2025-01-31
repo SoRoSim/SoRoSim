@@ -23,7 +23,7 @@ function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, 
 
         eq1 = norm(constraint_surface.hole_1  - xh1)^2;
 
-        c = [c; eq1 - (constraint_surface.radius + 0.01)^2];
+        c = [c; eq1 - 0.5*(constraint_surface.radius + 0.01)^2];
 
         dc = zeros(length(x), length(c));
         dc((i-1)*num_variables + Linkage.ndof + 19,2*i-1) = -2*(constraint_surface.hole_1 - xh1)'*g_xbar1(1:3,1:3)*xi_xbar1(4:6);
@@ -35,7 +35,7 @@ function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, 
     
         eq2 = norm(constraint_surface.hole_2 - xh2)^2;
     
-        c = [c; eq2 - (constraint_surface.radius + 0.01)^2];
+        c = [c; eq2 - 0.5*(constraint_surface.radius + 0.01)^2];
     
         dc((i-1)*num_variables + Linkage.ndof + 20,2*i) = -2*(constraint_surface.hole_2 - xh2)'*g_xbar2(1:3,1:3)*xi_xbar2(4:6);
         dc((i-1)*num_variables + 1:(i-1)*num_variables +Linkage.ndof,2*i) = -2*(constraint_surface.hole_2 - xh2)'*g_xbar2(1:3,1:3)*J_xbar2(4:6,:);

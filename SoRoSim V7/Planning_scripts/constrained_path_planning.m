@@ -57,7 +57,7 @@ toc
 qu_uq_l_final2 = fmincon(@(qu_uq_l)Objective2(S1, qu_uq_l, g_des_final), qu_uq_l0, [],[],[],[],lb,ub,constraints_handle,options);
 
 %% Plot the results
-figure
+S1.PlotParameters.ClosePrevious = false;
 S1.plotq(qu_uq_l_final1(1:S1.ndof))
 S1.plotq(qu_uq_l_final2(1:S1.ndof))
 hold on
@@ -82,7 +82,7 @@ initial_guess = initial_guess(:);
 
 
 constraints_handle = @(qu_uq_l)Constraint3(S1, qu_uq_l, n_points, g_des_initial);
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-10,'StepTolerance',1e-14 ,'MaxFunctionEvaluations',2e10,'Algorithm','sqp','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
+options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-6,'StepTolerance',1e-6 ,'MaxFunctionEvaluations',2e10,'Algorithm','sqp','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 tic
 qu_uq_l_con = fmincon(@(qu_uq_l)Objective3(S1, qu_uq_l,g_des_final, n_points),initial_guess, [],[],[],[],[],[],constraints_handle,options);
 toc
@@ -120,11 +120,23 @@ lb(:, 79:80) = 0;
 ub(:, 79:80) = 1;
 lb = lb';
 ub = ub';
+
 lb = lb(:);
 ub = ub(:);
 
 constraints_handle = @(qu_uq_l)Constraints4(S1, qu_uq_l, n_points, g_des_final, constraint_surface);
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-20,'StepTolerance',1e-14 ,'MaxFunctionEvaluations',2e10,'Algorithm','sqp','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
+options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-20,'StepTolerance',1e-14 ,'MaxFunctionEvaluations',2e10,'Algorithm','sqp');%,'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 tic
 qu_uq_l_con = fmincon(@(qu_uq_l)Objective4(S1, qu_uq_l,g_des_initial, n_points),initial_guess, [],[],[],[],[],[],constraints_handle,options);
 toc
+%%
+figure
+S1.PlotParameters.ClosePrevious= false;
+qs = qu_uq_l_con(:,1:S1.ndof);
+gs1 = S1.FwdKinematics(qs(1,:));
+plot_constraint(constraint_surface)
+for i = 1:5
+    S1.plotq(qs(2*i,:))
+    hold on
+end
+plotTransforms(se3(g_des_final),'FrameSize',0.08)
