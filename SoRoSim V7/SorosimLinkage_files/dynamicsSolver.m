@@ -89,9 +89,9 @@ for i=1:N
     g_here         = g_here*gstep;
     Ad_g_joint_inv = dinamico_Adjoint(ginv(gstep));
     J_here         = Ad_g_joint_inv*(J_here+S_here); 
+    Jd_here        = Ad_g_joint_inv*(Jd_here+Sd_here+dinamico_adj(eta_here)*S_here); %must use previous eta
+    psi_here       = Ad_g_joint_inv*(psi_here+(Sd_here(:,dofs_here)+dinamico_adj(eta_here)*S_here(:,dofs_here))*qd_here); %must use previous eta
     eta_here       = Ad_g_joint_inv*(eta_here+S_here(:,dofs_here)*qd_here);
-    Jd_here        = Ad_g_joint_inv*(Jd_here+Sd_here+dinamico_adj(eta_here)*S_here); 
-    psi_here       = Ad_g_joint_inv*(psi_here+(Sd_here(:,dofs_here)+dinamico_adj(eta_here)*S_here(:,dofs_here))*qd_here);
 
     if Linkage.VLinks(Linkage.LinkIndex(i)).linktype=='r'
 
@@ -120,7 +120,7 @@ for i=1:N
 
         Qtemp = J_here'*M_here; % temporary variable to avoid repetetion 
         M = M+Qtemp*J_here;
-        F = F-Qtemp*psi_here+J_here'*dinamico_coadj(eta_here)*M_here*eta_here; %Centripetal and Coriolis
+        F = F-Qtemp*psi_here-J_here'*dinamico_coadj(eta_here)*M_here*eta_here; %Centripetal and Coriolis
         
         % bringing all quantities to the end of rigid link
         gf        = Linkage.VLinks(Linkage.LinkIndex(i)).gf;
@@ -178,7 +178,7 @@ for i=1:N
     
             Qtemp = J_here'*M_here; % temporary variable to avoid repetetion 
             M = M+Qtemp*J_here;
-            F = F-Qtemp*psi_here+J_here'*dinamico_coadj(eta_here)*M_here*eta_here; %Centripetal and Coriolis
+            F = F-Qtemp*psi_here-J_here'*dinamico_coadj(eta_here)*M_here*eta_here; %Centripetal and Coriolis
         end
         i_sig    = i_sig+1;
 
@@ -206,7 +206,7 @@ for i=1:N
                     Z_here  = (H/2)*(Phi_Z1here+Phi_Z2here)+...
                               fZ4*(ad_xi_Z1here*Phi_Z2here-dinamico_adj(xi_Z2here)*Phi_Z1here);
 
-                    Zd_here = fZ4*dinamico_adj(xid_Z1here)*Phi_Z2here; 
+                    Zd_here = 2*fZ4*dinamico_adj(xid_Z1here)*Phi_Z2here; %not technically correct, but this term is always multiplied with qd
                     Omegad_here   = Z_here*qd_here;
 
                 else
@@ -253,9 +253,9 @@ for i=1:N
             g_here     = g_here*gstep;
             Ad_gh_inv  = dinamico_Adjoint(ginv(gstep));
             J_here     = Ad_gh_inv*(J_here+S_here); %full
-            eta_here   = Ad_gh_inv*(eta_here+S_here(:,dofs_here)*qd_here);
             Jd_here    = Ad_gh_inv*(Jd_here+Sd_here+dinamico_adj(eta_here)*S_here); %full
-            psi_here   = Ad_g_joint_inv*(psi_here+(Sd_here(:,dofs_here)+dinamico_adj(eta_here)*S_here(:,dofs_here))*qd_here);
+            psi_here   = Ad_gh_inv*(psi_here+(Sd_here(:,dofs_here)+dinamico_adj(eta_here)*S_here(:,dofs_here))*qd_here);
+            eta_here   = Ad_gh_inv*(eta_here+S_here(:,dofs_here)*qd_here);
             
             g((i_sig-1)*4+1:i_sig*4,:)  = g_here;
             J((i_sig-1)*6+1:i_sig*6,:)  = J_here;
@@ -275,7 +275,7 @@ for i=1:N
         
                 Qtemp = J_here'*M_here; % temporary variable to avoid repetetion 
                 M = M+Qtemp*J_here;
-                F = F-Qtemp*psi_here+J_here'*dinamico_coadj(eta_here)*M_here*eta_here; %Centripetal and Coriolis
+                F = F-Qtemp*psi_here-J_here'*dinamico_coadj(eta_here)*M_here*eta_here; %Centripetal and Coriolis
             end
             i_sig    = i_sig+1;
 

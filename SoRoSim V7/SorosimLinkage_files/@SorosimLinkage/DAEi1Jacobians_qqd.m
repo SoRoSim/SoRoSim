@@ -58,8 +58,8 @@ adjOmegap = zeros(24*nj,6); %Powers of adjOmega (1-4), used later
 g = zeros(4*nsig,4);    %Fwd kinematics
 
 J    = zeros(6*nsig,ndof); %Jacobian (J is S_B)
-eta  = zeros(6*nsig,1);    %velocity twist
 Jd   = zeros(6*nsig,ndof); %Jacobian dot (Jd is Sd_B)
+eta  = zeros(6*nsig,1);    %velocity twist
 etad = zeros(6*nsig,1);    %acceleration twist
 
 R_B = zeros(6*nsig,ndof); %Joint velocity gradient wrt q
@@ -100,8 +100,8 @@ for i=1:N
         Ad_g_ini_inv = dinamico_Adjoint(ginv(g_ini((i-1)*4+1:i*4,:)));
 
         J_here    = Ad_g_ini_inv*J_tip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
-        eta_here  = Ad_g_ini_inv*eta_tip((iLpre(i)-1)*6+1:iLpre(i)*6);
         Jd_here   = Ad_g_ini_inv*Jd_tip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
+        eta_here  = Ad_g_ini_inv*eta_tip((iLpre(i)-1)*6+1:iLpre(i)*6);
         etad_here = Ad_g_ini_inv*etad_tip((iLpre(i)-1)*6+1:iLpre(i)*6);
 
         R_Bhere = Ad_g_ini_inv*R_Btip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
@@ -111,8 +111,8 @@ for i=1:N
         g_here = g_ini((i-1)*4+1:i*4,:);
 
         J_here    = zeros(6,ndof);
-        eta_here  = zeros(6,1);
         Jd_here   = zeros(6,ndof);
+        eta_here  = zeros(6,1);
         etad_here = zeros(6,1);
 
         R_Bhere = zeros(6,ndof);
@@ -126,8 +126,8 @@ for i=1:N
     g((i_sig-1)*4+1:4*i_sig,:) = g_here;
 
     J((i_sig-1)*6+1:6*i_sig,:)    = J_here;
-    eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
     Jd((i_sig-1)*6+1:6*i_sig,:)   = Jd_here;
+    eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
     etad((i_sig-1)*6+1:6*i_sig,:) = etad_here;
 
     L_B((i_sig-1)*6+1:6*i_sig,:) = L_Bhere;
@@ -162,8 +162,8 @@ for i=1:N
     g_here  = g_here*gstep((ij-1)*4+1:4*ij,:);
 
     J_here    = Adgstepinv((ij-1)*6+1:6*ij,:)*(J_here+S((ij-1)*6+1:6*ij,:));
-    eta_here  = Adgstepinv((ij-1)*6+1:6*ij,:)*(eta_plus_here);
     Jd_here   = Adgstepinv((ij-1)*6+1:6*ij,:)*(Jd_here+Sd((ij-1)*6+1:6*ij,:)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,:));
+    eta_here  = Adgstepinv((ij-1)*6+1:6*ij,:)*(eta_plus_here);
     etad_here = Adgstepinv((ij-1)*6+1:6*ij,:)*(etad_plus_here);
 
     R_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(R_Bhere+R((ij-1)*6+1:6*ij,:));
@@ -185,8 +185,8 @@ for i=1:N
         g_here  = g_here*gi;
 
         J_here    = Ad_gi_inv*J_here;
-        eta_here  = Ad_gi_inv*eta_here;
         Jd_here   = Ad_gi_inv*Jd_here;
+        eta_here  = Ad_gi_inv*eta_here;
         etad_here = Ad_gi_inv*etad_here;
     
         R_Bhere = Ad_gi_inv*R_Bhere;
@@ -198,8 +198,8 @@ for i=1:N
         g((i_sig-1)*4+1:4*i_sig,:) = g_here;
 
         J((i_sig-1)*6+1:6*i_sig,:)    = J_here;
-        eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
         Jd((i_sig-1)*6+1:6*i_sig,:)   = Jd_here;
+        eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
         etad((i_sig-1)*6+1:6*i_sig,:) = etad_here;
     
         L_B((i_sig-1)*6+1:6*i_sig,:) = L_Bhere;
@@ -216,8 +216,8 @@ for i=1:N
         g_here  = g_here*gf;
 
         J_here    = Ad_gf_inv*J_here;
-        eta_here  = Ad_gf_inv*eta_here;
         Jd_here   = Ad_gf_inv*Jd_here;
+        eta_here  = Ad_gf_inv*eta_here;
         etad_here = Ad_gf_inv*etad_here;
     
         R_Bhere = Ad_gf_inv*R_Bhere;
@@ -242,8 +242,8 @@ for i=1:N
         g_here  = g_here*gi;
 
         J_here    = Ad_gi_inv*J_here;
-        eta_here  = Ad_gi_inv*eta_here;
         Jd_here   = Ad_gi_inv*Jd_here;
+        eta_here  = Ad_gi_inv*eta_here;
         etad_here = Ad_gi_inv*etad_here;
     
         R_Bhere = Ad_gi_inv*R_Bhere;
@@ -253,8 +253,8 @@ for i=1:N
         g((i_sig-1)*4+1:4*i_sig,:) = g_here;
 
         J((i_sig-1)*6+1:6*i_sig,:)    = J_here;
-        eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
         Jd((i_sig-1)*6+1:6*i_sig,:)   = Jd_here;
+        eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
         etad((i_sig-1)*6+1:6*i_sig,:) = etad_here;
     
         L_B((i_sig-1)*6+1:6*i_sig,:) = L_Bhere;
@@ -300,8 +300,8 @@ for i=1:N
             g_here  = g_here*gstep((ij-1)*4+1:4*ij,:);
 
             J_here    = Adgstepinv((ij-1)*6+1:6*ij,:)*(J_here+S((ij-1)*6+1:6*ij,:));
-            eta_here  = Adgstepinv((ij-1)*6+1:6*ij,:)*(eta_plus_here);
             Jd_here   = Adgstepinv((ij-1)*6+1:6*ij,:)*(Jd_here+Sd((ij-1)*6+1:6*ij,:)+dinamico_adj(eta_here)*S((ij-1)*6+1:6*ij,:));
+            eta_here  = Adgstepinv((ij-1)*6+1:6*ij,:)*(eta_plus_here);
             etad_here = Adgstepinv((ij-1)*6+1:6*ij,:)*(etad_plus_here);
         
             R_Bhere = Adgstepinv((ij-1)*6+1:6*ij,:)*(R_Bhere+R((ij-1)*6+1:6*ij,:));
@@ -310,9 +310,9 @@ for i=1:N
 
             g((i_sig-1)*4+1:4*i_sig,:) = g_here;
 
-            J((i_sig-1)*6+1:6*i_sig,:)    = J_here;
-            eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
+            J((i_sig-1)*6+1:6*i_sig,:)    = J_here; 
             Jd((i_sig-1)*6+1:6*i_sig,:)   = Jd_here;
+            eta((i_sig-1)*6+1:6*i_sig,:)  = eta_here;
             etad((i_sig-1)*6+1:6*i_sig,:) = etad_here;
         
             L_B((i_sig-1)*6+1:6*i_sig,:) = L_Bhere;
@@ -331,8 +331,8 @@ for i=1:N
         g_here  = g_here*gf;
 
         J_here    = Ad_gf_inv*J_here;
-        eta_here  = Ad_gf_inv*eta_here;
         Jd_here   = Ad_gf_inv*Jd_here;
+        eta_here  = Ad_gf_inv*eta_here;
         etad_here = Ad_gf_inv*etad_here;
     
         R_Bhere = Ad_gf_inv*R_Bhere;
@@ -347,8 +347,8 @@ for i=1:N
     g_tip((i-1)*4+1:i*4,:) = g_here;
 
     J_tip((i-1)*6+1:i*6,:)    = J_here;
-    eta_tip((i-1)*6+1:i*6,:)  = eta_here;
     Jd_tip((i-1)*6+1:i*6,:)   = Jd_here;
+    eta_tip((i-1)*6+1:i*6,:)  = eta_here;
     etad_tip((i-1)*6+1:i*6,:) = etad_here;
 
     R_Btip((i-1)*6+1:i*6,:) = R_Bhere;
@@ -368,7 +368,7 @@ for ip=1:Linkage.np
         g_here = g((i_sig-1)*4+1:i_sig*4,:);
         g_here(1:3,4) = zeros(3,1); %only rotational part
         Fp_here = (dinamico_Adjoint(g_here))'*Fp_here; %rotated into the local frame. Adj' = coAdj^-1
-        dFp_dq = dinamico_coadj(Fp_here)*I_theta*J((i_sig-1)*6+1:i_sig*6,:);
+        dFp_dq = -dinamico_coadjbar(Fp_here)*I_theta*J((i_sig-1)*6+1:i_sig*6,:);
         dID_dq = dID_dq-J((i_sig-1)*6+1:i_sig*6,:)'*dFp_dq; %external force hence negative
     end
 

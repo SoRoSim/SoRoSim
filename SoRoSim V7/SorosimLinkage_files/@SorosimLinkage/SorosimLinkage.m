@@ -486,9 +486,10 @@ classdef SorosimLinkage
     
                         [n_jact,i_jact,i_jactq,WrenchControlled,Bj1] = JointActuation(Linkage,false);
     
-                        Linkage.n_jact            = n_jact;
-                        Linkage.i_jact            = i_jact;
-                        Linkage.N_jact            = length(i_jact);
+                        Linkage.n_jact          = n_jact;
+                        Linkage.nact            = n_jact; %will update later
+                        Linkage.i_jact          = i_jact;
+                        Linkage.N_jact          = length(i_jact);
                         Linkage.i_jactq           = i_jactq;
                         Linkage.WrenchControlled  = WrenchControlled;
                         Linkage.Bj1              = Bj1;
