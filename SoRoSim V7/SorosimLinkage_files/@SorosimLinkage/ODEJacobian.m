@@ -74,8 +74,8 @@ function dxd_dx = ODEJacobian(Linkage,t,x,dynamicAction,GUI_actionInput)
             dy_dq  = C\([dtau_dq-dID_dq;-de_dq]);
             dy_dqd = C\([dtau_dqd-dID_dqd;-de_dqd]);
 
-            dFD_dq = dy_dq(:,1:ndof);
-            dFD_dqd = dy_dqd(:,1:ndof);
+            dFD_dq = dy_dq(1:ndof,1:ndof);
+            dFD_dqd = dy_dqd(1:ndof,1:ndof);
         end
     else
     

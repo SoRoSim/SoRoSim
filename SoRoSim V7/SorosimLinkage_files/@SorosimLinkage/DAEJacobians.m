@@ -379,7 +379,7 @@ for ip=1:Linkage.np
         g_here = g((i_sig-1)*4+1:i_sig*4,:);
         g_here(1:3,4) = zeros(3,1); %only rotational part
         Fp_here = (dinamico_Adjoint(g_here))'*Fp_here; %rotated into the local frame. Adj' = coAdj^-1
-        dFp_dq = dinamico_coadj(Fp_here)*I_theta*J((i_sig-1)*6+1:i_sig*6,:);
+        dFp_dq = -dinamico_coadjbar(Fp_here)*I_theta*J((i_sig-1)*6+1:i_sig*6,:);
         dID_dq = dID_dq-J((i_sig-1)*6+1:i_sig*6,:)'*dFp_dq; %external force hence negative
     end
 

@@ -494,7 +494,7 @@ if Linkage.CA
     tau = tau+tauC;
 end
 
-%% solving for x
+%% solving for y
 
 if Linkage.nCLj>0 %if there are closed chain joints
 
