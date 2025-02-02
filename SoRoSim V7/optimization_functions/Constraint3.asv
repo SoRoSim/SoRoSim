@@ -30,14 +30,13 @@ function [c,ceq, dc,dceq] = Constraint3(Linkage, x, n_points, g_des_initial, g_d
     qT = x(9*num_variables + 1:9*num_variables +Linkage.ndof);
     gT = Linkage.FwdKinematics(qT);
     g_T = gT(4*(length(Linkage.CVRods{1}(2).Xs)+2)+1:4*(length(Linkage.CVRods{1}(2).Xs)+3),:);
-    e3 = piecewise_logmap(ginv(g_des_final)*g_T);
-    ceq = [ceq; e3];
+    e2 = piecewise_logmap(ginv(g_des_final)*g_T);
+    deq2 = zeros(n_timesteps,length(x)/n_timesteps);
     [~,Teq2] = variable_expmap_gTg(e2);
     Ad_exp_eq2 = dinamico_Adjoint(ginv(g_des_final)*g_T);
     J_platform = Linkage.Jacobian(x(1:Linkage.ndof), 2);
     J_platform = J_platform(7:12,:);
-    Je3 = zeros(length(x), 6);
-    Je3(9*num_variables + 1:9*num_variables +Linkage.ndof,1:6) = (Teq2\(Ad_exp_eq2*J_platform))';
 
-    dceq = [dceq Je2 Je3];
+
+    dceq = [dceq Je2];
 end

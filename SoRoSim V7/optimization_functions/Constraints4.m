@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 function [c,ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, constraint_surface)    
+=======
+function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, g_des_final, constraint_surface)    
+>>>>>>> Stashed changes
     c = [];
     ceq = [];
     num_variables= length(x)/n_points;
@@ -52,6 +56,17 @@ function [c,ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, c
     Ad_exp_eq2 = dinamico_Adjoint(ginv(g_des_initial)*g_plat);
     Je2 = zeros(length(x), 6);
     Je2(1:Linkage.ndof,1:6) = (Teq2\(Ad_exp_eq2*J_platform))';
+    qT = x(9*num_variables + 1:9*num_variables +Linkage.ndof);
+    gT = Linkage.FwdKinematics(qT);
+    g_T = gT(4*(length(Linkage.CVRods{1}(2).Xs)+2)+1:4*(length(Linkage.CVRods{1}(2).Xs)+3),:);
+    e3 = piecewise_logmap(ginv(g_des_final)*g_T);
+    ceq = [ceq; e3];
+    [~,Teq2] = variable_expmap_gTg(e2);
+    Ad_exp_eq2 = dinamico_Adjoint(ginv(g_des_final)*g_T);
+    J_platform = Linkage.Jacobian(x(1:Linkage.ndof), 2);
+    J_platform = J_platform(7:12,:);
+    Je3 = zeros(length(x), 6);
+    Je3(9*num_variables + 1:9*num_variables +Linkage.ndof,1:6) = (Teq2\(Ad_exp_eq2*J_platform))';
 
 
-    dceq = [dceq Je2];
+    dceq = [dceq Je2 Je3];
