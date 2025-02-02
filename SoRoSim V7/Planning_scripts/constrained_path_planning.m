@@ -14,7 +14,7 @@ S1 = S1.Update;
 
 %%
 g_des_final = [0.0000         0   1.0000    0.1
-                0    1.0000         0         0.2
+                0    1.0000         0         0
                 -1.0000         0    0.0000    -0.4
                 0         0         0    1.0000];
 
@@ -22,15 +22,10 @@ g_des_initial = [0.0000         0   1.0000    0.3
                 0    1.0000         0         0
                 -1.0000         0    0.0000    -0.35
                 0         0         0    1.0000];
-<<<<<<< Updated upstream
-rotation_angle = 15;
-rotation_angle = rotation_angle*(pi/180);
-roty = eul2tform([0, rotation_angle,0]);
-=======
+
 rotation_angle = 20;
 rotation_angle = rotation_angle*(pi/180);
 roty = eul2tform([0,0, rotation_angle]);
->>>>>>> Stashed changes
 g_des_final = g_des_final*roty;
 
 %% Problem 1:
@@ -60,11 +55,8 @@ plotTransforms(se3(g_des_final), 'FrameSize',0.05);
 % qu_uq_l0 = zeros(80,1);
 qu_uq_l0 = [qu_uq_l_final1; root1; root2];
 constraints_handle = @(qu_uq_l)Constraints2(S1, qu_uq_l, constraint_surface);
-<<<<<<< Updated upstream
 options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-10,'StepTolerance',1e-15 ,'MaxFunctionEvaluations',2e6,'Algorithm', 'sqp', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true);%,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
-=======
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-6,'StepTolerance',1e-8 ,'MaxFunctionEvaluations',2e10,'Algorithm', 'sqp', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true);%,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
->>>>>>> Stashed changes
+
 lb = zeros(80,1);
 ub = zeros(80,1);
 lb(1:78) = -inf;
@@ -78,11 +70,8 @@ toc
 qu_uq_l_final2 = fmincon(@(qu_uq_l)Objective2(S1, qu_uq_l, g_des_final), qu_uq_l0, [],[],[],[],lb,ub,constraints_handle,options);
 
 %%
-<<<<<<< Updated upstream
 [c, ceq, ~, ~] = Constraints2(S1, qu_uq_l_final2, constraint_surface)
-=======
-[c, ~] = Objective2(S1, qu_uq_l_final1, g_des_initial)
->>>>>>> Stashed changes
+
 
 %% Plot the results
 S1.PlotParameters.ClosePrevious = false;
@@ -108,15 +97,11 @@ for i = 1:n_x_t
 end
 initial_guess = initial_guess(:);
 
-<<<<<<< Updated upstream
 
 constraints_handle = @(qu_uq_l)Constraint3(S1, qu_uq_l, n_points, g_des_initial);
 options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-6,'StepTolerance',1e-6 ,'MaxFunctionEvaluations',2e10,'Algorithm','sqp','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
-=======
 % lambda = 5e3;
-constraints_handle = @(qu_uq_l)Constraint3(S1, qu_uq_l, n_points, g_des_initial, g_des_final);
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-10,'StepTolerance',1e-10 ,'MaxFunctionEvaluations',2e10,'Algorithm','sqp','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);
->>>>>>> Stashed changes
+
 tic
 qu_uq_l_con = fmincon(@(qu_uq_l)Objective4(S1, qu_uq_l, n_points),initial_guess, [],[],[],[],[],[],constraints_handle,options);
 toc
@@ -125,18 +110,12 @@ save("Datafiles/zy_rotation_neg15_degs.mat","qu_uq_l_con")
 Objective4(S1, qu_uq_l_con,g_des_final, 10)
 %% Plot the solution
 % figure
-<<<<<<< Updated upstream
-S1.PlotParameters.ClosePrevious= false;
-qu_uq_l_con = reshape(qu_uq_l_con, n_x_t, n_points);
-qu_uq_l_con = qu_uq_l_con';
-qs = qu_uq_l_con(:,1:S1.ndof);
-=======
+
 
 S1.PlotParameters.ClosePrevious= false;
 qu_uq_l = reshape(qu_uq_l_con, n_x_t, n_points);
 qu_uq_l = qu_uq_l';
 qs = qu_uq_l(:,1:S1.ndof);
->>>>>>> Stashed changes
 gs1 = S1.FwdKinematics(qs(1,:));
 plot_constraint(constraint_surface)
 for i = 1:10
@@ -182,11 +161,8 @@ total_time = 1;
 n_points = 10;
 dt = total_time/(n_points-1);
 qu_uq_l1 = [qu_uq_l_final1; root1; root2];
-<<<<<<< Updated upstream
 
-=======
 qu_uq_l2 = [qu_uq_l_final2; root1; root2];
->>>>>>> Stashed changes
 initial_guess = zeros(n_x_t, n_points);
 for i = 1:n_x_t
     initial_guess(i,:) = linspace(qu_uq_l1(i), qu_uq_l2(i), n_points);
@@ -202,25 +178,12 @@ ub = ub';
 lb = lb(:);
 ub = ub(:);
 
-<<<<<<< Updated upstream
 constraints_handle = @(qu_uq_l)Constraints4(S1, qu_uq_l, n_points, g_des_final, constraint_surface);
 options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-6,'StepTolerance',1e-8 ,'MaxFunctionEvaluations',2e10,'Algorithm','active-set','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 tic
 qu_uq_l_con = fmincon(@(qu_uq_l)Objective4(S1, qu_uq_l,g_des_initial, n_points),initial_guess, [],[],[],[],lb,ub,constraints_handle,options);
 toc
-%%
-figure
-S1.PlotParameters.ClosePrevious= false;
-qu_uq_l_con = reshape(qu_uq_l_con, n_x_t, n_points);
-qu_uq_l_con = qu_uq_l_con';
-qs = qu_uq_l_con(:,1:S1.ndof);
-gs1 = S1.FwdKinematics(qs(1,:));
-=======
-constraints_handle = @(qu_uq_l)Constraints4(S1, qu_uq_l, n_points, g_des_initial, g_des_final, constraint_surface);
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-6,'StepTolerance',1e-8 ,'MaxFunctionEvaluations',2e10,'Algorithm','sqp','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
-tic
-qu_uq_l_con = fmincon(@(qu_uq_l)Objective4(S1, qu_uq_l, n_points),initial_guess, [],[],[],[],lb,ub,constraints_handle,options);
-toc
+
 %%
 Objective4(S1, qu_uq_l_con,g_des_initial, n_points)
 %%
@@ -230,7 +193,6 @@ qu_uq_l = reshape(qu_uq_l_con, n_x_t, n_points);
 qu_uq_l = qu_uq_l';
 %%
 qs = qu_uq_l_final(:,1:S1.ndof);
->>>>>>> Stashed changes
 plot_constraint(constraint_surface)
 for i = 1:5
     S1.plotq(qs(2*i,:))
