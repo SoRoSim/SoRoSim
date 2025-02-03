@@ -1,8 +1,5 @@
-<<<<<<< Updated upstream
-function [c,ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, constraint_surface)    
-=======
+
 function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, g_des_final, constraint_surface)    
->>>>>>> Stashed changes
     c = [];
     ceq = [];
     num_variables= length(x)/n_points;
@@ -28,8 +25,8 @@ function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, 
 
         eq1 = norm(constraint_surface.hole_1  - xh1)^2;
 
-        c = [c; eq1 - 0.4*(constraint_surface.radius + 0.01)^2];
-
+        c = [c; eq1 - 0.2*(constraint_surface.radius + 0.01)^2];
+        % i
         dc((i-1)*num_variables + Linkage.ndof + 19,2*i-1) = -2*(constraint_surface.hole_1 - xh1)'*g_xbar1(1:3,1:3)*xi_xbar1(4:6);
         dc((i-1)*num_variables + 1:(i-1)*num_variables +Linkage.ndof,2*1-1) = -2*(constraint_surface.hole_1 - xh1)'*g_xbar1(1:3,1:3)*J_xbar1(4:6,:);
         
@@ -39,8 +36,9 @@ function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, 
     
         eq2 = norm(constraint_surface.hole_2 - xh2)^2;
     
-        c = [c; eq2 - 0.4*(constraint_surface.radius + 0.01)^2];
-    
+        c = [c; eq2 - 0.2*(constraint_surface.radius + 0.01)^2];
+        % g_xbar2
+        % J_xbar2
         dc((i-1)*num_variables + Linkage.ndof + 20,2*i) = -2*(constraint_surface.hole_2 - xh2)'*g_xbar2(1:3,1:3)*xi_xbar2(4:6);
         dc((i-1)*num_variables + 1:(i-1)*num_variables +Linkage.ndof,2*i) = -2*(constraint_surface.hole_2 - xh2)'*g_xbar2(1:3,1:3)*J_xbar2(4:6,:);
 
