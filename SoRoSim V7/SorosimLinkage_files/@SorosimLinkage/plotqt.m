@@ -31,9 +31,9 @@ tic
 tmax        = max(t);
 
 % With fullfile, we avoid conflicts with Ubuntu/Windows
+FrameRate   = PlotParameters.FrameRateValue;
 if options.record
     v = VideoWriter(video_file, 'MPEG-4');
-    FrameRate   = PlotParameters.FrameRateValue;
     v.FrameRate = FrameRate;
     open(v);
 end
