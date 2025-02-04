@@ -1,18 +1,28 @@
 %Function for the dynamic simulation of the linkage
 %Last modified by Anup Teejo Mathew 23/05/2021
-function [t,qqd] = dynamics(Linkage,x0,dynamicAction,userOptions) %x0 = [q0;qd0], dynamicAction(t) = [0 0 u_k;q_k,qd_k,qdd_k]
+function [t,qqd] = dynamics(Linkage,x0,dynamicAction,dynamicsOptions) %x0 = [q0;qd0], dynamicAction(t) = [0 0 u_k;q_k,qd_k,qdd_k]
+
+arguments
+    Linkage
+    x0 = [];
+    dynamicAction = [];
+
+    % Options
+    dynamicsOptions.dt = 0.01;
+    dynamicsOptions.Jacobian = true;
+    dynamicsOptions.displayTime = true; %display time
+    dynamicsOptions.plotProgress = false; %to plot robot configuration as simulation progresses
+    dynamicsOptions.Integrator = 'ode15s';
+    dynamicsOptions.t_start = 0;
+    dynamicsOptions.t_end = 0;
+end
 
 ndof  = Linkage.ndof;
 GUI_actionInput = false;
-
-if nargin<=3||isempty(userOptions)
-    userOptions = [];
-end
-dynamicsOptions = initializeDynamicsOptions(userOptions);
 t_start = dynamicsOptions.t_start;
 
 %Actuation input
-if nargin <= 2 || isempty(dynamicAction)
+if isempty(dynamicAction)
     if Linkage.Actuated
         GUI_actionInput = true; %in this case dynamicAction is a cell of nact elements. For soft and wrench controlled joints each element is a function of time
                           %for joint coordinate controlled joints each element is a cell of 3 elements denoting q_k, qd_k and qdd_k
@@ -54,7 +64,7 @@ end
 
 
 %initial guess definition: reference configuration
-if nargin==1||isempty(x0)%if initial condition is not given
+if isempty(x0)%if initial condition is not given
     q0                 = zeros(1,ndof);
     ndof               = Linkage.ndof;
     qd0                = zeros(1,ndof);

@@ -1,9 +1,21 @@
 %Function for the static equilibrium function of the linkage
 %Last modified by Anup Teejo Mathew 02.03.2022
-function [q,u,lambda]=statics(Linkage,x0,action,userOptions) %x0 is initial guess of unknowns arranged like this: [q_u0;u_u0;l0]. input is actuation input like this: [u_k;q_k]
+function [q,u,lambda]=statics(Linkage,x0,action,staticsOptions) %x0 is initial guess of unknowns arranged like this: [q_u0;u_u0;l0]. input is actuation input like this: [u_k;q_k]
+
+arguments
+    Linkage
+    x0 = [];
+    action = [];
+    
+    % Options
+    staticsOptions.magnifier = true;
+    staticsOptions.magnifierValue = 1e6;
+    staticsOptions.Jacobian = true;
+    staticsOptions.Algorithm = 'trust-region-dogleg';
+end
 
 %Actuation input
-if nargin <= 2 || isempty(action)
+if isempty(action)
     input_temp = zeros(Linkage.nact,1); %input_temp has q_k in the indices of u_u
     if Linkage.Actuated
         n_k = Linkage.ActuationPrecompute.n_k; %number of known values of q (for joint controlled systems)
@@ -36,7 +48,7 @@ end
 
 
 %initial guess definition
-if nargin == 1 || isempty(x0)
+if isempty(x0)
     
     q_u0 = zeros(1,Linkage.ndof - n_k);
     u_u0 = zeros(1,n_k);
@@ -68,11 +80,6 @@ if nargin == 1 || isempty(x0)
     x0 = eval(['[', strjoin(answer, ' '), ']'])';
 
 end
-
-if nargin<=3||isempty(userOptions)
-    userOptions = [];
-end
-staticsOptions = initializeStaticsOptions(userOptions);
 
 if staticsOptions.Jacobian
     options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display','iter','Jacobian','on','MaxFunctionEvaluations',1e7);

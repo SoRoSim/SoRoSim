@@ -633,7 +633,7 @@ classdef SorosimLinkage
                 save('LinkageProgress.mat','Linkage')
     
                 %% Plot parameters
-                PlotParameters.Lscale         = Lscale;
+                Lscale = Linkage.PlotParameters.Lscale;
                 PlotParameters.CameraPosition = [Lscale*2 -Lscale/2 Lscale/2];
                 PlotParameters.CameraTarget   = [0 0 0];
                 PlotParameters.CameraUpVector = [0 0 1];
@@ -648,6 +648,7 @@ classdef SorosimLinkage
                 PlotParameters.Position       = [0.1300 0.1100 0.7750 0.8150]; %default value (normalized)
                 PlotParameters.CameraRotationSpeed = 0;
                 PlotParameters.VideoResolution = 0.5;
+                PlotParameters.Lscale = Lscale;
     
                 Linkage.PlotParameters = PlotParameters;
                 close all

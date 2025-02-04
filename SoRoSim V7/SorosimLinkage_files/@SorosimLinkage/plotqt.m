@@ -1,6 +1,7 @@
 %Function for the plot of dynamic simulation
 %Last modified by Anup Teejo Mathew - 25/05/2021
 function plotqt(Linkage, t, qqd, options)
+
 arguments
     Linkage
     t
