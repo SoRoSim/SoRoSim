@@ -9,7 +9,7 @@ if nargin<=3||isempty(userOptions)
     userOptions = [];
 end
 dynamicsOptions = initializeDynamicsOptions(userOptions);
-
+t_start = dynamicsOptions.t_start;
 
 %Actuation input
 if nargin <= 2 || isempty(dynamicAction)
@@ -42,7 +42,7 @@ else
     
     if Linkage.Actuated
         n_k = Linkage.ActuationPrecompute.n_k;
-        [action,q_k,qd_k] = dynamicAction(dynamicsOptions.t_start);
+        [action,q_k,qd_k] = dynamicAction(t_start);
         if ~(length(q_k)==n_k&&length(qd_k)==n_k&&length(action)==Linkage.nact)
             error('Output dimension mismatch for dynamicActionInput(t_start)');
         end
@@ -78,7 +78,7 @@ if nargin==1||isempty(x0)%if initial condition is not given
 else
     n0 = Linkage.ndof;
     if Linkage.Actuated
-        n0=n0-Linkage.ActuationPrecompute-n_k;
+        n0=n0-Linkage.ActuationPrecompute.n_k;
     end
     if ~(length(x0)==2*n0)
         error('Invalid dimension for initial condition: expected %d, but got %d.', 2*n0, length(x0));
@@ -99,8 +99,8 @@ if Linkage.Actuated
 
     for ia=Linkage.nact-n_k+1:Linkage.nact
         if GUI_actionInput
-            q0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact))  = dynamicAction{ia}{1}(0);
-            qd0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact)) = dynamicAction{ia}{2}(0);
+            q0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact))  = dynamicAction{ia}{1}(t_start);
+            qd0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact)) = dynamicAction{ia}{2}(t_start);
         else
             [~,q_k0,qd_k0] = dynamicAction(0);
             q0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact))  = q_k0(ia-Linkage.nact+n_k);
@@ -118,6 +118,8 @@ if dynamicsOptions.t_end==0
     answer           = inputdlg(prompt,dlgtitle,[1 50],definput,opts);
     
     tmax = eval(answer{1});
+else
+    tmax = dynamicsOptions.t_end;
 end
 
 
@@ -133,32 +135,32 @@ ODEFn = @(t,x) Linkage.derivatives(t,x,dynamicAction,GUI_actionInput,dynamicsOpt
 switch dynamicsOptions.Integrator
     case 'ode45'
         tic
-        [t,qqd] = ode45(ODEFn,0:dt:tmax,x0,options);
+        [t,qqd] = ode45(ODEFn,t_start:dt:tmax,x0,options);
         toc
     case 'ode23'
         tic
-        [t,qqd] = ode23(ODEFn,0:dt:tmax,x0,options);
+        [t,qqd] = ode23(ODEFn,t_start:dt:tmax,x0,options);
         toc
     case 'ode113'
         tic
-        [t,qqd] = ode113(ODEFn,0:dt:tmax,x0,options);
+        [t,qqd] = ode113(ODEFn,t_start:dt:tmax,x0,options);
         toc
     case 'ode23s'  
         tic
-        [t,qqd] = ode23s(ODEFn,0:dt:tmax,x0,options);
+        [t,qqd] = ode23s(ODEFn,t_start:dt:tmax,x0,options);
         toc
     case 'ode15s'
         tic
-        [t,qqd] = ode15s(ODEFn,0:dt:tmax,x0,options);
+        [t,qqd] = ode15s(ODEFn,t_start:dt:tmax,x0,options);
         toc
     case 'ode1'
         tic
-        qqd = ode1(ODEFn,0:dt:tmax,x0);
+        qqd = ode1(ODEFn,t_start:dt:tmax,x0);
         toc
         t=0:dt:tmax;
     case 'ode2'
         tic
-        qqd = ode2(ODEFn,0:dt:tmax,x0);
+        qqd = ode2(ODEFn,t_start:dt:tmax,x0);
         toc
         t=0:dt:tmax;
 end

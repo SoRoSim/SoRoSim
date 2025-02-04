@@ -102,6 +102,7 @@ classdef SorosimLinkage
         %FrameRateValue           %FrameRate for dyanmic plot
         %ClosePrevious            %Logical 0 to not close previous image, 1 to close. (default value: 1)
         %CameraRotationSpeed      %For a cinematic rotation of the scene (default 0)
+        %VideoResolution          %1 for full screen resolution (higher the better)
 
 
     end
@@ -646,6 +647,7 @@ classdef SorosimLinkage
                 PlotParameters.ClosePrevious  = true;
                 PlotParameters.Position       = [0.1300 0.1100 0.7750 0.8150]; %default value (normalized)
                 PlotParameters.CameraRotationSpeed = 0;
+                PlotParameters.VideoResolution = 0.5;
     
                 Linkage.PlotParameters = PlotParameters;
                 close all
@@ -802,7 +804,7 @@ classdef SorosimLinkage
                     Xc = 0;
                     if Linkage.Ediv(ia,i)>0
                         for j=Linkage.Sdiv(ia,i):Linkage.Ediv(ia,i)
-                            lp = Linkage.VLinks(Linkage.LinkIndex(i)).lp{j};
+                            ld = Linkage.VLinks(Linkage.LinkIndex(i)).ld{j};
                             nip = Linkage.CVRods{i}(j+1).nip;
                             Xs = Linkage.CVRods{i}(j+1).Xs;
                             dcj  = zeros(3,nip);
@@ -814,7 +816,7 @@ classdef SorosimLinkage
                             end
                             
                             for ii=2:nip
-                                Xc = Xc+(Xs(ii)-Xs(ii-1))*lp;
+                                Xc = Xc+(Xs(ii)-Xs(ii-1))*ld;
                                 dcj(:,ii) = dc_fni(Xc);
                                 if ~isempty(dcp_fni)
                                     dcpj(:,ii) = dcp_fni(Xc);

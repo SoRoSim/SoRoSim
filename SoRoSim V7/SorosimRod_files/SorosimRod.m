@@ -574,14 +574,15 @@ function UpdateIntegration(R,varargin) %user input is nGauss or nGausse dependin
         function UpdateAll(R)
             if isempty(R.dof)
                 return
-            end
-            R.UpdateDOF();
-            R.UpdateWeights();
-            R.UpdatePhis();
-            R.UpdateXi_star();
-            R.UpdateMEG();
-            if isempty(R.div)
+            end    
+            if isempty(R.div) % if joint
                 R.UpdateEGJoint();
+            else
+                R.UpdateDOF();
+                R.UpdateWeights();
+                R.UpdatePhis();
+                R.UpdateXi_star();
+                R.UpdateMEG();
             end
         end
 
@@ -595,11 +596,13 @@ function UpdateIntegration(R,varargin) %user input is nGauss or nGausse dependin
 
         function Link2RodUpdate(R)
             if ~isempty(R.Type) % Condition for closed chain case
-                R.UpdateWeights(); %weights will change if lenght is changed
-                R.UpdatePhis(); %scaling factor will change
-                R.UpdateMEG(); %rod cross section dimentions or material properties
+                
                 if isempty(R.div)
                     R.UpdateEGJoint(); %when Kj or Dj changes
+                else
+                    R.UpdateWeights(); %weights will change if lenght is changed
+                    R.UpdatePhis(); %scaling factor will change
+                    R.UpdateMEG(); %rod cross section dimentions or material properties
                 end
             end
         end

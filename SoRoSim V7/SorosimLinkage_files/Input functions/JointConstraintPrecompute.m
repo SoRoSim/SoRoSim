@@ -16,10 +16,10 @@ end
 index_q_k = index_q_k(1:count);
 index_u_u = index_u_u(1:count);
 
-index_u_u = [index_u_u S.n_jact+1:S.nact]; %including soft actuator indexes (may change for length controlled)
 
 index_q_u = setdiff(1:S.ndof,index_q_k);
 index_u_k = setdiff(1:S.nact,index_u_u);
+
 n_k = length(index_q_k);
 
 end

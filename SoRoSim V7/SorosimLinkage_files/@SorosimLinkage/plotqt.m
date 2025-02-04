@@ -11,7 +11,7 @@ iLpre     = Linkage.iLpre;
 
 tic
 tmax        = max(t);
-v           = VideoWriter('.\Dynamics');
+v = VideoWriter('.\Dynamics', 'MPEG-4');
 FrameRate   = PlotParameters.FrameRateValue;
 v.FrameRate = FrameRate;
 open(v);
@@ -20,7 +20,11 @@ open(v);
 
 fh=figure(1);
 fh.Units='normalized';
-fh.OuterPosition=[0 0 1 1];
+FigScale = PlotParameters.VideoResolution;
+FigScale(FigScale<0.1)=0.5;
+FigScale(FigScale>1)=1;
+FigLocation = (1-FigScale)/2;
+fh.OuterPosition=[FigLocation FigLocation FigScale FigScale];
 
 set(gca,'CameraPosition',PlotParameters.CameraPosition,...
     'CameraTarget',PlotParameters.CameraTarget,...
@@ -47,9 +51,10 @@ set(gca, 'TickLabelInterpreter', 'latex');
 
 set(gca,'FontSize',12)
 
+set(gcf, 'Renderer', 'OpenGL');
+
 axis ([PlotParameters.XLim PlotParameters.YLim PlotParameters.ZLim]);
 
-drawnow
 drawnow
 
 
@@ -286,7 +291,9 @@ for tt=0:1/FrameRate:tmax
 
     end
     
+    drawnow limitrate nocallbacks;
     frame = getframe(gcf);
+    frame.cdata = imresize(frame.cdata, [ceil(size(frame.cdata,1)/2)*2, ceil(size(frame.cdata,2)/2)*2]);
     writeVideo(v,frame);
 end
 

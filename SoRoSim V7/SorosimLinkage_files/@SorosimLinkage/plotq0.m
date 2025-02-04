@@ -7,7 +7,7 @@ if nargin==1
     Lh=1e4; %I guess no one will make a linkage with 10,000 links. Happy to be wrong
 end
 
-% close all
+close all
 
 N         = Linkage.N;
 Lscale    = Linkage.PlotParameters.Lscale;% later
