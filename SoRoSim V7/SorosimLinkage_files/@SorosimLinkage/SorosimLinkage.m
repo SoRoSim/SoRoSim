@@ -689,7 +689,7 @@ classdef SorosimLinkage
 
         plotq0(Linkage,Lh,Dh,CLh);     %to plot the free body diagram of the linkage
         plotq(Linkage,q);              %to plot the state of the linkage for a given q
-        plotqt(Linkage,t,qqd);        %to get dynamic simulation video output for a given t (time array) and qqd (array of joint coordinates and their time derivatives)
+        plotqt(Linkage,t,qqd,options);        %to get dynamic simulation video output for a given t (time array) and qqd (array of joint coordinates and their time derivatives)
 
         %--------------------------------------------------------------------------
         %GET FUNCTIONS FOR DEPENDENT PROPERTIES: Connect the properties of

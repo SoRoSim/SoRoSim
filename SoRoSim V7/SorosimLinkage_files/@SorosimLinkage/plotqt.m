@@ -1,7 +1,25 @@
 %Function for the plot of dynamic simulation
 %Last modified by Anup Teejo Mathew - 25/05/2021
-function plotqt(Linkage,t,qqd)
+function plotqt(Linkage, t, qqd, options)
+arguments
+    Linkage
+    t
+    qqd
+    % Options
+    options.video_name = "Dynamics"
+    options.video_path = "."
+    options.record = true
+    % options.video_ext = ".mp4"
+end
+
 close all
+
+% Video Settings
+video_ext = ".mp4";
+
+% Fullfile avoids conflicts with Ubuntu, since Windows use "\" and Ubuntu
+% use "/".
+video_file = fullfile(options.video_path, options.video_name + video_ext);
 
 PlotParameters = Linkage.PlotParameters;
 
@@ -11,10 +29,14 @@ iLpre     = Linkage.iLpre;
 
 tic
 tmax        = max(t);
-v = VideoWriter('.\Dynamics', 'MPEG-4');
+
+% With fullfile, we avoid conflicts with Ubuntu/Windows
 FrameRate   = PlotParameters.FrameRateValue;
-v.FrameRate = FrameRate;
-open(v);
+if options.record
+    v = VideoWriter(video_file, 'MPEG-4');
+    v.FrameRate = FrameRate;
+    open(v);
+end
 
 %Plot options
 
@@ -292,16 +314,21 @@ for tt=0:1/FrameRate:tmax
     end
     
     drawnow limitrate nocallbacks;
-    frame = getframe(gcf);
-    frame.cdata = imresize(frame.cdata, [ceil(size(frame.cdata,1)/2)*2, ceil(size(frame.cdata,2)/2)*2]);
-    writeVideo(v,frame);
+    if options.record
+        frame = getframe(gcf);
+        frame.cdata = imresize(frame.cdata, [ceil(size(frame.cdata,1)/2)*2, ceil(size(frame.cdata,2)/2)*2]);
+        writeVideo(v,frame);
+    end
 end
 
-close(v);
+if options.record
+    close(v);
 
-answer = questdlg('Play output video in MATLAB?','Grapical Output', ...
-	'Yes','No','Yes');
-
-if strcmp('Yes',answer)
-    implay('.\Dynamics.avi')
+    % Play the video only if it was recorded
+    answer = questdlg('Play output video in MATLAB?','Grapical Output', ...
+	    'Yes','No','Yes');
+    
+    if strcmp('Yes',answer)
+        implay(video_file)
+    end
 end
