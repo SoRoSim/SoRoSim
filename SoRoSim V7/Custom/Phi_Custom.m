@@ -10,15 +10,15 @@ function Phi = Phi_Custom(X,varargin)
 
 nele = 1;
 dof = 18;
-Phi   = zeros(6,dof);
+Phi = zeros(6,dof);
 k = 1;
-Bdof = [1 1 1 1 1 1]'; %FEM dof
+Phi_dof = [1 1 1 1 1 1]'; %FEM dof
 
 for i=1:6
     w = 1/nele;
     a = 0;
 
-    for j=1:Bdof(i)*nele
+    for j=1:Phi_dof(i)*nele
         b = a+w;
         if X>=a&&X<=b
             Xc = (X-a)/(b-a);
@@ -30,7 +30,7 @@ for i=1:6
         a = a+w;
     end
 
-    k = k+Bdof(i);
+    k = k+Phi_dof(i);
 end
 
 end

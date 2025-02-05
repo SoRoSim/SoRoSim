@@ -1,7 +1,7 @@
 %Function that allows the user to specify spherical joint control and actuation
 %specifications (29.11.2024)
 
-function [n_Sact,i_Sact,i_Sactq,WrenchControlledS] = SphericalJointActuation(S,Update)
+function [n_Sact,i_Sact,i_Sactq,WrenchControlledS] = SphericalJointActuation(Linkage,Update)
 if nargin==1
     Update=false;
 end
@@ -11,14 +11,14 @@ i_Sactq           = [];
 WrenchControlledS = [];
 dofi              = 1;
 if ~Update
-    for i=1:S.N %for each link
+    for i=1:Linkage.N %for each link
 
-        VRods_i = S.CVRods{i};
+        VRods_i = Linkage.CVRods{i};
 
-        if S.VLinks(S.LinkIndex(i)).jointtype == 'S'
+        if Linkage.VLinks(Linkage.LinkIndex(i)).jointtype == 'S'
 
             close all
-            S.plotq0(i);
+            Linkage.plotq0(i);
 
             quest  = ['Is the spherical joint of link ',num2str(i),' actuated?'];
             answer = questdlg(quest,'Spherical Joint',...
@@ -46,23 +46,23 @@ if ~Update
         end
 
         dofi = dofi+VRods_i(1).dof;
-        for j = 1:S.VLinks(S.LinkIndex(i)).npie-1
+        for j = 1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1
             dofi = dofi+VRods_i(j+1).dof;
         end
     end
 else
-    for i=1:S.N %for each link
+    for i=1:Linkage.N %for each link
 
-        VRods_i = S.CVRods{i};
+        VRods_i = Linkage.CVRods{i};
 
-        if S.VLinks(S.LinkIndex(i)).jointtype=='S'&&any(S.i_jact==i)
+        if Linkage.VLinks(Linkage.LinkIndex(i)).jointtype=='S'&&any(Linkage.i_jact==i)
             
             i_Sactq  = [i_Sactq dofi dofi+1 dofi+2];
 
         end
 
         dofi = dofi+VRods_i(1).dof;
-        for j = 1:S.VLinks(S.LinkIndex(i)).npie-1
+        for j = 1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1
             dofi = dofi+VRods_i(j+1).dof;
         end
     end

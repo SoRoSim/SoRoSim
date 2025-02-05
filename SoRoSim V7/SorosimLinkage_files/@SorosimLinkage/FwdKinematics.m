@@ -29,10 +29,10 @@ if isrow(q)
     q=q';
 end
 
-N         = Linkage.N;
-g_ini     = Linkage.g_ini;
-g_Ltip    = repmat(eye(4),N,1);
-iLpre     = Linkage.iLpre;
+N     = Linkage.N;
+g_ini = Linkage.g_ini;
+g_tip = repmat(eye(4),N,1);
+iLpre = Linkage.iLpre;
 
 dof_start = 1;                         %starting dof of current piece
 
@@ -40,7 +40,7 @@ dof_start = 1;                         %starting dof of current piece
 for i = 1:N
     
     if Linkage.iLpre(i)>0
-        g_here=g_Ltip((iLpre(i)-1)*4+1:iLpre(i)*4,:)*g_ini((i-1)*4+1:i*4,:);
+        g_here=g_tip((iLpre(i)-1)*4+1:iLpre(i)*4,:)*g_ini((i-1)*4+1:i*4,:);
     else
         g_here=g_ini((i-1)*4+1:i*4,:);
     end
@@ -121,7 +121,7 @@ for i = 1:N
                     end
                 end
                 ad_xi_Z1here = dinamico_adj(xi_Z1here);  
-                Gamma_here   = (H/2)*(xi_Z1here+xi_Z2here)+...
+                Omega_here   = (H/2)*(xi_Z1here+xi_Z2here)+...
                                 ((sqrt(3)*H^2)/12)*ad_xi_Z1here*xi_Z2here;
                       
             else % order 2
@@ -134,11 +134,11 @@ for i = 1:N
                     end
                 end
                 
-                Gamma_here  = H*xi_Zhere;
+                Omega_here  = H*xi_Zhere;
 
             end
 
-            gh              = variable_expmap_g(Gamma_here);
+            gh = variable_expmap_g(Omega_here);
             
             g_here                     = g_here*gh;
             if full||(i==i_here&&nargin==3)||(i==i_here&&j==j_here)
@@ -153,7 +153,7 @@ for i = 1:N
         dof_start = dof_start+dof_here;
         
     end
-    g_Ltip((i-1)*4+1:i*4,:) = g_here; 
+    g_tip((i-1)*4+1:i*4,:) = g_here; 
 end
 
 end

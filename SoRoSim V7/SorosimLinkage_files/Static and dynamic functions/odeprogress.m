@@ -1,6 +1,6 @@
 %Runs parallel with the ode45
 %Last modified by Anup Teejo Mathew, 02.03.2022
-function status = odeprogress(t,y,flag,Tr,Show)
+function status = odeprogress(t,y,flag,Linkage,Show)
 %ODEWBAR Graphical waitbar printing ODE solver progress.
 %   When the function odewbar is passed to an ODE solver as the 'OutputFcn'
 %   property, i.e. options = odeset('OutputFcn',@odewbar), the solver calls 
@@ -26,7 +26,7 @@ if nargin < 3 || isempty(flag)
  	if cputime-tlast>0.2
  		tlast = cputime;
         if Show
-            plotalong(Tr,t(end),y(:,end)) 
+            plotalong(Linkage,t(end),y(:,end)) 
         end
  	else
  		status = 0;
@@ -39,22 +39,31 @@ else
   case 'init'               % odeprint(tspan,y0,'init')
 	  
       if Show
-        close all  
-        figure('units','normalized','outerposition',[0 0 1 1]);
-        set(gca,'CameraPosition',Tr.PlotParameters.CameraPosition,...
-            'CameraTarget',Tr.PlotParameters.CameraTarget,...
-            'CameraUpVector',Tr.PlotParameters.CameraUpVector,...
-            'FontSize',18);
-        if Tr.PlotParameters.Light
-            camlight(Tr.PlotParameters.Az_light,Tr.PlotParameters.El_light)
+        close all
+        PlotParameters = Linkage.PlotParameters;
+        fh=figure(1);
+        fh.Units='normalized';
+        FigScale = PlotParameters.VideoResolution;
+        FigScale(FigScale<0.1)=0.5;
+        FigScale(FigScale>1)=1;
+        FigLocation = (1-FigScale)/2;
+        fh.OuterPosition=[FigLocation FigLocation FigScale FigScale];
+        
+        set(gca,'CameraPosition',PlotParameters.CameraPosition,...
+            'CameraTarget',PlotParameters.CameraTarget,...
+            'CameraUpVector',PlotParameters.CameraUpVector,...
+            'FontSize',18)
+        
+        if PlotParameters.Light
+            camlight(PlotParameters.Az_light,PlotParameters.El_light)
         end
+        
         axis equal
         grid on
         hold on
-        xlabel('X (m)')
-        ylabel('Y (m)')
-        zlabel('Z (m)') 
-        axis([Tr.PlotParameters.X_lim Tr.PlotParameters.Y_lim Tr.PlotParameters.Z_lim]);
+        xlabel('x (m)')
+        ylabel('y (m)')
+        zlabel('z (m)')
         
       end
       tlast = cputime;

@@ -1,46 +1,47 @@
-function [g,Tg,Tgd]=variable_expmap_gTgTgd(Gamma,Gammad)
+function [g,Tg,Tgd]=variable_expmap_gTgTgd(Omega,Omegad)
 
-k      = Gamma(1:3);
+k      = Omega(1:3);
 theta  = norm(k);
-kd     = Gammad(1:3);
-thetad = (kd'*k)/theta;
 
-Gammahat  = dinamico_hat(Gamma);
-adjGamma  = dinamico_adj(Gamma);
-adjGammad = dinamico_adj(Gammad);
+Omegahat  = dinamico_hat(Omega);
+adjOmega  = dinamico_adj(Omega);
+adjOmegad = dinamico_adj(Omegad);
 
-Gammahatp2 = Gammahat*Gammahat;
-Gammahatp3 = Gammahatp2*Gammahat;
+Omegahatp2 = Omegahat*Omegahat;
+Omegahatp3 = Omegahatp2*Omegahat;
 
-adjGammap2 = adjGamma*adjGamma;
-adjGammap3 = adjGammap2*adjGamma;
-adjGammap4 = adjGammap3*adjGamma;
+adjOmegap2 = adjOmega*adjOmega;
+adjOmegap3 = adjOmegap2*adjOmega;
+adjOmegap4 = adjOmegap3*adjOmega;
 
-adjGammad2 = adjGammad*adjGamma+adjGamma*adjGammad;
-adjGammad3 = adjGammad2*adjGamma+adjGammap2*adjGammad;
-adjGammad4 = adjGammad3*adjGamma+adjGammap3*adjGammad;
+adjOmegad2 = adjOmegad*adjOmega+adjOmega*adjOmegad;
+adjOmegad3 = adjOmegad2*adjOmega+adjOmegap2*adjOmegad;
+adjOmegad4 = adjOmegad3*adjOmega+adjOmegap3*adjOmegad;
 
 
 if (theta<=1e-2)
-    g  = [1 0 0 0;0 1 0 0;0 0 1 0;0 0 0 1]+Gammahat+Gammahatp2/2+Gammahatp3/6;
+    g  = [1 0 0 0;0 1 0 0;0 0 1 0;0 0 0 1]+Omegahat+Omegahatp2/2+Omegahatp3/6;
     
     f1 = 1/2;
     f2 = 1/6;
     f3 = 1/24;
     f4 = 1/120;
     
-    Tg  = [1 0 0 0 0 0;0 1 0 0 0 0;0 0 1 0 0 0;0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1]+f1*adjGamma+f2*adjGammap2+f3*adjGammap3+f4*adjGammap4;
-    Tgd = f1*adjGammad+f2*adjGammad2+f3*adjGammad3+f4*adjGammad4;
+    Tg  = [1 0 0 0 0 0;0 1 0 0 0 0;0 0 1 0 0 0;0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1]+f1*adjOmega+f2*adjOmegap2+f3*adjOmegap3+f4*adjOmegap4;
+    Tgd = f1*adjOmegad+f2*adjOmegad2+f3*adjOmegad3+f4*adjOmegad4;
 else
 
-    tp2        = theta*theta;
-    tp3        = tp2*theta;
-    tp4        = tp3*theta;
-    tp5        = tp4*theta;
-    tp6        = tp5*theta;
+    kd     = Omegad(1:3);
+    thetad = (kd'*k)/theta;
+
+    tp2 = theta*theta;
+    tp3 = tp2*theta;
+    tp4 = tp3*theta;
+    tp5 = tp4*theta;
+    tp6 = tp5*theta;
     
-    sintheta   = sin(theta);
-    costheta   = cos(theta);
+    sintheta = sin(theta);
+    costheta = cos(theta);
     
     t1 = theta*sintheta;
     t2 = theta*costheta;
@@ -51,15 +52,15 @@ else
     t7 = (2-2*costheta-t1)/(2*tp4);
     t8 = (2*theta-3*sintheta+t2)/(2*tp5);
     
-    g   = [1 0 0 0;0 1 0 0;0 0 1 0;0 0 0 1]+Gammahat+...
-          (1-costheta)/(tp2)*Gammahatp2+...
-          ((theta-sintheta)/(tp3))*Gammahatp3;
-    Tg  = [1 0 0 0 0 0;0 1 0 0 0 0;0 0 1 0 0 0;0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1]+t5*adjGamma+...
-          t6*adjGammap2+...
-          t7*adjGammap3+...
-          t8*adjGammap4;
-    Tgd = (thetad*(t3)/(2*tp3))*adjGamma+t5*adjGammad+...
-          (thetad*(t4)/(2*tp4))*adjGammap2+t6*adjGammad2+...
-          (thetad*(t3)/(2*tp5))*adjGammap3+t7*adjGammad3+...
-          (thetad*(t4)/(2*tp6))*adjGammap4+t8*adjGammad4;
+    g   = [1 0 0 0;0 1 0 0;0 0 1 0;0 0 0 1]+Omegahat+...
+          (1-costheta)/(tp2)*Omegahatp2+...
+          ((theta-sintheta)/(tp3))*Omegahatp3;
+    Tg  = [1 0 0 0 0 0;0 1 0 0 0 0;0 0 1 0 0 0;0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1]+t5*adjOmega+...
+          t6*adjOmegap2+...
+          t7*adjOmegap3+...
+          t8*adjOmegap4;
+    Tgd = (thetad*(t3)/(2*tp3))*adjOmega+t5*adjOmegad+...
+          (thetad*(t4)/(2*tp4))*adjOmegap2+t6*adjOmegad2+...
+          (thetad*(t3)/(2*tp5))*adjOmegap3+t7*adjOmegad3+...
+          (thetad*(t4)/(2*tp6))*adjOmegap4+t8*adjOmegad4;
 end

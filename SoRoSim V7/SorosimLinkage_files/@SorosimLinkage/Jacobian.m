@@ -6,7 +6,6 @@ if isrow(q)
     q=q';
 end
 
-
 full = false;
 if nargin==4
     if j_here==0
@@ -33,22 +32,22 @@ i_sig = 1;
 
 N         = Linkage.N;
 
-g_ini     = Linkage.g_ini;
-g_Ltip    = repmat(eye(4),N,1);
-J_Ltip    = repmat(zeros(6,ndof),N,1);
-iLpre     = Linkage.iLpre;
+g_ini = Linkage.g_ini;
+g_tip = repmat(eye(4),N,1);
+J_tip = zeros(6*N,ndof);
+iLpre = Linkage.iLpre;
 
 dof_start = 1; %starting dof of current piece
 
 for i = 1:N
     
     if iLpre(i)>0
-        g_here       = g_Ltip((iLpre(i)-1)*4+1:iLpre(i)*4,:)*g_ini((i-1)*4+1:i*4,:);
+        g_here       = g_tip((iLpre(i)-1)*4+1:iLpre(i)*4,:)*g_ini((i-1)*4+1:i*4,:);
         Ad_g_ini_inv = dinamico_Adjoint(ginv(g_ini((i-1)*4+1:i*4,:)));
-        J_here       = Ad_g_ini_inv*J_Ltip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
+        J_here       = Ad_g_ini_inv*J_tip((iLpre(i)-1)*6+1:iLpre(i)*6,:);
     else
-        g_here   = g_ini((i-1)*4+1:i*4,:);
-        J_here   = zeros(6,ndof);
+        g_here = g_ini((i-1)*4+1:i*4,:);
+        J_here = zeros(6,ndof);
     end
     
     %Joint
@@ -59,18 +58,18 @@ for i = 1:N
     
     if dof_here == 0 %fixed joint (N)
         g_joint  = eye(4);
-        TgPhi_here = zeros(6,ndof);
+        S_here = zeros(6,ndof);
     else
         xi           = Phi_here*q_here+xi_star;
         [g_joint,Tg] = variable_expmap_gTg(xi);
 
-        TgPhi_here                                   = zeros(6,ndof);
-        TgPhi_here(:,dof_start:dof_start+dof_here-1) = Tg*Phi_here;
+        S_here                                   = zeros(6,ndof);
+        S_here(:,dof_start:dof_start+dof_here-1) = Tg*Phi_here;
     end
     
     %updating g, Jacobian, Jacobian_dot and eta
     g_here = g_here*g_joint;
-    J_here = dinamico_Adjoint(ginv(g_joint))*(J_here+TgPhi_here);
+    J_here = dinamico_Adjoint(ginv(g_joint))*(J_here+S_here);
     
     if full||(i==i_here&&nargin==3)||(i==i_here&&j_here==0)
         J((i_sig-1)*6+1:i_sig*6,:) = J_here;
@@ -139,10 +138,10 @@ for i = 1:N
                     xi_Z2here = Phi_Z2here*q_here+xi_Z2here;
                 end
                 ad_xi_Z1here = dinamico_adj(xi_Z1here);
-                PhiGamma_here  = (H/2)*(Phi_Z1here+Phi_Z2here)+...
+                Z_here  = (H/2)*(Phi_Z1here+Phi_Z2here)+...
                                ((sqrt(3)*H^2)/12)*(ad_xi_Z1here*Phi_Z2here-dinamico_adj(xi_Z2here)*Phi_Z1here); %choice of order from use    
 
-                Gamma_here   = (H/2)*(xi_Z1here+xi_Z2here)+...
+                Omega_here   = (H/2)*(xi_Z1here+xi_Z2here)+...
                                 ((sqrt(3)*H^2)/12)*ad_xi_Z1here*xi_Z2here;
                       
             else % order 2
@@ -152,21 +151,21 @@ for i = 1:N
                 if dof_here>0
                     xi_Zhere = Phi_Zhere*q_here+xi_Zhere;
                 end
-                PhiGamma_here = H*Phi_Zhere;  
+                Z_here = H*Phi_Zhere;  
 
                 
-                Gamma_here  = H*xi_Zhere;
+                Omega_here  = H*xi_Zhere;
 
             end
             
-            [gh,TGamma_here] = variable_expmap_gTg(Gamma_here);
+            [gh,Tg] = variable_expmap_gTg(Omega_here);
             
-            TPhiGamma_here = zeros(6,ndof);
-            TPhiGamma_here(:,dof_start:dof_start+dof_here-1) = TGamma_here*PhiGamma_here;
+            S_here = zeros(6,ndof);
+            S_here(:,dof_start:dof_start+dof_here-1) = Tg*Z_here;
             
             %updating g, Jacobian, Jacobian_dot and eta
             g_here = g_here*gh;
-            J_here = dinamico_Adjoint(ginv(gh))*(J_here+TPhiGamma_here);
+            J_here = dinamico_Adjoint(ginv(gh))*(J_here+S_here);
             
             if full||(i==i_here&&nargin==3)||(i==i_here&&j==j_here)
                 J((i_sig-1)*6+1:i_sig*6,:) = J_here;
@@ -182,8 +181,8 @@ for i = 1:N
         
         dof_start = dof_start+dof_here;
     end
-    g_Ltip((i-1)*4+1:i*4,:) = g_here;
-    J_Ltip((i-1)*6+1:i*6,:) = J_here;
+    g_tip((i-1)*4+1:i*4,:) = g_here;
+    J_tip((i-1)*6+1:i*6,:) = J_here;
 end
 end
 

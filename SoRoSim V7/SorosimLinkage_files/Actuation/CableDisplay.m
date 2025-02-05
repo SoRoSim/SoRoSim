@@ -1,21 +1,21 @@
 %Function to display and save the actuation cables 
 %Last modified by Anup Teejo Mathew (14.06.2021)
-function CableDisplay(S,dc_fn,iL,div_start,div_end)
+function CableDisplay(Linkage,dc_fn,iL,div_start,div_end)
 
 %Forward kinematics
-q         = zeros(S.ndof,1);
-N         = S.N;
+q         = zeros(Linkage.ndof,1);
+N         = Linkage.N;
 dof_start = 1;
-g_ini     = S.g_ini;
+g_ini     = Linkage.g_ini;
 g_Ltip    = repmat(eye(4),N,1);
-iLpre     = S.iLpre;
-VLinks    = S.VLinks;
-CVRods    = S.CVRods;
-LinkIndex = S.LinkIndex;
+iLpre     = Linkage.iLpre;
+VLinks    = Linkage.VLinks;
+CVRods    = Linkage.CVRods;
+LinkIndex = Linkage.LinkIndex;
 
-XC        = [];
-YC        = [];
-ZC        = [];
+xC        = [];
+yC        = [];
+zC        = [];
 
 for i = 1:iL %upto iL is enough
     
@@ -52,16 +52,16 @@ for i = 1:iL %upto iL is enough
     for j = 1:(VLinks(LinkIndex(i)).npie)-1
         
         xi_starfn = VRods(j+1).xi_starfn;
-        gi      = S.VLinks(S.LinkIndex(i)).gi{j};
-        ld  = S.VLinks(S.LinkIndex(i)).ld{j};
+        gi      = Linkage.VLinks(Linkage.LinkIndex(i)).gi{j};
+        ld  = Linkage.VLinks(Linkage.LinkIndex(i)).ld{j};
         Phi_Scale = diag([1/ld 1/ld 1/ld 1 1 1]);
 
-        Type    = S.CVRods{i}(j+1).Type;
+        Type    = Linkage.CVRods{i}(j+1).Type;
 
-        Phi_dof      = S.CVRods{i}(j+1).Phi_dof;
-        Phi_odr      = S.CVRods{i}(j+1).Phi_odr;
+        Phi_dof      = Linkage.CVRods{i}(j+1).Phi_dof;
+        Phi_odr      = Linkage.CVRods{i}(j+1).Phi_odr;
 
-        Phi_h     = S.CVRods{i}(j+1).Phi_h;
+        Phi_h     = Linkage.CVRods{i}(j+1).Phi_h;
         
         %updating g, Jacobian, Jacobian_dot and eta at X=0
         g_here    = g_here*gi;
@@ -84,9 +84,9 @@ for i = 1:iL %upto iL is enough
         if i==iL&&j==div_start&&j<=div_end
             dc_here   = dc_fn(x_c);
             PosC_here = g_here*[dc_here;1];
-            XC        = [XC PosC_here(1)];
-            YC        = [YC PosC_here(2)];
-            ZC        = [ZC PosC_here(3)];
+            xC        = [xC PosC_here(1)];
+            yC        = [yC PosC_here(2)];
+            zC        = [zC PosC_here(3)];
         end
         
         for ii = 1:n_l-1
@@ -98,7 +98,7 @@ for i = 1:iL %upto iL is enough
             
             if ~isempty(q_here)                 
                 if strcmp(Type,'FEM Like')
-                    SubClass  = S.CVRods{i}(j+1).SubClass;
+                    SubClass  = Linkage.CVRods{i}(j+1).SubClass;
                     xi_Zhere  = xi_Zhere+Phi_Scale*Phi_h(X_Z,Phi_dof,Phi_odr,SubClass)*q_here;
                 elseif strcmp(Type,'Custom Basis')
                     xi_Zhere  = xi_Zhere+Phi_Scale*Phi_h(X_Z)*q_here;
@@ -115,9 +115,9 @@ for i = 1:iL %upto iL is enough
                 x_c       = x_c+H*ld;
                 dc_here   = dc_fn(x_c);
                 PosC_here = g_here*[dc_here;1];
-                XC        = [XC PosC_here(1)];
-                YC        = [YC PosC_here(2)];
-                ZC        = [ZC PosC_here(3)];
+                xC        = [xC PosC_here(1)];
+                yC        = [yC PosC_here(2)];
+                zC        = [zC PosC_here(3)];
             end
 
         end
@@ -126,6 +126,6 @@ for i = 1:iL %upto iL is enough
     g_Ltip((i-1)*4+1:i*4,:) = g_here; 
 end
 
-plot3(XC,YC,ZC,'LineWidth',2,'Color','m');
+plot3(xC,yC,zC,'LineWidth',2,'Color','m');
 
 end

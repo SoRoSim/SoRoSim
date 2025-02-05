@@ -1,5 +1,5 @@
 %Function for the dynamic simulation of the linkage
-%Last modified by Anup Teejo Mathew 23/05/2021
+%Last modified by Anup Teejo Mathew 05/02/2025
 function [t,qqd] = dynamics(Linkage,x0,dynamicAction,dynamicsOptions) %x0 = [q0;qd0], dynamicAction(t) = [0 0 u_k;q_k,qd_k,qdd_k]
 
 arguments

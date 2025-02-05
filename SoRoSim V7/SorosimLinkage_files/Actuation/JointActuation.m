@@ -5,77 +5,77 @@
 %joints. 
 %Last modified by Anup Teejo Mathew - 09/12/2024
 
-function [n_jact,i_jact,i_jactq,WrenchControlled,Bqj1] = JointActuation(Tr,Update)
+function [n_jact,i_jact,i_jactq,WrenchControlled,Bj1] = JointActuation(Linkage,Update)
 
-    if any(Tr.jointtype=='R')%revolute joint
+    if any(Linkage.jointtype=='R')%revolute joint
         if Update
-            [n_Ract,i_Ract,i_Ractq,WrenchControlledR,BqR] = RevoluteJointActuation(Tr,Update);
+            [n_Ract,i_Ract,i_Ractq,WrenchControlledR,BR] = RevoluteJointActuation(Linkage,Update);
         else
-            [n_Ract,i_Ract,i_Ractq,WrenchControlledR,BqR] = RevoluteJointActuation(Tr);
+            [n_Ract,i_Ract,i_Ractq,WrenchControlledR,BR] = RevoluteJointActuation(Linkage);
         end
     else
         n_Ract            = 0;
         i_Ract            = [];
         i_Ractq           = [];
         WrenchControlledR = [];
-        BqR               = [];
+        BR                = [];
     end
 
-    n_jact             = n_Ract;
-    i_jact             = i_Ract;
-    i_jactq            = i_Ractq;
-    WrenchControlled   = WrenchControlledR;
-    Bqj1               = BqR;
+    n_jact           = n_Ract;
+    i_jact           = i_Ract;
+    i_jactq          = i_Ractq;
+    WrenchControlled = WrenchControlledR;
+    Bj1              = BR;
 
 
     %Prismatic joint
-    if any(Tr.jointtype=='P')
+    if any(Linkage.jointtype=='P')
         if Update
-            [n_Pact,i_Pact,i_Pactq,WrenchControlledP,BqP] = PrismaticJointActuation(Tr,Update);
+            [n_Pact,i_Pact,i_Pactq,WrenchControlledP,BP] = PrismaticJointActuation(Linkage,Update);
         else
-            [n_Pact,i_Pact,i_Pactq,WrenchControlledP,BqP] = PrismaticJointActuation(Tr);
+            [n_Pact,i_Pact,i_Pactq,WrenchControlledP,BP] = PrismaticJointActuation(Linkage);
         end
     else
         n_Pact            = 0;
         i_Pact            = [];
         i_Pactq           = [];
         WrenchControlledP = [];
-        BqP               = [];
+        BP                = [];
     end
 
-    n_jact              = n_jact+n_Pact;
-    i_jact              = [i_jact i_Pact];
-    i_jactq             = [i_jactq i_Pactq];
-    WrenchControlled    = [WrenchControlled WrenchControlledP];
-    Bqj1                = [Bqj1 BqP];
+    n_jact           = n_jact+n_Pact;
+    i_jact           = [i_jact i_Pact];
+    i_jactq          = [i_jactq i_Pactq];
+    WrenchControlled = [WrenchControlled WrenchControlledP];
+    Bj1              = [Bj1 BP];
 
     %Helical joint
-    if any(Tr.jointtype=='H')
+    if any(Linkage.jointtype=='H')
         if Update
-            [n_Hact,i_Hact,i_Hactq,WrenchControlledH,BqH] = HelicalJointActuation(Tr,Update);
+            [n_Hact,i_Hact,i_Hactq,WrenchControlledH,BH] = HelicalJointActuation(Linkage,Update);
         else
-            [n_Hact,i_Hact,i_Hactq,WrenchControlledH,BqH] = HelicalJointActuation(Tr);
+            [n_Hact,i_Hact,i_Hactq,WrenchControlledH,BH] = HelicalJointActuation(Linkage);
         end
     else
         n_Hact            = 0;
         i_Hact            = [];
         i_Hactq           = [];
         WrenchControlledH = [];
-        BqH               = [];
+        BH                = [];
     end
 
-    n_jact              = n_jact+n_Hact;
-    i_jact              = [i_jact i_Hact];
-    i_jactq             = [i_jactq i_Hactq];
-    WrenchControlled    = [WrenchControlled WrenchControlledH];
-    Bqj1                = [Bqj1 BqH];
+    n_jact           = n_jact+n_Hact;
+    i_jact           = [i_jact i_Hact];
+    i_jactq          = [i_jactq i_Hactq];
+    WrenchControlled = [WrenchControlled WrenchControlledH];
+    Bj1              = [Bj1 BH];
 
     %Cylindrical joint
-    if any(Tr.jointtype=='C')
+    if any(Linkage.jointtype=='C')
         if Update
-            [n_Cact,i_Cact,i_Cactq,WrenchControlledC] = CylindricalJointActuation(Tr,Update);
+            [n_Cact,i_Cact,i_Cactq,WrenchControlledC] = CylindricalJointActuation(Linkage,Update);
         else
-            [n_Cact,i_Cact,i_Cactq,WrenchControlledC] = CylindricalJointActuation(Tr);
+            [n_Cact,i_Cact,i_Cactq,WrenchControlledC] = CylindricalJointActuation(Linkage);
         end
     else
         n_Cact            = 0;
@@ -84,17 +84,17 @@ function [n_jact,i_jact,i_jactq,WrenchControlled,Bqj1] = JointActuation(Tr,Updat
         WrenchControlledC = [];
     end
 
-    n_jact              = n_jact+n_Cact;
-    i_jact              = [i_jact i_Cact];
-    i_jactq             = [i_jactq i_Cactq];
-    WrenchControlled    = [WrenchControlled WrenchControlledC];
+    n_jact           = n_jact+n_Cact;
+    i_jact           = [i_jact i_Cact];
+    i_jactq          = [i_jactq i_Cactq];
+    WrenchControlled = [WrenchControlled WrenchControlledC];
 
     %Planar joint 
-    if any(Tr.jointtype=='A')
+    if any(Linkage.jointtype=='A')
         if Update
-            [n_Aact,i_Aact,i_Aactq,WrenchControlledA] = PlanarJointActuation(Tr,Update);
+            [n_Aact,i_Aact,i_Aactq,WrenchControlledA] = PlanarJointActuation(Linkage,Update);
         else
-            [n_Aact,i_Aact,i_Aactq,WrenchControlledA] = PlanarJointActuation(Tr);
+            [n_Aact,i_Aact,i_Aactq,WrenchControlledA] = PlanarJointActuation(Linkage);
         end
     else
         n_Aact            = 0;
@@ -103,17 +103,17 @@ function [n_jact,i_jact,i_jactq,WrenchControlled,Bqj1] = JointActuation(Tr,Updat
         WrenchControlledA = [];
     end
 
-    n_jact              = n_jact+n_Aact;
-    i_jact              = [i_jact i_Aact];
-    i_jactq             = [i_jactq i_Aactq];
-    WrenchControlled    = [WrenchControlled WrenchControlledA];
+    n_jact           = n_jact+n_Aact;
+    i_jact           = [i_jact i_Aact];
+    i_jactq          = [i_jactq i_Aactq];
+    WrenchControlled = [WrenchControlled WrenchControlledA];
 
     %Spherical joint 
-    if any(Tr.jointtype=='S')
+    if any(Linkage.jointtype=='S')
         if Update
-            [n_Sact,i_Sact,i_Sactq,WrenchControlledS] = SphericalJointActuation(Tr,Update);
+            [n_Sact,i_Sact,i_Sactq,WrenchControlledS] = SphericalJointActuation(Linkage,Update);
         else
-            [n_Sact,i_Sact,i_Sactq,WrenchControlledS] = SphericalJointActuation(Tr);
+            [n_Sact,i_Sact,i_Sactq,WrenchControlledS] = SphericalJointActuation(Linkage);
         end
     else
         n_Sact            = 0;
@@ -122,17 +122,17 @@ function [n_jact,i_jact,i_jactq,WrenchControlled,Bqj1] = JointActuation(Tr,Updat
         WrenchControlledS = [];
     end
 
-    n_jact              = n_jact+n_Sact;
-    i_jact              = [i_jact i_Sact];
-    i_jactq             = [i_jactq i_Sactq];
-    WrenchControlled    = [WrenchControlled WrenchControlledS];
+    n_jact           = n_jact+n_Sact;
+    i_jact           = [i_jact i_Sact];
+    i_jactq          = [i_jactq i_Sactq];
+    WrenchControlled = [WrenchControlled WrenchControlledS];
 
     %Free joint 
-    if any(Tr.jointtype=='F')
+    if any(Linkage.jointtype=='F')
         if Update
-            [n_Fact,i_Fact,i_Factq,WrenchControlledF] = FreeJointActuation(Tr,Update);
+            [n_Fact,i_Fact,i_Factq,WrenchControlledF] = FreeJointActuation(Linkage,Update);
         else
-            [n_Fact,i_Fact,i_Factq,WrenchControlledF] = FreeJointActuation(Tr);
+            [n_Fact,i_Fact,i_Factq,WrenchControlledF] = FreeJointActuation(Linkage);
         end
         
     else
@@ -142,9 +142,9 @@ function [n_jact,i_jact,i_jactq,WrenchControlled,Bqj1] = JointActuation(Tr,Updat
         WrenchControlledF = [];
     end
 
-    n_jact              = n_jact+n_Fact;
-    i_jact              = [i_jact i_Fact];
-    i_jactq             = [i_jactq i_Factq];
-    WrenchControlled    = [WrenchControlled WrenchControlledF];
+    n_jact           = n_jact+n_Fact;
+    i_jact           = [i_jact i_Fact];
+    i_jactq          = [i_jactq i_Factq];
+    WrenchControlled = [WrenchControlled WrenchControlledF];
 end
 

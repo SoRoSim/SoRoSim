@@ -1,3 +1,5 @@
+%If dFact_dq is unavailable keep it [] and turn off Jacobian during simulation
+%Last modified by Anup Teejo Mathew 05/02/2025
 function [Fact,dFact_dq] = CustomActuation(Linkage,q,g,J,t,qd,Jdot)
 
 %q and qd: joint coordinates and their time derivatives, 
@@ -5,8 +7,8 @@ function [Fact,dFact_dq] = CustomActuation(Linkage,q,g,J,t,qd,Jdot)
 %t:  time
 
 %Fact should be 6*n column vector where n is the total number of gaussian
-%points of all soft divisions including the start and end point of a division (nGauss).
-%(Example: linkage with 2 soft links and 1 rigid link (n=nGauss1+nGauss2)
+%points of all soft divisions including the start and end point of a division (nip).
+%(Example: linkage with 2 soft links and 1 rigid link (n=nip1+nip2)
 %Fact should be arranged according to the order of precedence of Link
 %numbers
 

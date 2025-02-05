@@ -103,9 +103,11 @@ function dxd_dx = ODEJacobian(Linkage,t,x,dynamicAction,GUI_actionInput)
     
     dxd_dx = zeros(2*ndof,2*ndof);
     dxd_dx(1:ndof,ndof+1:2*ndof) = eye(ndof);
-    if Linkage.Actuated
+
+    if Linkage.Actuated&&(~Linkage.CAI)
         dxd_dx(1:ndof,ndof+Linkage.ActuationPrecompute.index_q_k) = zeros(ndof,n_k);
     end
+    
     dxd_dx(ndof+1:2*ndof,:) = [dFD_dq,dFD_dqd];
 
 end

@@ -1,25 +1,16 @@
-%Function to calculate actuation input as a function of state and time
-% input = [u_k;q_k]
-%Last modified 17/01/2025
+%Function to calculate action as a function of state and time
+%Last modified 05/02/2025
 
-function [input,dinput_dx] = CustomActuatorInput(Linkage,x,t)
+function [action,daction_dx] = CustomActuatorInput(Linkage,x,t)
 
-% x is a vector of unknowns for statics x = [q_u;u_u;lambda], x is [q_u;qd_u;u_u;lambda] for dynamics
-% input = [u_k;q_k] is the input to the model (refer to sorosim language)
+% x is a vector of unknowns for statics x = [q_u;u_u;lambda], x is [q, qdot] for dynamics
+% t is time
+% action = [u_k;q_k] for statics and [u_k;qdd_k] for dynamics
 
-% g = Linkage.FwdKinematics(q);
-% J = Linkage.Jacobian(q);
-% Jdot = Linkage.Jacobiandot(q,qd);
-% deta_dq
-% detadot_dq
-% M = Linkage.GeneralizedMassMatrix(q);
-% F = Linkage.GeneralizedExternalCoriolisForce(q,qd,t);
-% B = Linage.ActuationMatrix(q);
-
-input = zeros(Linkage.nact,1);
+action = zeros(Linkage.nact,1);
 nx = length(x);
 
-dinput_dx = zeros(Linkage.nact,nx);
+daction_dx = zeros(Linkage.nact,nx);
 
 
 end

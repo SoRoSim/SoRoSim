@@ -57,7 +57,7 @@ set(gca,'CameraPosition',PlotParameters.CameraPosition,...
 if PlotParameters.Light
     camlight(PlotParameters.Az_light,PlotParameters.El_light)
 end
-% view(0,90)
+
 axis equal
 grid on
 hold on

@@ -1,19 +1,17 @@
-%Function to calculate the custom external force (point force in local
-%frame, if distributed multiply with quadrature weight)
+%Function to calculate the custom external force and its Jacobian
+%If dFext_dq is unavailable keep it [] and turn off Jacobian during simulation
+%Last modified by Anup Teejo Mathew 05/02/2025
 
-%Last modified by Anup Teejo Mathew 11/12/2024
-
-function [Fext,dFext_dq]=CustomExtForce(Linkage,q,g,J,t,qd,Jdot)
+function [Fext,dFext_dq] = CustomExtForce(Linkage,q,g,J,t,qd,Jdot)
 
 %%%%NOTE%%%%
-%Tr: Linkage element,
+%Linkage: Linkage element,
 %q and qd: joint coordinates and their time derivatives,
-%g, J, Jd, and eta: transformation matrix, Jacobian, time derivative of jacobian, and screw velocity at every significant point of the linkage
+%g, J, and Jd: transformation matrix, Jacobian, and time derivative of Jacobian at every significant point of the linkage
 %t: time
-%Currently applicable only for independent bases
 
-%Fext should be 6*nsig column vector. If distributed wrench, multiply with
-%corresponding quadrature weight to make it a point wrench
+%Fext should be 6*nsig column vector of point external wrenches. If distributed wrench, multiply with
+%corresponding quadrature weight to make it a point wrench!
 
 % Significant points: 1 for every joint (at X=1), 1 at the center of the rigid link, for soft links at every integration points
 
@@ -22,9 +20,9 @@ function [Fext,dFext_dq]=CustomExtForce(Linkage,q,g,J,t,qd,Jdot)
 % eta = S.ScrewVelocity(q,qd); %Screwvelocity of the linkage calculated at every significant points
 % J   = S.Jacobiandot(q,qd);   %time derivative of geometric jacobian of the linkage calculated at every significant points
 
-%%%END%%%
+%%%END OF NOTE%%%
 
-nsig    = Linkage.nsig; %everything except rigid joints
+nsig = Linkage.nsig; %everything except rigid joints
 Fext = zeros(6*nsig,1);
 dFext_dq = zeros(6*nsig,Linkage.ndof);
 

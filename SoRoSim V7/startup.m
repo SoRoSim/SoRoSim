@@ -49,7 +49,7 @@
 %% 1. SorosimLink Class
 
 % %General Properties
-% 
+        
 % jointtype    %Type of joint used to connect the link (lumped DoF). (R) for Revolute,(P) for Prismatic, (H) for Helical, (U) for Universal, (C) for Cylindrical, (A) for Planar, (S) for Spherical, (F) for Free motion and (N) for Fixed
 % linktype     %'s' for soft or 'r' for rigid
 % npie         %Number of Cosserat rod pieces. For a rigid link, npie = 1 (of the joint). For a soft link, npie=1+number of divisions 
@@ -91,35 +91,37 @@
 % PlotFn    %Handle of function to plot the geometry (for rigid link)
 % Lscale    %Scaling factor for plotting symbols or axes
 
-%% 2. SorosimTwist
+%%%%Methods%%%%
+
+%% 2. SorosimRod
 
 % Type         %Base type (Monomial, Lagrange Polynomial, Linear Interpolation, Gaussian, Custom, Non-linear Gaussian)
 % SubClass     %Now only for FEM Like basis (linear,quadratic,cubic)
-% Bdof         %(6x1) array specifying the allowable DoFs of a soft piece. 1 if allowed 0 if not.
-% Bodr         %(6x1) array specifying the order of allowed DoF (0: constant, 1: linear, 2: quadratic,...)
+% Phi_dof      %(6x1) array specifying the allowable deformation modes of a soft division. 1 if allowed 0 if not.
+% Phi_odr      %(6x1) array specifying the order of allowed DoF (0: constant, 1: linear, 2: quadratic,...)
 % dof          %degress of freedom of each base
 % 
-% Bh           %Function handle for base
-% B            %(6xdof) Base matrix calculated at lumped joints or ((6xnGauss)xdof) base matrices computed at every significant points of a soft division
-% B_Z1         %Base calculated at 4th order first Zanna point (Xs+Z1*(delta(Xs)))
-% B_Z2         %Base calculated at 4th order second Zanna point (Xs+Z2*(delta(Xs)))
-% B_Z          %Base calculated at 2nd order Zanna point 
+% Phi_h          %Function handle for base
+% Phi            %(6xdof) Base matrix calculated at lumped joints or ((6xnGauss)xdof) base matrices computed at every significant points of a soft division
+% Phi_Z1         %Base calculated at 4th order first Zanna point (Xs+Z1*(delta(Xs)))
+% Phi_Z2         %Base calculated at 4th order second Zanna point (Xs+Z2*(delta(Xs)))
+% Phi_Z          %Base calculated at 2nd order Zanna point 
 % 
 % xi_starfn    %Reference strain vector as a function of X
 % xi_star      %(6x1) reference strain vector at the lumped joint or ((6xnGauss)x4) reference strain vectors computed at Gauss quadrature and Zannah collocation points
 % 
 % Link         %Link associated with this twist only for soft link
 % div          %Division associated with this twist
-% nip           %number of integration point including boundaries
+% 
+% nip          %number of integration point including boundaries
 % Xs           %integration points 
 % Ws           %weights of integration point
+% 
 % Ms           %Inertia matrix of cross-section (6nip x 6) matrix
-% Es           %Stiffness matrix (6nip x 6) matrix
-% Gs           %Damping matrix (6nip x 6) matrix
+% Es           %Stiffness matrix (6nip x 6) matrix, for a rigid joint it is joint stiffness matrix in (6x6)
+% Gs           %Damping matrix (6nip x 6) matrix, for a rigid joint it is joint damping matrix in (6x6) 
 % 
 % Xadd         %additional integration points (nx1) vector 
-% CI           %logical 0 by default 1 if custom integration is enabled
-% CIFn         %function handle for custom integration
 
 %%%%Methods%%%%
 % Updatexi_star(T)
@@ -129,27 +131,29 @@
 %% 3. SorosimLinkage
 
 % %General Properties
-% 
-% N            %Total number of Links
+
+% N            %Total number of Links (not total number of rods)
 % ndof         %Total number of DOF
 % nsig         %Total number of points at which compulations are performed (significant points): N+N_rigid+sum(N_soft_div*nGauss_div)
-% VLinks       %Vector of all unique links (obtained from user input)
-% LinkIndex    %(Nx1) array of indices corresponding to each links. ith Link = Tr.VLinks(LinkIndex(i))
-% CVTwists     %Cell element of Twist vectors for each link
+% nj           %Total number of virtual joints (rigid joints plus virutal joints of all soft rods)
+% VLinks       %Vector of all unique links (obtained from user input) VLinks(
+% LinkIndex    %(Nx1) array of indices corresponding to each links. ith Link = S.VLinks(LinkIndex(i))
+% CVRods       %Cell element of Rod vectors for each link S.CVRods{i}(j) i: Link index, j=1 for joint, j=2 to ndiv+1 for divisions.
 % 
 % iLpre        %(Nx1) array corresponding to the Link index of the Link to which the ith Link is connected
 % g_ini        %(4Nx4) Fixed initial transformation matrices of Links wrt to the tip of its previous link
-% Z_order      %order of Zannah collocation (2, 4, or 6) default value is 4
+% Z_order      %Order of Zannah collocation (2, 4, or 6) default value is 4
+% OneBasis     %Enable if every rod is governed by the same q vector. Example a POD basis. (logical 0 by default)
 % 
 % %Closed Loop Joints (Link A is connect to Link B via a closed loop joint)
 % 
-% nCLj         %Total number of closed loop joints
-% iACL         %(nCLjx1)array corresponding to the index of Link A
+% nCLj         %Total number of closed loop joints (default 0)
+% iCLA         %(nCLjx1)array corresponding to the index of Link A
 % iCLB         %(nCLjx1)array corresponding to the index of Link B
-% VTwistsCLj   %(nCLjx1)array of Twist vectors corresponding to each closed loop joint
+% VRodsCLj     %(nCLjx1)array of Rod vectors corresponding to each closed loop joint
 % gACLj        %(nCLjx1)cells of fixed transformation from the tip of Link A to the close loop joint
 % gBCLj        %(nCLjx1)cells of fixed transformation from the tip of Link B to the close loop joint
-% CLprecompute %Struct element which contains pre-computed BpCLj (cell element of constrain basis), i_sigA (array of significant index corresponding to A), i_sigB (array ofsignificant index corresponding to B), and nCLp (total number of constraints)
+% CLprecompute %Struct element which contains pre-computed Phi_p (cell element of constrain basis), i_sigA (array of significant index corresponding to A), i_sigB (array ofsignificant index corresponding to B), and nCLp (total number of constraints)
 % T_BS         %Baumgarte stabilization constant. Lower the value stricter the constrain.
 % 
 % %External Force Properties
@@ -157,47 +161,53 @@
 % G             %Value of G
 % 
 % %Point forces/moments
-% PointForce    %logical 1 if point force/moment is present 0 if not
-% FollowerForce %logical 1 if point force/moment is a follower force (local frame) and 0 if it is wrt global frame
-% np            %Number of point forces
-% Fp_loc        %Cell element of Link and Division numbers [i,j] corresponding to the point force/moment location (at the end of a soft division/center of mass of rigid link)
+% np            %Number of point wrenches (default 0)
+% LocalWrench   %logical 1 if point force/moment is a follower force (local frame) and 0 if it is wrt global frame
+% Fp_loc        %Cell element of Link, Division numbers, and location if along a soft link: [i,j,X]. Corresponding to the point force/moment location (at the end of a soft division/center of mass of rigid link)
 % Fp_vec        %Cell element with value of point forces/moments [Mx My Mz Fx Fy Fz]'
+% Fp_sig        %Precomputed value of significant point corresponding to point wrenches
 % 
 % %Custom external force
-% CEFP          %logical 1 if custom external force is present 0 if not (default value is 0)
-% M_added       %For the computation of external force that depend on etadot
+% CEF          %logical 1 if custom external force is present 0 if not (default value is 0)
 % 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % Underwater Simulation
+% UnderWater    %Enable if it is an underwater simulation (default logical 0)
+% Rho_water     %Water density by default 1000 kg/m^3
+% M_added       %Added mass for fluid simulations (by default zeros(6*nsig,6))
+% DL            %Drag-Lift Matrix (by default zeros(6*nsig,6))
+% 
 % %Actuation Properties
-% Actuated          %logical 1 if actuated 0 if not
-% nact              %Total number of actuators
+% Actuated      %logical 1 if actuated 0 if not
+% nact          %Total number of actuators
 % 
 % %Joint actuation parameters
-% Bqj1              %Pre-computed actuation base for joints with dof = 1
-% n_jact            %Total number of joint actuators
-% i_jact            %(n_jactx1) array of index of links whos joints are actuated
-% i_jactq           %(n_jactx1) array of joint coordinate index of all active joints
-% WrenchControlled  %(n_jactx1) array of logical 1 if the joint is wrench controlled 0 if joint coordinate controlled
+% Bj1                 %Pre-computed actuation base for joints with dof = 1
+% N_jact              %Total number of links whos joints are actuated
+% n_jact              %Total number of joint actuators (eg. 3 for a spherical joint)
+% i_jact              %Array of index of links whos joints are actuated
+% i_jactq             %(n_jactx1) array of joint coordinate index of all active joints
+% WrenchControlled    %(n_jactx1) array of logical 1 if the joint is wrench controlled 0 if joint coordinate controlled
+% ActuationPrecompute %struct of precomputed actuation parameters: n_k (total number of constrained DoF), index_q_u, index_q_k, index_u_k, index_u_u
 % 
 % %Thread-like actuator for soft links
 % n_sact            %Number of soft link actuators
+% i_sact            %Index of soft actuators present in i th link, jth divisions. Syntax i_sact{i}{j} will give you a row vector with soft actuator index
 % dc                %(n_sactxN) cells of local cable position (0, yp, zp) at Gauss quadrature points of all active soft divisions
 % dcp               %(n_sactxN) cells of space derivative of the local cable position (0,yp',zp')
 % Sdiv              %(n_sactxN) cells of starting division number
 % Ediv              %(n_sactxN) cells of ending division  number
-% Inside            %(1xn_sact) cells with logical 1 if the actuator is fully inside the linkage, 0 if not
 % CableFunction     %Struct with cell elements (Cy_fn and Cz_fn) of parameterized functions corresponding to the y and z coodinates of the cable
 % 
 % %Custom actuation
-% CAP               %logical 1 if custom actation is present 0 if not (default value: 0)
-% CAS               %logical 1 to apply a custom actuator strength (default value: 0)
+% CA               %logical 1 if custom actation is present 0 if not (default value: 0)
+% CAI              %logical 1 to apply a custom actuator strength (default value: 0)
 % 
 % %Pre-computed elastic Properties
 % K       %Generalized Stiffness matrix
-% Damped  %1 if the soft links are elastically damped 0 if not (default value is 1)
+% Damped  %logical 1 if the soft links are elastically damped logical 0 if not (default value is 1)
 % D       %Generalized Damping matrix
 % 
-% CP1     %Custom constant properties of linkage
+% CP1     %Custom constant properties of linkage that can be useful
 % CP2
 % CP3
 % 
@@ -205,39 +215,41 @@
 % PlotParameters
 % 
 % %%%PlotParameters is a struct with following elements%%%
-% %Lscale
-% %CameraPosition     CameraPosition with respect to origin
-% %CameraUpVector     Orientation of normal
-% %CameraTarget       Target location
-% %Light              logical 1 if the light is on, 0 if not. (default value: 1)
-% %Az_light           Light Azimuth wrt camera
-% %El_light           Light Elevation wrt camera
-% %X_lim              X limit [X_lower_limt X_upper_limit]
-% %Y_lim              Y limit [Y_lower_limt Y_upper_limit]
-% %Z_lim              Z limit [Z_lower_limt Z_upper_limit]
-% %FrameRateValue     FrameRate for dyanmic plot
-% %ClosePrevious      logical 0 to not close previous image, 1 to close. (default value: 1)
+% %Lscale                   %Scaling factor for axis
+% %CameraPosition           %CameraPosition with respect to origin
+% %CameraUpVector           %Orientation of normal
+% %CameraTarget             %Target location
+% %Light                    %logical 1 if the light is on, 0 if not. (default value: 1)
+% %Az_light                 %Light Azimuth wrt camera
+% %El_light                 %Light Elevation wrt camera
+% %XLim                     %x limit [X_lower_limt X_upper_limit]
+% %YLim                     %y limit [Y_lower_limt Y_upper_limit]
+% %ZLim                     %z limit [Z_lower_limt Z_upper_limit]
+% %FrameRateValue           %FrameRate for dyanmic plot
+% %ClosePrevious            %Logical 0 to not close previous image, 1 to close. (default value: 1)
+% %CameraRotationSpeed      %For a cinematic rotation of the scene (default 0)
+% %VideoResolution          %1 for full screen resolution (higher the better)
 
 
 %%%%METHODS%%%%
 
-% g       = FwdKinematics(Tr,q,t,i,j);           %to get the transformation matrix at every significant points (arranged as column array) i: link, j: division (j=0 for joints)
-% J       = Jacobian(Tr,q,t,i,j);                %to get the Jacobian at every significant points (arranged as column array)
-% Jd      = Jacobiandot(Tr,q,qd,t,i,j);          %to get the derivative of Jacobian at every significant points (arranged as column array)
-% xi      = ScrewStrain(Tr,q,t,i,j)              %to get the screw strain at every significant points (arranged as column array)
-% eta     = ScrewVelocity(Tr,q,qd,t,i,j);        %to get the screw velocity at every significant points (arranged as column array)
-% D       = findD(Tr,q,qd,t);                    %to compute and get the generalized damping matrix
-% K       = findK(Tr,q,t)                        %to compute and get the generalized stiffness matrix
-% Bq      = ActuationMatrix(Tr,q,t);             %to get the generalized actuation matrix (custom actuation not included)
-% M       = GeneralizedMassMatrix(Tr,q,t)        %to get the generalized mass matrix
-% C       = GeneralizedCoriolisMatrix(Tr,q,qd,t) %to get the generalized coriolis matrix
-% F       = GeneralizedExternalForce(Tr,q,qd,t)  %to get the generalized external force matrix
-% [t,qqd] = dynamics(Tr,qqd0,odetype,dt);             %for dynamic simulation
-% [q,u]   = statics(Tr,qu0,magnifier)            %for static simulation
+% g       = FwdKinematics(Linkage,q,i,j);           %to get the transformation matrix at every significant points (arranged as column array) i: link, j: division (j=0 for joints)
+% J       = Jacobian(Linkage,q,i,j);                %to get the Jacobian at every significant points (arranged as column array)
+% Jd      = Jacobiandot(Linkage,q,qd,i,j);          %to get the derivative of Jacobian at every significant points (arranged as column array)
+% xi      = ScrewStrain(Linkage,q,i,j)              %to get the screw strain at every significant points (arranged as column array)
+% eta     = ScrewVelocity(Linkage,q,qd,i,j);        %to get the screw velocity at every significant points (arranged as column array)
+% D       = findD(Linkage);                    %to compute and get the generalized damping matrix
+% K       = findK(Linkage)                        %to compute and get the generalized stiffness matrix
+% Bq      = ActuationMatrix(Linkage,q);             %to get the generalized actuation matrix (custom actuation not included)
+% M       = GeneralizedMassMatrix(Linkage,q,t)        %to get the generalized mass matrix
+% C       = GeneralizedCoriolisMatrix(Linkage,q,qd) %to get the generalized coriolis matrix
+% F       = GeneralizedExternalForce(Linkage,q,qd)  %to get the generalized external force matrix
+% [t,qqd] = dynamics(Linkage,x0,dynamicAction,dynamicsOptions) %for dynamic simulation
+% [q,u,lambda] = statics(Linkage,x0,action,staticsOptions) %for static simulation
 % 
-% plotq0(Tr,Lh,Dh,CLh);       %to plot the free body diagram of the linkage
-% plotq(Tr,q,t);              %to plot the state of the linkage for a given q
-% plotqqd(Tr,t,qqd);          %to get dynamic simulation video output for a given t (time array) and qqd (array of joint coordinates and their time derivatives)
+% plotq0(Linkage,Lh,Dh,CLh);       %to plot the free body diagram of the linkage
+% plotq(Linkage,q);              %to plot the state of the linkage for a given q
+% plotqt(Linkage,t,qqd);          %to get dynamic simulation video output for a given t (time array) and qqd (array of joint coordinates and their time derivatives)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
 

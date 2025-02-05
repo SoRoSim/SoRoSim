@@ -1,30 +1,30 @@
 %Function that allows the user to specify helical joint control and actuation
 %specifications (24.05.2021)
 
-function [n_Hact,i_Hact,i_Hactq,WrenchControlledH,BqH] = HelicalJointActuation(S,Update)
+function [n_Hact,i_Hact,i_Hactq,WrenchControlledH,BH] = HelicalJointActuation(Linkage,Update)
 if nargin==1
     Update=false;
 end
-ndof              = S.ndof;
+ndof              = Linkage.ndof;
 B1                = zeros(ndof,1);
 
 n_Hact            = 0;
 i_Hact            = [];
 i_Hactq           = [];
-BqH               = [];
+BH                = [];
 WrenchControlledH = [];
 
 dofi              = 1;
 
 if ~Update
-    for i = 1:S.N %for each link
+    for i = 1:Linkage.N %for each link
 
-        VRods_i = S.CVRods{i};
+        VRods_i = Linkage.CVRods{i};
 
-        if S.VLinks(S.LinkIndex(i)).jointtype == 'H'
+        if Linkage.VLinks(Linkage.LinkIndex(i)).jointtype == 'H'
 
             close all
-            S.plotq0(i);
+            Linkage.plotq0(i);
 
             quest  = ['Is the Helical joint of link ',num2str(i),' actuated?'];
             answer = questdlg(quest,'Helical Joint',...
@@ -37,7 +37,7 @@ if ~Update
                     i_Hact   = [i_Hact i];
                     i_Hactq  = [i_Hactq;dofi];
                     B1(dofi) = 1;
-                    BqH      = [BqH,B1];
+                    BH       = [BH,B1];
                     B1       = zeros(ndof,1);
 
                     quest    = 'Is the helical joint controlled by wrench or joint coordinate (q)?';
@@ -55,27 +55,27 @@ if ~Update
         end
 
         dofi = dofi+VRods_i(1).dof;
-        for j = 1:S.VLinks(S.LinkIndex(i)).npie-1
+        for j = 1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1
             dofi = dofi+VRods_i(j+1).dof;
         end
 
     end
 else
-    for i=1:S.N %for each link
+    for i=1:Linkage.N %for each link
 
-        VRods_i = S.CVRods{i};
+        VRods_i = Linkage.CVRods{i};
 
-        if S.VLinks(S.LinkIndex(i)).jointtype=='H'&&any(S.i_jact==i)
+        if Linkage.VLinks(Linkage.LinkIndex(i)).jointtype=='H'&&any(Linkage.i_jact==i)
             
             i_Hactq  = [i_Hactq dofi];
             B1(dofi) = 1;
-            BqH      = [BqH,B1];
+            BH       = [BH,B1];
             B1       = zeros(ndof,1);
 
         end
 
         dofi = dofi+VRods_i(1).dof;
-        for j = 1:S.VLinks(S.LinkIndex(i)).npie-1
+        for j = 1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1
             dofi = dofi+VRods_i(j+1).dof;
         end
     end
