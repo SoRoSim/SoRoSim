@@ -64,6 +64,19 @@ else
         xlabel('x (m)')
         ylabel('y (m)')
         zlabel('z (m)')
+
+        % Set all text elements to use LaTeX interpreter
+        set(get(gca, 'Title'), 'Interpreter', 'latex');
+        set(get(gca, 'XLabel'), 'Interpreter', 'latex');
+        set(get(gca, 'YLabel'), 'Interpreter', 'latex');
+        set(get(gca, 'ZLabel'), 'Interpreter', 'latex');
+        set(gca, 'TickLabelInterpreter', 'latex');
+        
+        set(gca,'FontSize',12)
+        
+        set(gcf, 'Renderer', 'OpenGL');
+        
+        axis ([PlotParameters.XLim PlotParameters.YLim PlotParameters.ZLim]);
         
       end
       tlast = cputime;
