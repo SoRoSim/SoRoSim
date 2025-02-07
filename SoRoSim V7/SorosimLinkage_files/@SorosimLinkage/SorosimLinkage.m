@@ -349,7 +349,7 @@ classdef SorosimLinkage
                 switch FG_ANS
                     case 'No'
                         Linkage.Gravity = false;
-                        Linkage.G       = 0;
+                        Linkage.G       = [0 0 0 0 0 -9.81]';
                     case 'Yes'
                         Linkage.Gravity = true;
                         
