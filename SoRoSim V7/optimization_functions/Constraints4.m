@@ -1,4 +1,3 @@
-
 function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, g_des_final, constraint_surface)    
     c = [];
     ceq = [];
@@ -20,6 +19,7 @@ function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, 
 
 
         xbar1 = x((i-1)*num_variables + Linkage.ndof + 19);
+        % xbar1 = max(lb, min(xbar1, ub)); 
         [g_xbar1, xi_xbar1, J_xbar1] = Screw_interpolate(Linkage,xbar1, q, 1);
         xh1 = g_xbar1(1:3,4);
 
@@ -30,7 +30,9 @@ function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, 
         dc((i-1)*num_variables + Linkage.ndof + 19,2*i-1) = -2*(constraint_surface.hole_1 - xh1)'*g_xbar1(1:3,1:3)*xi_xbar1(4:6);
         dc((i-1)*num_variables + 1:(i-1)*num_variables +Linkage.ndof,2*1-1) = -2*(constraint_surface.hole_1 - xh1)'*g_xbar1(1:3,1:3)*J_xbar1(4:6,:);
         
+
         xbar2 = x((i-1)*num_variables + Linkage.ndof + 20);
+        % xbar2 = max(lb, min(xbar2, ub)); 
         [g_xbar2, xi_xbar2, J_xbar2] = Screw_interpolate(Linkage,xbar2, q, 3);
         xh2 = g_xbar2(1:3,4);
     
