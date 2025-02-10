@@ -3,8 +3,8 @@ close all
 load("Datafiles\Parallel_robot.mat")
 % load("Datafiles\constrain_surface.mat")
 % S1 = S2;
-S1.VLinks(1).ld = {1.1};
-S1.VLinks(3).ld = {1.1};
+S1.VLinks(1).ld = {0.9};
+S1.VLinks(3).ld = {0.9};
 S1.VLinks(1).E = 5.105e+8;
 S1.g_ini(13,4) = 2*(S1.VLinks(1).L*cosd(60) + S1.VLinks(2).r(0));
 S1.VLinks(2).Rho = 3240;
@@ -19,7 +19,7 @@ S1 = S1.Update;
 %%
 g_des_initial = [0.0000         0   1.0000    0.3
                 0    1.0000         0         0
-                -1.0000         0    0.0000    -0.3
+                -1.0000         0    0.0000    -0.5
                 0         0         0    1.0000];
 
 
@@ -30,10 +30,10 @@ g_des_final = [0.0000         0   1.0000    -0.25
                 0         0         0    1.0000];
 
 
-rotation_angle = 60;
+rotation_angle = 40;
 
 rotation_angle = rotation_angle*(pi/180);
-roty = eul2tform([0, 0,rotation_angle]);
+roty = eul2tform([0,0, rotation_angle]);
 % g_des_final = g_des_final*roty
 
 %% Find rotations about the center of the two holes
@@ -73,7 +73,7 @@ plotTransforms(se3(g_des_final), 'FrameSize',0.05);
 qu_uq_l0 = [qu_uq_l_final1; root1; root2];
 constraints_handle = @(qu_uq_l)Constraints2(S1, qu_uq_l, constraint_surface);
 
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-6,'StepTolerance',1e-8 ,'MaxIterations',4e4,'MaxFunctionEvaluations',2e6,'Algorithm', 'sqp', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
+options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-6,'StepTolerance',1e-10 ,'MaxIterations',4e4,'MaxFunctionEvaluations',2e6,'Algorithm', 'sqp', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 
 lb = zeros(80,1);
 ub = zeros(80,1);
@@ -225,7 +225,7 @@ lb = lb(:);
 ub = ub(:);
 
 constraints_handle = @(qu_uq_l)Constraints4(S1, qu_uq_l, n_points, g_des_initial, g_des_final, constraint_surface);
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-6,'StepTolerance',1e-8 ,'MaxFunctionEvaluations',2e10,'Algorithm','interior-point','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
+options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-6,'StepTolerance',1e-10 ,'MaxFunctionEvaluations',2e10,'Algorithm','interior-point','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 tic
 qu_uq_l_con = fmincon(@(qu_uq_l)Objective4(S1, qu_uq_l, n_points),initial_guess, [],[],[],[],lb,ub,constraints_handle,options);
 toc

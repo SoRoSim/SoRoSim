@@ -1,4 +1,4 @@
-function [c, ceq, dc dceq] = Constraints2(Linkage, x, constraint_surface)
+function [c, ceq, dc, dceq] = Constraints2(Linkage, x, constraint_surface)
     q = x(1:Linkage.ndof);
     u = x(Linkage.ndof+1:Linkage.ndof+12);
     l = x(Linkage.ndof+13:Linkage.ndof+18);
@@ -17,7 +17,7 @@ function [c, ceq, dc dceq] = Constraints2(Linkage, x, constraint_surface)
     eq1 = norm(constraint_surface.hole_1  - xh1)^2;
 
 
-    c = [c; eq1 - 0.2*(constraint_surface.radius + 0.01)^2];
+    c = [c; eq1 - 0.2*(constraint_surface.radius - 0.01)^2];
 
 
     dc = zeros(length(x), length(c));
@@ -30,8 +30,8 @@ function [c, ceq, dc dceq] = Constraints2(Linkage, x, constraint_surface)
     eq2 = norm(constraint_surface.hole_2 - xh2)^2;
 
 
-    c = [c; eq2 - 0.2*(constraint_surface.radius + 0.01)^2];
-
+    c = [c; eq2 - 0.2*(constraint_surface.radius - 0.01)^2];
+ 
 
 
     dc(80,2) = -2*(constraint_surface.hole_2 - xh2)'*g_xbar2(1:3,1:3)*xi_xbar2(4:6);
