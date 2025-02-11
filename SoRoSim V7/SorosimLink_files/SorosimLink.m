@@ -539,8 +539,14 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
             if isempty(SorosimLink.color)
                 return
             end
-            SorosimLink.Kj = 0;
-            SorosimLink.Dj = 0;
+            if SorosimLink.jointtype~='N'
+                SorosimLink.Kj = 0;
+                SorosimLink.Dj = 0;
+            else
+                SorosimLink.Kj = [];
+                SorosimLink.Dj = [];
+            end
+
         end
         
         
