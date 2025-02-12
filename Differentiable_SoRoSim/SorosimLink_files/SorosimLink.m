@@ -79,9 +79,9 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                             
                             jointtype    = answer{1};
                             CS           = answer{2};
-                            Kj           = str2double(answer{3});
-                            Rho          = str2double(answer{4}); 
-                            L            = str2double(answer{5});
+                            Kj           = eval(answer{3});
+                            Rho          = eval(answer{4}); 
+                            L            = eval(answer{5});
                             
                             badanswer = LinkInputCheck(jointtype,CS,Kj,badanswer);
                             
@@ -112,8 +112,8 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 opts.Interpreter = 'tex';
                                 answer           = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
     
-                                ri        = str2double(answer{1});
-                                rf        = str2double(answer{2});
+                                ri        = eval(answer{1});
+                                rf        = eval(answer{2});
     
                                 syms X1
                                 r   = ri+X1*(rf-ri);
@@ -136,10 +136,10 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 opts.Interpreter = 'tex';
                                 answer           = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
     
-                                hi       = str2double(answer{1});
-                                wi       = str2double(answer{2});
-                                hf       = str2double(answer{3});
-                                wf       = str2double(answer{4});
+                                hi       = eval(answer{1});
+                                wi       = eval(answer{2});
+                                hf       = eval(answer{3});
+                                wf       = eval(answer{4});
     
                                 syms X1
                                 h   = hi+X1*(hf-hi);
@@ -170,10 +170,10 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 opts.Interpreter = 'tex';
                                 answer           = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
     
-                                ai       = str2double(answer{1});
-                                bi       = str2double(answer{2});
-                                af       = str2double(answer{3});
-                                bf       = str2double(answer{4});
+                                ai       = eval(answer{1});
+                                bi       = eval(answer{2});
+                                af       = eval(answer{3});
+                                bf       = eval(answer{4});
     
                                 syms X1
                                 a   = ai+X1*(af-ai);
@@ -231,12 +231,12 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
     
                             jointtype     = answer{1};
                             CS            = answer{2};
-                            Kj            = str2double(answer{3});
-                            ndiv          = str2double(answer{4});
-                            Rho           = str2double(answer{5});
-                            E             = str2double(answer{6});
-                            Poi           = str2double(answer{7});
-                            Eta           = str2double(answer{8});
+                            Kj            = eval(answer{3});
+                            ndiv          = eval(answer{4});
+                            Rho           = eval(answer{5});
+                            E             = eval(answer{6});
+                            Poi           = eval(answer{7});
+                            Eta           = eval(answer{8});
                             
                             badanswer = LinkInputCheck(jointtype,CS,Kj,badanswer);
                             
@@ -277,9 +277,9 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 opts.Interpreter = 'tex';
                                 answer2          = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
                                 
-                                ldj   = str2double(answer2{1});
-                                rd_i  = str2double(answer2{2});
-                                rd_f  = str2double(answer2{3});
+                                ldj   = eval(answer2{1});
+                                rd_i  = eval(answer2{2});
+                                rd_f  = eval(answer2{3});
                                                          
                                 syms X1
                                 r_sym = rd_i+X1*(rd_f-rd_i);
@@ -304,11 +304,11 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 opts.Interpreter = 'tex';
                                 answer2 = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
                                 
-                                ldj    = str2double(answer2{1});
-                                hi_p   = str2double(answer2{2});
-                                wi_p   = str2double(answer2{3});
-                                hf_p   = str2double(answer2{4});
-                                wf_p   = str2double(answer2{5});
+                                ldj    = eval(answer2{1});
+                                hi_p   = eval(answer2{2});
+                                wi_p   = eval(answer2{3});
+                                hf_p   = eval(answer2{4});
+                                wf_p   = eval(answer2{5});
                                 
                                 syms X1
                                 h_sym = hi_p+X1*(hf_p-hi_p);
@@ -340,11 +340,11 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 opts.Interpreter = 'tex';
                                 answer2 = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
                                 
-                                ldj    = str2double(answer2{1});
-                                ai_p   = str2double(answer2{2});
-                                bi_p   = str2double(answer2{3});
-                                af_p   = str2double(answer2{4});
-                                bf_p   = str2double(answer2{5});
+                                ldj    = eval(answer2{1});
+                                ai_p   = eval(answer2{2});
+                                bi_p   = eval(answer2{3});
+                                af_p   = eval(answer2{4});
+                                bf_p   = eval(answer2{5});
                                 
                                 syms X1
                                 a_sym = ai_p+X1*(af_p-ai_p);
