@@ -543,7 +543,7 @@ for ii=1:Linkage.np
                 if i==Fp_loc(1)
                     g_here = g((i_sigplot-1)*4+1:i_sigplot*4,:);
 
-                    if ~Linkage.LocalWrench{ii}
+                    if ~Linkage.LocalWrench(ii)
                         pos = g_here(1:3,4);
                         g_here(1:3,4)=zeros(3,1); % only rotating
                         Fp_vec = dinamico_coAdjoint(ginv(g_here))*Fp_vec;

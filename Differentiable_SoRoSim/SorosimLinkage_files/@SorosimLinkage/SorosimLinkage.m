@@ -537,6 +537,7 @@ classdef SorosimLinkage
                                     CableFunction.dcp_fn=dcp_fn;
                                     Linkage.CableFunction = CableFunction;
                                     
+                                    N = Linkage.N; %repeat but may need
                                     i_sact = cell(N, 1); %indexes of soft actuators for every link and division syntax i_sact{i}{j}
                                     for i = 1:N
                                         if Linkage.VLinks(Linkage.LinkIndex(i)).linktype=='s'

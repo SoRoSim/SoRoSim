@@ -375,7 +375,7 @@ for ip=1:Linkage.np
     i_sig = Linkage.Fp_sig(ip);
     I_theta = diag([1 1 1 0 0 0]);
 
-    if ~Linkage.LocalWrench(i) %if in the global frame
+    if ~Linkage.LocalWrench(ip) %if in the global frame
         g_here = g((i_sig-1)*4+1:i_sig*4,:);
         g_here(1:3,4) = zeros(3,1); %only rotational part
         Fp_here = (dinamico_Adjoint(g_here))'*Fp_here; %rotated into the local frame. Adj' = coAdj^-1
@@ -891,10 +891,12 @@ if Linkage.Actuated
                             Phi_a = zeros(6,na_here);
                             PHI_AU = zeros(6,6);
                             xihat_123  = [0 -xi(3) xi(2) xi(4);xi(3) 0 -xi(1) xi(5);-xi(2) xi(1) 0 xi(6)];%4th row is avoided to speedup calculation
+                            ia_here = 1;
                             for ia =Linkage.i_sact{i}{j}
                                 dc = Linkage.dc{ia,i}{j}(:,ii);
                                 dcp = Linkage.dcp{ia,i}{j}(:,ii);
-                                [Phi_a(:,ia),PHI_AU_ia] = SoftActuator(u(n_jact+ia),dc,dcp,xihat_123);
+                                [Phi_a(:,ia_here),PHI_AU_ia] = SoftActuator(u(n_jact+ia),dc,dcp,xihat_123);
+                                ia_here = ia_here+1;
                                 PHI_AU = PHI_AU+PHI_AU_ia;
                             end
                             B_here = B_here+Ws(ii)*Phi'*Phi_a;

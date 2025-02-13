@@ -364,7 +364,7 @@ for ip=1:Linkage.np
     i_sig = Linkage.Fp_sig(ip);
     I_theta = diag([1 1 1 0 0 0]);
 
-    if ~Linkage.LocalWrench(i) %if in the global frame
+    if ~Linkage.LocalWrench(ip) %if in the global frame
         g_here = g((i_sig-1)*4+1:i_sig*4,:);
         g_here(1:3,4) = zeros(3,1); %only rotational part
         Fp_here = (dinamico_Adjoint(g_here))'*Fp_here; %rotated into the local frame. Adj' = coAdj^-1
