@@ -2,13 +2,15 @@
 
 ## adj = dinamico_adj(screw)
 **Input**: A screw vector \\( \in\mathbb{R}^6 \\)<br>
-**Ouput**: ==adjoint== 
+**Ouput**: 
 Given a screw vector\\(\in \mathbb{R}^6\\), returns the adjoint, given by:
 \\[ adj(S) = \begin{bmatrix}\tilde{w} & 0 \cr \tilde{v} &\tilde{w}\end{bmatrix}\\]
 
 
 ## Adj = **dinamico_Adjoint**(g)
-Given an element in \\(SE(3)\\), returns the Adjoint.
+**Input**: An element  \\(g \in SE(3)\\)<br>
+**Output**: A matrix in \\(\mathbb{R}^{6\timrd6}\\).
+Given an element in \\g_{ab} \in (SE(3)\\), returns the Adjoint. The Adjoint is used to transform a twist with respect to {b} to a twist with respect to {a}.
 \\[Ad(g) = \begin{bmatrix}\mathbf{R} & \mathbf{0} \cr \mathbf{\tilde{r}R} & \mathbf{R}\end{bmatrix}\\]
 
 ## coadj = **dinamico_coadj**(screw)
