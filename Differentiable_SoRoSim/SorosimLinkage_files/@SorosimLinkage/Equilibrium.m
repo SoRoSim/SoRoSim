@@ -408,7 +408,7 @@ for i=N:-1:1 %backwards
             
                 coAdgstep = Adgstepinv((ij-1)*6+1:6*ij,:)';
             
-                M_ap1 = Ws(ii+1)*Linkage.CVRods{i}(2).Ms(ii*6+1:6*(ii+1),:); %at alpha + 1. multiplied with weight
+                M_ap1 = Ws(ii+1)*Linkage.CVRods{i}(j+1).Ms(ii*6+1:6*(ii+1),:); %at alpha + 1. multiplied with weight
                 
                 F_ap1 = -M_ap1*dinamico_Adjoint(ginv(g(i_sig*4+1:4*(i_sig+1),:)))*G; %note that next computational point is used
                 F_ap1 = F_ap1-Fk(i_sig*6+1:6*(i_sig+1)); %external point forces
@@ -443,7 +443,7 @@ for i=N:-1:1 %backwards
             
             end
             
-            M_ap1 = Ws(1)*Linkage.CVRods{i}(2).Ms(1:6,:); %at X = 0 usually Ws is 0
+            M_ap1 = Ws(1)*Linkage.CVRods{i}(j+1).Ms(1:6,:); %at X = 0 usually Ws is 0
             F_ap1 = -M_ap1*dinamico_Adjoint(ginv(g(i_sig*4+1:4*(i_sig+1),:)))*G;
             F_ap1 = F_ap1-Fk(i_sig*6+1:6*(i_sig+1)); %external point forces
 

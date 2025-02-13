@@ -1,4 +1,4 @@
-function [dID_dq,dID_dqd,dtau_dq,dtau_dqd,de_dq,de_dqd,daction_dq,daction_dqd] = DAEi1Jacobians_qqd(Linkage,q,qd,qdd,u,lambda)
+function [dID_dq,dID_dqd,dtau_dq,dtau_dqd,de_dq,de_dqd,daction_dq,daction_dqd] = DAEi1Jacobians_qqd(Linkage,t,q,qd,qdd,u,lambda)
 %only Jacobians
 %For index 1 DAE e=e(q,qd,qdd)
 
@@ -360,7 +360,7 @@ end
 %% Point Wrench 
 
 for ip=1:Linkage.np
-    Fp_here = Linkage.Fp_vec{ip}(0);
+    Fp_here = Linkage.Fp_vec{ip}(t);
     i_sig = Linkage.Fp_sig(ip);
     I_theta = diag([1 1 1 0 0 0]);
 

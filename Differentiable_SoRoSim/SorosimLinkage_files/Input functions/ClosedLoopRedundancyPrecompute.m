@@ -9,7 +9,21 @@ function Linkage = ClosedLoopRedundancyPrecompute(Linkage)
 
         i_sigA = Linkage.CLprecompute.i_sigA(iCLj);
         i_sigB = Linkage.CLprecompute.i_sigB(iCLj);
-        Phi_p = Linkage.CLprecompute.Phi_p{iCLj};
+
+        Phi_here = Linkage.VRodsCLj(iCLj).Phi;
+        dof_here = Linkage.VRodsCLj(iCLj).dof;
+    
+        Phi_p = eye(6); % Start with 6x6 identity matrix
+
+        for id = 1:dof_here % Loop through each column of Phi_here and remove matching columns from Phi_piCL
+            match_idx = find(all(Phi_p == Phi_here(:, id), 1), 1);% Find the matching column index in Phi_piCL
+            if ~isempty(match_idx)
+                % Remove the matching column
+                Phi_p(:, match_idx) = [];
+            end
+        end
+
+        % Phi_p = Linkage.CLprecompute.Phi_p{iCLj};
         % nl = size(Phi_p,2);
         
         if i_sigA>0

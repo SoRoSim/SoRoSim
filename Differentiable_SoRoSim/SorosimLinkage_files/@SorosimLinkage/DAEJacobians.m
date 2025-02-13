@@ -1,4 +1,4 @@
-function [ID,tau,e,dID_dq,dID_dqd,dID_dqdd,dID_dlambda,dtau_dq,dtau_dqd,dtau_du,de_dq,de_dqd,de_dqdd,daction_dq,daction_dqd] = DAEJacobians(Linkage,q,qd,qdd,u,lambda,index)
+function [ID,tau,e,dID_dq,dID_dqd,dID_dqdd,dID_dlambda,dtau_dq,dtau_dqd,dtau_du,de_dq,de_dqd,de_dqdd,daction_dq,daction_dqd] = DAEJacobians(Linkage,t,q,qd,qdd,u,lambda,index)
 
 %For index 1 DAE e=e(q,qd,qdd). For index 3 DAE e=e(q)
 
@@ -371,7 +371,7 @@ end
 %% Point Wrench 
 
 for ip=1:Linkage.np
-    Fp_here = Linkage.Fp_vec{ip}(0);
+    Fp_here = Linkage.Fp_vec{ip}(t);
     i_sig = Linkage.Fp_sig(ip);
     I_theta = diag([1 1 1 0 0 0]);
 
