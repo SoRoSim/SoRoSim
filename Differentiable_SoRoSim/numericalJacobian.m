@@ -1,3 +1,4 @@
+%computes numerical Jacobian of func(x)
 function J = numericalJacobian(func, x, epsilon)
     if nargin < 3
         epsilon = 1e-6; % Default step size

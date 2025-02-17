@@ -1,3 +1,4 @@
+%compares 2 matricies of same size
 function matrixCompare(A,B)
     % Compute absolute difference matrix
     diff_matrix = abs(A - B);
