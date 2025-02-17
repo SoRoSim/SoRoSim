@@ -15,7 +15,7 @@ function [c, ceq, dc, dceq] = Constraints4(Linkage, x, n_points, g_des_initial, 
         [res, jac_q, jac_u, jac_l] = StaticResidueJacobian(Linkage, q, u, l);
         ceq = [ceq; res];
 
-        dceq((i-1)*num_variables +1:i*num_variables-2, (i-1)*66+1:i*66) = [jac_q jac_u jac_l]';  %% Remove the 66 and make it general later
+        dceq((i-1)*num_variables +1:i*num_variables-2, (i-1)*(Linkage.ndof+6*Linkage.nCLj)+1:i*(Linkage.ndof+6*Linkage.nCLj)) = [jac_q jac_u jac_l]';  %% Remove the 66 and make it general later
 
 
         xbar1 = x((i-1)*num_variables + Linkage.ndof + 19);
