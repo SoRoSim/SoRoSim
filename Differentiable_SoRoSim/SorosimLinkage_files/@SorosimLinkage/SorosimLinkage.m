@@ -179,6 +179,10 @@ classdef SorosimLinkage
                 definput         = {num2str(nargin)};
                 opts.Interpreter = 'tex';
                 ans_act          = inputdlg(prompt,dlgtitle,[1 75],definput,opts);
+                if isempty(ans_act)
+                    return;
+                end
+
                 N                = str2double(ans_act{1});
 
                 Linkage.VLinks = VLinks;

@@ -76,7 +76,9 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                             definput         = {'N','C','0','1000','0.3'};
                             opts.Interpreter = 'tex';
                             answer           = inputdlg(prompt,dlgtitle,[1 60],definput,opts);
-                            
+                            if isempty(answer)
+                                return
+                            end
                             jointtype    = answer{1};
                             CS           = answer{2};
                             Kj           = eval(answer{3});
@@ -111,6 +113,9 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 definput         = {'0.03','0.03'};
                                 opts.Interpreter = 'tex';
                                 answer           = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
+                                if isempty(answer)
+                                    return
+                                end
     
                                 ri        = eval(answer{1});
                                 rf        = eval(answer{2});
@@ -135,7 +140,9 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 definput         = {'0.02','0.02','0.02','0.02'};
                                 opts.Interpreter = 'tex';
                                 answer           = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
-    
+                                if isempty(answer)
+                                    return
+                                end
                                 hi       = eval(answer{1});
                                 wi       = eval(answer{2});
                                 hf       = eval(answer{3});
@@ -169,7 +176,9 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 definput         = {'0.04','0.02','0.04','0.02'};
                                 opts.Interpreter = 'tex';
                                 answer           = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
-    
+                                if isempty(answer)
+                                    return
+                                end
                                 ai       = eval(answer{1});
                                 bi       = eval(answer{2});
                                 af       = eval(answer{3});
@@ -228,7 +237,9 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                             definput         = {'N','C','0','1','1000','1e6','0.5','1e4'};
                             opts.Interpreter = 'tex';
                             answer           = inputdlg(prompt,dlgtitle,[1 60],definput,opts);
-    
+                            if isempty(answer)
+                                return
+                            end
                             jointtype     = answer{1};
                             CS            = answer{2};
                             Kj            = eval(answer{3});
@@ -276,7 +287,9 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 definput         = {'0.3','0.03','0.03'};
                                 opts.Interpreter = 'tex';
                                 answer2          = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
-                                
+                                if isempty(answer2)
+                                    return
+                                end
                                 ldj   = eval(answer2{1});
                                 rd_i  = eval(answer2{2});
                                 rd_f  = eval(answer2{3});
@@ -303,7 +316,9 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 definput         = {'0.3','0.02','0.02','0.02','0.02'};
                                 opts.Interpreter = 'tex';
                                 answer2 = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
-                                
+                                if isempty(answer2)
+                                    return
+                                end
                                 ldj    = eval(answer2{1});
                                 hi_p   = eval(answer2{2});
                                 wi_p   = eval(answer2{3});
@@ -339,7 +354,9 @@ classdef SorosimLink < handle %pass by reference (no copy of memory is made)
                                 definput         = {'0.3','0.04','0.02','0.04','0.02'};
                                 opts.Interpreter = 'tex';
                                 answer2 = inputdlg(prompt,dlgtitle,[1 70],definput,opts);
-                                
+                                if isempty(answer2)
+                                    return
+                                end
                                 ldj    = eval(answer2{1});
                                 ai_p   = eval(answer2{2});
                                 bi_p   = eval(answer2{3});
