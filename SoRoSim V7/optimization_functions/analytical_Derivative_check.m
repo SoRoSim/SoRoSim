@@ -1,13 +1,12 @@
-input = rand(12,1);
+qu_uq_l0 = [qu_uq_l_final1; roots];
 
-func = @(x)Equilibrium(S1, x, input, 1);
-[J_num, J_ana] = numericalJacobian(func, x);
+func = @(qu_uq_l0)Cons2_3L(S1, qu_uq_l0, hole_pos,link_index, radius);
 %%
-x = rand(78,1);
+x = rand(126,1);
 
 [J_num, J_ana] = numericalJacobian(func, x);
 A = J_num;
-B = J_ana;
+B = J_ana';
  
 % Compute absolute difference matrix
 diff_matrix = abs(A - B);

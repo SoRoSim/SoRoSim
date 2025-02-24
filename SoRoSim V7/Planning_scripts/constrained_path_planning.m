@@ -1,7 +1,7 @@
 clear
 close all
-load("Datafiles\TwoLeggedRevolute.mat")
-% load("Datafiles\Parallel_robot.mat")
+% load("Datafiles\TwoLeggedRevolute.mat")
+load("Datafiles\Parallel_robot.mat")
 load("Datafiles\constrain_surface.mat")
 % S1 = S2;
 S1.VLinks(1).ld = {0.9};
