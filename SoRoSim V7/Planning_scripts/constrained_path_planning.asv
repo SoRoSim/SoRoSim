@@ -2,21 +2,27 @@ clear
 close all
 load("Datafiles\TwoLeggedRevolute.mat")
 % load("Datafiles\Parallel_robot.mat")
-load("Datafiles\constrain_surface.mat")
+% load("Datafiles\constrain_surface.mat")
 % S1 = S2;
-S1.VLinks(1).ld = {0.9};
-S1.VLinks(3).ld = {0.9};
-S1.VLinks(1).E = 5.105e+8;
-S1.g_ini(13,4) = 2*(S1.VLinks(1).L*cosd(60) + S1.VLinks(2).r(0));
-S1.VLinks(2).Rho = 3240;
-S1.VLinks(3).E = 5.105e+8;
-
-
-% S1.PlotParameters.ClosePrevious = false;
-S1.CVRods{1}(2).UpdateAll;
-S1.CVRods{3}(2).UpdateAll;
-S1 = S1.Update;
-
+% S1.VLinks(1).ld = {0.7};
+% S1.VLinks(3).ld = {0.7};
+% % S1.VLinks(1).r{1} = @(X1)0.0018;
+% % S1.VLinks(3).r{1} = @(X1)0.0018;
+% 
+% S1.VLinks(1).E = 71.05e9;
+% S1.VLinks(3).E = 71.05e9;
+% S1.g_ini(13,4) = 2*(S1.VLinks(1).L*cosd(60) + S1.VLinks(2).r(0));
+% 
+% S1.VLinks(2).Rho = 1240;
+% S1.VLinks(2).r = @(X1)0.04;
+% S1.VLinks(2).L = 0.01;
+% 
+% % S1.PlotParameters.ClosePrevious = false;
+% S1.CVRods{1}(2).UpdateAll;
+% S1.CVRods{3}(2).UpdateAll;
+% S1 = S1.Update;
+leg_index = [1,3];
+radius = 0.05;
 %%
 g_des_initial = [0.0000         0   1.0000    0.3
                 0    1.0000         0         0
@@ -26,12 +32,12 @@ g_des_initial = [0.0000         0   1.0000    0.3
 rotation_angle = 40;
 
 rotation_angle = rotation_angle*(pi/180);
-roty = eul2tform([0,0, rotation_angle]);
+roty = eul2tform([0, rotation_angle,0]);
 % g_des_final = g_des_final*roty
 
 %% Find rotations about the center of the two holes
-T1 = [eye(3) [(constraint_surface.hole_1(1) + constraint_surface.hole_2(1))/2; (constraint_surface.hole_1(2)+constraint_surface.hole_2(2))/2; (constraint_surface.hole_1(3) + constraint_surface.hole_2(3))/2]; [0 0 0 1]];
-T2 = [eye(3) -[(constraint_surface.hole_1(1) + constraint_surface.hole_2(1))/2; (constraint_surface.hole_1(2)+constraint_surface.hole_2(2))/2; (constraint_surface.hole_1(3) + constraint_surface.hole_2(3))/2]; [0 0 0 1]];
+T1 = [eye(3) -(hole_position(1,:) - hole_position(2,:))'/2; [0 0 0 1]];
+T2 = [eye(3) (hole_position(1,:) - hole_position(2,:))'/2; [0 0 0 1]];
 g_des_final = T1*roty*T2*g_des_initial;
 %% Problem 1:
 % This involves finding the pose of the two tips such that the end-effector
@@ -47,12 +53,12 @@ toc
 
 %% Find a constraining surface that is feasible
 figure
-% S1.plotq(qu_uq_l_final1(1:S1.ndof));
-S1.plotq(qu_uq_l_final2(1:S1.ndof));
-% [constraint_surface, root1, root2] = find_constraint(S1, qu_uq_l_final1(1:S1.ndof), 0);
-% plot_constraint(constraint_surface);
-
-% plotTransforms(se3(g_des_initial), 'FrameSize',0.05);
+S1.plotq(qu_uq_l_final1(1:S1.ndof));
+% S1.plotq(qu_uq_l_final2(1:S1.ndof));
+[hole_position, roots] = find_constraint(S1,qu_uq_l_final1(1:S1.ndof), 0,leg_index);
+plot_constraint(hole_position, 0.05, [1,3]);
+hold on
+plotTransforms(se3(g_des_initial), 'FrameSize',0.05);
 plotTransforms(se3(g_des_final), 'FrameSize',0.05);
 
 
@@ -63,8 +69,8 @@ plotTransforms(se3(g_des_final), 'FrameSize',0.05);
 % hole constraints
 
 % qu_uq_l0 = zeros(80,1);
-qu_uq_l0 = [qu_uq_l_final1; 0.5; 0.5];
-constraints_handle = @(qu_uq_l)Constraints2(S1, qu_uq_l, constraint_surface);
+qu_uq_l0 = [qu_uq_l_final1;roots];
+constraints_handle = @(qu_uq_l)Constraints2(S1, qu_uq_l, hole_position, radius);
 
 options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-6,'StepTolerance',1e-10 ,'MaxIterations',4e4,'MaxFunctionEvaluations',2e6,'Algorithm', 'sqp', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 
@@ -89,7 +95,8 @@ S1.PlotParameters.ClosePrevious = false;
 S1.plotq(qu_uq_l_final1(1:S1.ndof))
 S1.plotq(qu_uq_l_final2(1:S1.ndof))
 hold on
-plot_constraint(constraint_surface)
+plot_constraint(hole_position, 0.05, [1,3])
+hold on
 plotTransforms(se3(g_des_initial),'FrameSize',0.05)
 plotTransforms(se3(g_des_final), 'FrameSize',0.05)
 
@@ -136,7 +143,7 @@ end
 initial_guess = initial_guess(:);
 
 constraints_handle = @(qu_uq_l)Constraint3(S1, qu_uq_l, n_points, g_des_initial, g_des_final);
-options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-8,'StepTolerance',1e-8 ,'MaxFunctionEvaluations',2e10,'Algorithm','sqp','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
+options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-8,'StepTolerance',1e-8 ,'MaxFunctionEvaluations',2e10,'Algorithm','sqp','SpecifyObjectiveGradient',false,'SpecifyConstraintGradient',false);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 % lambda = 5e3;
 
 tic
@@ -208,8 +215,8 @@ end
 initial_guess = initial_guess(:);
 lb = ones(n_points,n_x_t)*-inf;
 ub = ones(n_points, n_x_t)*inf;
-lb(:, S1.ndof+S1.nact+:80) = 0;
-ub(:, 79:80) = 1;
+lb(:, S1.ndof+S1.nact+6*S1.nCLj+1:S1.ndof+S1.nact+6*S1.nCLj+2) = 0;
+ub(:, S1.ndof+S1.nact+6*S1.nCLj+1:S1.ndof+S1.nact+6*S1.nCLj+2) = 1;
 
 lb = lb';
 ub = ub';
@@ -217,7 +224,7 @@ ub = ub';
 lb = lb(:);
 ub = ub(:);
 
-constraints_handle = @(qu_uq_l)Constraints4(S1, qu_uq_l, n_points, g_des_initial, g_des_final, constraint_surface);
+constraints_handle = @(qu_uq_l)Constraints4(S1, qu_uq_l, n_points, g_des_initial, g_des_final, hole_position, 0.05);
 options = optimoptions('fmincon','Display','iter','OptimalityTolerance',1e-6,'StepTolerance',1e-10 ,'MaxFunctionEvaluations',2e10,'Algorithm','sqp','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true);%EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
 tic
 qu_uq_l_con = fmincon(@(qu_uq_l)Objective4(S1, qu_uq_l, n_points),initial_guess, [],[],[],[],lb,ub,constraints_handle,options);
@@ -227,12 +234,13 @@ toc
 Objective4(S1, qu_uq_l_con, n_points);
 [c, ceq, ~, ~] = Constraints4(S1, qu_uq_l_con, n_points, g_des_initial, g_des_final, constraint_surface);
 %%
-figure
+% figure
 S1.PlotParameters.ClosePrevious= false;
 qu_uq_l = reshape(qu_uq_l_con, n_x_t, n_points);
 qu_uq_l = qu_uq_l';
 qs = qu_uq_l(:,1:S1.ndof);
-plot_constraint(constraint_surface)
+plot_constraint(hole_position, 0.05, [1,3])
+hold on
 for i = 1:5
     S1.plotq(qs(2*i,:))
     hold on
