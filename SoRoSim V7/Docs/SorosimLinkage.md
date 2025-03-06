@@ -72,7 +72,11 @@ This leads the user to a GUI that allows the definition of relative position and
 |      |                  |          |                                                                                                         |
 |      |                  |          |                                                                                                         |
 
-## Class methods
+
+
+# Linkage definition
+
+# Class methods
 
 ### Bq = **ActuationMatrix**(Tr,q)
 **Input**: Tr ([[SorosimLinkage]]), q (generalised coordintes) <br>
