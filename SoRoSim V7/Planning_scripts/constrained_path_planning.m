@@ -1,8 +1,8 @@
 clear
 close all
-load("Datafiles\TwoLeggedRevolute.mat")
-% load("Datafiles\Parallel_robot.mat")
-% load("Datafiles\constrain_surface.mat")
+% load("Datafiles\TwoLeggedRevolute.mat")
+load("Datafiles\Parallel_robot.mat")
+load("Datafiles\constrain_surface.mat")
 % S1 = S2;
 % S1.VLinks(1).ld = {0.7};
 % S1.VLinks(3).ld = {0.7};
@@ -22,7 +22,6 @@ load("Datafiles\TwoLeggedRevolute.mat")
 % S1.CVRods{3}(2).UpdateAll;
 % S1 = S1.Update;
 leg_index = [1,3];
-radius = 0.05;
 %%
 g_des_initial = [0.0000         0   1.0000    0.3
                 0    1.0000         0         0
@@ -55,7 +54,7 @@ toc
 figure
 S1.plotq(qu_uq_l_final1(1:S1.ndof));
 % S1.plotq(qu_uq_l_final2(1:S1.ndof));
-[hole_position, roots] = find_constraint(S1,qu_uq_l_final1(1:S1.ndof), -0.2,leg_index);
+[hole_position, roots] = find_constraint(S1,qu_uq_l_final1(1:S1.ndof), -0.15,leg_index);
 plot_constraint(hole_position, 0.05, [1,3]);
 hold on
 plotTransforms(se3(g_des_initial), 'FrameSize',0.05);
