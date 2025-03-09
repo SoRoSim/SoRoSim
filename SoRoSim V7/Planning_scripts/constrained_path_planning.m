@@ -4,13 +4,13 @@ close all
 load("Datafiles\Parallel_robot.mat")
 load("Datafiles\constrain_surface.mat")
 % S1 = S2;
-% S1.VLinks(1).ld = {0.7};
-% S1.VLinks(3).ld = {0.7};
+S1.VLinks(1).ld = {0.7};
+S1.VLinks(3).ld = {0.7};
 % % S1.VLinks(1).r{1} = @(X1)0.0018;
 % % S1.VLinks(3).r{1} = @(X1)0.0018;
 % 
-% S1.VLinks(1).E = 71.05e9;
-% S1.VLinks(3).E = 71.05e9;
+S1.VLinks(1).E = 5e8;
+S1.VLinks(3).E = 5e8;
 % S1.g_ini(13,4) = 2*(S1.VLinks(1).L*cosd(60) + S1.VLinks(2).r(0));
 % 
 % S1.VLinks(2).Rho = 1240;
@@ -18,9 +18,9 @@ load("Datafiles\constrain_surface.mat")
 % S1.VLinks(2).L = 0.01;
 % 
 % % S1.PlotParameters.ClosePrevious = false;
-% S1.CVRods{1}(2).UpdateAll;
-% S1.CVRods{3}(2).UpdateAll;
-% S1 = S1.Update;
+S1.CVRods{1}(2).UpdateAll;
+S1.CVRods{3}(2).UpdateAll;
+S1 = S1.Update;
 leg_index = [1,3];
 %%
 g_des_initial = [0.0000         0   1.0000    0.3
@@ -35,8 +35,8 @@ roty = eul2tform([0, rotation_angle,0]);
 % g_des_final = g_des_final*roty
 
 %% Find rotations about the center of the two holes
-T1 = [eye(3) -(hole_position(1,:) - hole_position(2,:))'/2; [0 0 0 1]];
-T2 = [eye(3) (hole_position(1,:) - hole_position(2,:))'/2; [0 0 0 1]];
+T1 = [eye(3) (hole_position(2,:) - hole_position(1,:))'; [0 0 0 1]];
+T2 = [eye(3) -(hole_position(2,:) - hole_position(1,:))'; [0 0 0 1]];
 g_des_final = T1*roty*T2*g_des_initial;
 %% Problem 1:
 % This involves finding the pose of the two tips such that the end-effector
@@ -53,8 +53,8 @@ toc
 %% Find a constraining surface that is feasible
 figure
 S1.plotq(qu_uq_l_final1(1:S1.ndof));
-% S1.plotq(qu_uq_l_final2(1:S1.ndof));
-[hole_position, roots] = find_constraint(S1,qu_uq_l_final1(1:S1.ndof), -0.15,leg_index);
+S1.plotq(qu_uq_l_final2(1:S1.ndof));
+% [hole_position, roots] = find_constraint(S1,qu_uq_l_final1(1:S1.ndof), -0.15,leg_index);
 plot_constraint(hole_position, 0.05, [1,3]);
 hold on
 plotTransforms(se3(g_des_initial), 'FrameSize',0.05);
@@ -66,8 +66,8 @@ plotTransforms(se3(g_des_final), 'FrameSize',0.05);
 % This problem requires finding the pose of the two ends of the robot, such
 % that the rigid body achieves a certain desired pose while satisfying the
 % hole constraints
-
 % qu_uq_l0 = zeros(80,1);
+
 qu_uq_l0 = [qu_uq_l_final1;roots];
 constraints_handle = @(qu_uq_l)Constraints2(S1, qu_uq_l, hole_position, radius);
 
@@ -103,7 +103,6 @@ plotTransforms(se3(g_des_final), 'FrameSize',0.05)
 n_points = 10;
 n_x_t = 78;
 g = interpolate_transformation(g_des_initial, g_des_final, n_points);
-
 
 constraints_handle = @(qu_uq_l)constraints1(S1, qu_uq_l);
 options = optimoptions('fmincon','Display','final-detailed','OptimalityTolerance',1e-6,'StepTolerance',1e-8 ,'MaxFunctionEvaluations',2e10,'Algorithm', 'sqp', 'SpecifyObjectiveGradient',true, 'SpecifyConstraintGradient',true);%,'EnableFeasibilityMode',true);%,'OptimalityTolerance',1e-10,'StepTolerance',1e-20);
@@ -203,12 +202,12 @@ n_x_t = ndof+20;
 total_time = 1;
 n_points = 10;
 dt = total_time/(n_points-1);
-qu_uq_l1 = [qu_uq_l_final1; 0.5; 0.5];
-
-qu_uq_l2 = [qu_uq_l_final2; 0.5; 0.5];
+% qu_uq_l1 = [qu_uq_l_final1; 0.5; 0.5];
+% 
+% qu_uq_l2 = [qu_uq_l_final2; 0.5; 0.5];
 initial_guess = zeros(n_x_t, n_points);
 for i = 1:n_x_t
-    initial_guess(i,:) = linspace(qu_uq_l1(i), qu_uq_l2(i), n_points);
+    initial_guess(i,:) = linspace(qu_uq_l_final1(i), qu_uq_l_final2(i), n_points);
 end
 % initial_guess = qu_uq_l_final';
 initial_guess = initial_guess(:);

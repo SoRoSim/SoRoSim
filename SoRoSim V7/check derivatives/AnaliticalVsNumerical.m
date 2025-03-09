@@ -1,10 +1,10 @@
-x  = ones(800,1)*0.3;
+x  = ones(80,1)*0.1;
 
-func = @(x)Constraints4(S1, x, 10, g_des_initial, constraint_surface);
+func = @(x)Constraints2(S1, x, hole_position, radius);
 [NJ1, AJ] = numericalJacobian(func, x);
 % [NJ2, ~] = numericalJacobian(func, x, 1e-5);
 
-A = NJ1;
+A = NJ1';
 B = AJ;
  
 % Compute absolute difference matrix

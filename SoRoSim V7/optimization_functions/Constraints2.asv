@@ -40,7 +40,7 @@ function [c, ceq, dc, dceq] = Constraints2(Linkage, x, hole_position, radius)
     eq2 = norm(hole_position(2,1:2)' - xh2(1:2))^2;
 
 
-    c = [c; eq2 - 0.2*(radius - Linkage.VLinks(3).r{1}(0))^2];
+    c = [c; eq2 - 0.2*(radius + Linkage.VLinks(3).r{1}(0))^2];
  
 
     

@@ -6,7 +6,7 @@ To define a SorosimLinkage S1 from previously defined Sorosims L1 and L2, we sim
 ```
 S1 = SorosimLinkage(L1,L2)
 ```
-This leads the user to a GUI that allows the definition of relative position and orientation of the two links with respect to other links in the linkage. #todo ==add picture==
+This leads the user to a GUI that allows the definition of relative position and orientation of the two links with respect to other links in the linkage. 
 
 | Type | Name             | datatype | Description                                                                                             |
 | ---- | ---------------- | -------- | ------------------------------------------------------------------------------------------------------- |
@@ -76,6 +76,8 @@ This leads the user to a GUI that allows the definition of relative position and
 
 # Linkage definition
 
+![alt text](image-1.png)
+
 # Class methods
 
 ### Bq = **ActuationMatrix**(Tr,q)
@@ -96,6 +98,11 @@ This leads the user to a GUI that allows the definition of relative position and
 ### K = **findK**(Tr,varargin)
 
 ### g = **FwdKinematics**(Tr,q,i_here,j_here)
+Computes the forward kinematics of the linkage. In general it is computed as: 
+
+\\(gLpre \times gini\times g_{joint} \times gi \times gf\\) for rigid links
+
+\\(gLpre \times gini\times g_{joint} \times gi \times \exp(\hat{\Omega}) \times gf\\) 
 
 ### C = **GeneralizedCoriolisMatrix**(Tr,q,qd)
 
