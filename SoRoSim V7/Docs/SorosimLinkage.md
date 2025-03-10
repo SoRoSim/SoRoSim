@@ -6,7 +6,7 @@ To define a SorosimLinkage S1 from previously defined Sorosims L1 and L2, we sim
 ```
 S1 = SorosimLinkage(L1,L2)
 ```
-This leads the user to a GUI that allows the definition of relative position and orientation of the two links with respect to other links in the linkage. #todo ==add picture==
+This leads the user to a GUI that allows the definition of relative position and orientation of the two links with respect to other links in the linkage. 
 
 | Type | Name             | datatype | Description                                                                                             |
 | ---- | ---------------- | -------- | ------------------------------------------------------------------------------------------------------- |
@@ -74,7 +74,7 @@ This leads the user to a GUI that allows the definition of relative position and
 
 
 
-# Linkage definition
+
 
 # Class methods
 
