@@ -66,7 +66,7 @@ for i = 1:N
         dof_here = Tr.CVRods{i}(j+1).dof;
         q_here   = q(dof_start:dof_start+dof_here-1);
         xi_star  = Tr.CVRods{i}(j+1).xi_star;
-        Lscale   = Tr.VLinks(Tr.LinkIndex(i)).ld{j};
+        % Lscale   = Tr.VLinks(Tr.LinkIndex(i)).ld{j};
         nip      = Tr.CVRods{i}(j+1).nip;
         Phi        = Tr.CVRods{i}(j+1).Phi;
 
@@ -74,14 +74,14 @@ for i = 1:N
         for ii = 1:nip
             
              xi_here = xi_star(6*(ii-1)+1:6*ii,1);
-             xi_here(1:3) = xi_here(1:3)*Lscale; %scaling using the formula: Lscale m = 1 unit
+             % xi_here(1:3) = xi_here(1:3)*Lscale; %scaling using the formula: Lscale m = 1 unit
 
             Phi_here  = Phi(6*(ii-1)+1:6*ii,:);%note this step
             if dof_here>0
                 xi_here = Phi_here*q_here+xi_here; 
             end
             
-            xi_here(1:3) = xi_here(1:3)/Lscale; %to SI units
+            % xi_here(1:3) = xi_here(1:3)/Lscale; %to SI units
             
             if full||(i==i_here&&nargin==3)||(i==i_here&&j==j_here)
                 xi((i_sig-1)*6+1:i_sig*6) = xi_here;

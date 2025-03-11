@@ -1,7 +1,7 @@
 clear
 close all
-% load("Datafiles\TwoLeggedRevolute.mat")
-load("Datafiles\Parallel_robot.mat")
+load("Datafiles\TwoLeggedRevolute.mat")
+% load("Datafiles\Parallel_robot.mat")
 load("Datafiles\constrain_surface.mat")
 % S1 = S2;
 S1.VLinks(1).ld = {0.7};
@@ -9,8 +9,9 @@ S1.VLinks(3).ld = {0.7};
 % % S1.VLinks(1).r{1} = @(X1)0.0018;
 % % S1.VLinks(3).r{1} = @(X1)0.0018;
 % 
-S1.VLinks(1).E = 5e8;
-S1.VLinks(3).E = 5e8;
+
+S1.VLinks(1).E = 71.05e6;
+S1.VLinks(3).E = 71.05e6;
 % S1.g_ini(13,4) = 2*(S1.VLinks(1).L*cosd(60) + S1.VLinks(2).r(0));
 % 
 % S1.VLinks(2).Rho = 1240;
@@ -25,18 +26,19 @@ leg_index = [1,3];
 %%
 g_des_initial = [0.0000         0   1.0000    0.3
                 0    1.0000         0         0
-                -1.0000         0    0.0000    -0.5
+                -1.0000         0    0.0000    -0.6
                 0         0         0    1.0000];
 
-rotation_angle = 40;
+rotation_angle = 80;
 
 rotation_angle = rotation_angle*(pi/180);
 roty = eul2tform([0, rotation_angle,0]);
 % g_des_final = g_des_final*roty
 
 %% Find rotations about the center of the two holes
-T1 = [eye(3) (hole_position(2,:) - hole_position(1,:))'; [0 0 0 1]];
-T2 = [eye(3) -(hole_position(2,:) - hole_position(1,:))'; [0 0 0 1]];
+
+T1 = [eye(3) (hole_position(2,:) + hole_position(1,:))'/2; [0 0 0 1]];
+T2 = [eye(3) -(hole_position(2,:) + hole_position(1,:))'/2; [0 0 0 1]];
 g_des_final = T1*roty*T2*g_des_initial;
 %% Problem 1:
 % This involves finding the pose of the two tips such that the end-effector

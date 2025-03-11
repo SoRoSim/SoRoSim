@@ -74,7 +74,7 @@ This leads the user to a GUI that allows the definition of relative position and
 
 
 
-# Linkage definition
+
 
 ![alt text](image-1.png)
 

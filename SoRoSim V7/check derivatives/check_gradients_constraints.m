@@ -31,8 +31,9 @@ function check_gradients_constraints(func_handle, x)
     disp(['Checking Gradient Accuracy for Function: ', func2str(func_handle)]);
     
     % Compute Relative Error for Inequality Gradients
-    if ~isempty(dc_analytical) && ~ismpty(dc_finite) 
-        error_dc = abs(dc_analytical - dc_finite) ./ (abs(dc_finite) + 1e-8);
+
+    if ~isempty(dc_analytical) && ~isempty(dc_finite) 
+        error_dc = abs(dc_analytical - dc_finite) ;
         disp('Maximum relative error in inequality constraint gradients:');
         [max_error, index] = max(error_dc(:));
         disp(max_error(:));
@@ -44,12 +45,13 @@ function check_gradients_constraints(func_handle, x)
     end
     if ~isempty(dceq_analytical) && ~isempty(dceq_finite)
         % Compute Relative Error for Equality Gradients
-        error_dceq = abs(dceq_analytical - dceq_finite) ./ (abs(dceq_finite) + 1e-8);
+        error_dceq = abs(dceq_analytical - dceq_finite);
         disp(' Maximum relative error in equality constraint gradients:');
         [max_error, index] = max(error_dceq(:));
         disp(max_error(:));
         [row, col] = ind2sub(size(error_dceq), index);
-        disp(['Largest discrepancy found in **inequality constraint gradients** at x(', num2str(row), ', ', num2str(col), ')']);
+
+        disp(['Largest discrepancy found in **equality constraint gradients** at x(', num2str(row), ', ', num2str(col), ')']);
     else
         error_dceq = 1e-6;
     end
