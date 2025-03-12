@@ -1,7 +1,7 @@
 clear
 close all
-load("Datafiles\TwoLeggedRevolute.mat")
-% load("Datafiles\Parallel_robot.mat")
+% load("Datafiles\TwoLeggedRevolute.mat")
+load("Datafiles\Parallel_robot.mat")
 load("Datafiles\constrain_surface.mat")
 % S1 = S2;
 S1.VLinks(1).ld = {0.7};
@@ -23,6 +23,7 @@ S1.CVRods{1}(2).UpdateAll;
 S1.CVRods{3}(2).UpdateAll;
 S1 = S1.Update;
 leg_index = [1,3];
+normal = [0 0; 0 0; -1 1];
 %%
 g_des_initial = [0.0000         0   1.0000    0.3
                 0    1.0000         0         0
