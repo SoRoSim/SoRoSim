@@ -535,6 +535,8 @@ if Linkage.nCLj>0
         de_dqdd = A;
     end
 
+else
+    dID_dlambda = [];
 end
 
 %A should be FULL ROW RANK Matrix. Otherwise Problem!
@@ -912,6 +914,8 @@ if Linkage.Actuated
 
     tau = tau+B*u;
     dtau_du = B;
+else
+    dtau_du = [];
 end
 %% Custom Soft Actuation
 
