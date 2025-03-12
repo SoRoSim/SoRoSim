@@ -13,13 +13,13 @@ if nargin==4
     if j_here==0
         nsig = 1;
     else
-        nsig = Linkage.CVTwists{i_here}(j_here+1).nip; %j_here>1 is allowed only for soft links
+        nsig = Linkage.CVRods{i_here}(j_here+1).nip; %j_here>1 is allowed only for soft links
     end
 elseif nargin==3
     if Linkage.VLinks(Linkage.LinkIndex(i_here)).linktype=='s'
         nsig = 1;
         for j=1:Linkage.VLinks(Linkage.LinkIndex(i_here)).npie-1
-            nsig = nsig+Linkage.CVTwists{i_here}(j+1).nip;
+            nsig = nsig+Linkage.CVRods{i_here}(j+1).nip;
         end
     else
         nsig = 2; %joint and CM
@@ -35,10 +35,10 @@ i_sig     = 1;
 for i = 1:N
     
     %Joint
-    dof_here = Linkage.CVTwists{i}(1).dof;
+    dof_here = Linkage.CVRods{i}(1).dof;
     q_here   = q(dof_start:dof_start+dof_here-1);
-    Phi_here = Linkage.CVTwists{i}(1).Phi;
-    xi_star  = Linkage.CVTwists{i}(1).xi_star;
+    Phi_here = Linkage.CVRods{i}(1).Phi;
+    xi_star  = Linkage.CVRods{i}(1).xi_star;
     
     if dof_here == 0 %fixed joint (N)
         xi_here = zeros(6,1);
@@ -63,11 +63,11 @@ for i = 1:N
     
     for j = 1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1
         
-        dof_here = Linkage.CVTwists{i}(j+1).dof;
+        dof_here = Linkage.CVRods{i}(j+1).dof;
         q_here   = q(dof_start:dof_start+dof_here-1);
-        xi_star  = Linkage.CVTwists{i}(j+1).xi_star;
-        nip      = Linkage.CVTwists{i}(j+1).nip;
-        Phi      = Linkage.CVTwists{i}(j+1).Phi;
+        xi_star  = Linkage.CVRods{i}(j+1).xi_star;
+        nip      = Linkage.CVRods{i}(j+1).nip;
+        Phi      = Linkage.CVRods{i}(j+1).Phi;
 
         
         for ii = 1:nip
