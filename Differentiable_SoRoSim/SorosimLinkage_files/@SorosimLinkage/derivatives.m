@@ -51,6 +51,8 @@ function qdqdd = derivatives(Linkage,t,qqd,dynamicAction,GUI_actionInput,dynamic
     qdd = y(1:ndof);
 
     if Linkage.Actuated
+        n_k  = Linkage.ActuationPrecompute.n_k;
+
         if n_k>0
             qdd(Linkage.ActuationPrecompute.index_q_u) = y(1:ndof-n_k);
             qdd(Linkage.ActuationPrecompute.index_q_k) = action(nact-n_k+1:end);
