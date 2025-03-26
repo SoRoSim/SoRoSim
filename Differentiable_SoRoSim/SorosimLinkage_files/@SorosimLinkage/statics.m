@@ -12,6 +12,8 @@ arguments
     staticsOptions.magnifierValue = 1e6;
     staticsOptions.Jacobian = true;
     staticsOptions.Algorithm = 'trust-region-dogleg';
+    staticsOptions.plot = true;
+    staticsOptions.save = true;
 end
 
 %Actuation input
@@ -118,7 +120,12 @@ end
 if Linkage.nCLj > 0
     varsToSave{end+1} = 'lambda';
 end
-save('StaticsSolution.mat', varsToSave{:});
 
-Linkage.plotq(q);
+if staticsOptions.plot
+    save('StaticsSolution.mat', varsToSave{:});
+end
+
+if staticsOptions.plot
+    Linkage.plotq(q);
+end
 end
