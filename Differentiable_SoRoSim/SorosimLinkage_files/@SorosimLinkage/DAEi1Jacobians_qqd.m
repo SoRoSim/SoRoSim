@@ -8,7 +8,7 @@ nsig = Linkage.nsig; %Total number of computational points
 nj   = Linkage.nj; %Total number of joints (rigid and virtual soft joints (nip-1))
 
 if Linkage.CAI
-    [~,daction_dx] = CustomActuatorInput(Linkage,[q;qd]); %x is qqd
+    [~,daction_dx] = CustomActuatorInput(Linkage,[q;qd], t); %x is qqd
     daction_dq  = daction_dx(:,1:ndof);
     daction_dqd = daction_dx(:,ndof+1:2*ndof);
 else
