@@ -79,7 +79,7 @@ for i=1:N
         xi          = Phi_here*q_here+xi_star;
         xid         = Phi_here*qd_here;
 
-        [gstep,Tg,Tgd] = variable_expmap_gTgTgd_mex(xi,xid);
+        [gstep,Tg,Tgd] = variable_expmap_gTgTgd(xi,xid);
 
         S_here(:,dofs_here)  = Tg*Phi_here;
         Sd_here(:,dofs_here) = Tgd*Phi_here;
@@ -238,7 +238,7 @@ for i=1:N
 
             end
 
-            [gstep,Tg,Tgd] = variable_expmap_gTgTgd_mex(Omega_here,Omegad_here); % mex code, C program
+            [gstep,Tg,Tgd] = variable_expmap_gTgTgd(Omega_here,Omegad_here); % mex code, C program
 
             S_here               = zeros(6,ndof);
             S_here(:,dofs_here)  = Tg*Z_here;

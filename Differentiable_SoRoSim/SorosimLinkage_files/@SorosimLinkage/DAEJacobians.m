@@ -157,7 +157,7 @@ for i=1:N
     %[Omega,Z,g,T,S,Sd,f,fd,adjOmegap,dSdq_qd,dSdq_qdd,dSddq_qd]=RigidJointDifferentialKinematics(Phi,xi_star,q,qd,qdd)
     [Omega(:,ij),Z((ij-1)*6+1:6*ij,dofs_here),gstep((ij-1)*4+1:4*ij,:),T((ij-1)*6+1:6*ij,:),S((ij-1)*6+1:6*ij,dofs_here),...
      Sd((ij-1)*6+1:6*ij,dofs_here),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),dS_dq_qd((ij-1)*6+1:6*ij,dofs_here),...
-     dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here),dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)] = RigidJointDifferentialKinematics_mex(Phi_here,xi_star,q(dofs_here),qd(dofs_here),qdd(dofs_here));
+     dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here),dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)] = RigidJointDifferentialKinematics(Phi_here,xi_star,q(dofs_here),qd(dofs_here),qdd(dofs_here));
     Adgstepinv((ij-1)*6+1:6*ij,:) = dinamico_Adjoint(ginv(gstep((ij-1)*4+1:4*ij,:)));
 
     eta_plus_here  = eta_here+S((ij-1)*6+1:6*ij,dofs_here)*qd(dofs_here); %eta of X=1 expressed in the frame of X=0
@@ -286,7 +286,7 @@ for i=1:N
                 %[Omega,Z,g,T,S,Sd,f,fd,adjOmegap,dSdq_qd,dSdq_qdd,dSddq_qd]=SoftJointDifferentialKinematics_Z4(h,Phi_Z1,Phi_Z2,xi_star_Z1,xi_star_Z2,q,qd,qdd)
                 [Omega(:,ij),Z((ij-1)*6+1:6*ij,dofs_here),gstep((ij-1)*4+1:4*ij,:),T((ij-1)*6+1:6*ij,:),S((ij-1)*6+1:6*ij,dofs_here),...
                  Sd((ij-1)*6+1:6*ij,dofs_here),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),dS_dq_qd((ij-1)*6+1:6*ij,dofs_here),...
-                 dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here),dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)] = SoftJointDifferentialKinematics_Z4_mex(h(ij),Phi_Z1,Phi_Z2,xi_star_Z1,xi_star_Z2,q(dofs_here),qd(dofs_here),qdd(dofs_here));
+                 dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here),dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)] = SoftJointDifferentialKinematics_Z4(h(ij),Phi_Z1,Phi_Z2,xi_star_Z1,xi_star_Z2,q(dofs_here),qd(dofs_here),qdd(dofs_here));
                 Adgstepinv((ij-1)*6+1:6*ij,:) = dinamico_Adjoint(ginv(gstep((ij-1)*4+1:4*ij,:)));
             else % order 2
                 xi_star_Z  = xi_star(6*(ii-1)+1:6*ii,4);
@@ -295,7 +295,7 @@ for i=1:N
                 %[Omega,Z,g,T,S,Sd,f,fd,adjOmegap,dSdq_qd,dSdq_qdd,dSddq_qd]=SoftJointDifferentialKinematics_Z2(h,Phi_Z,xi_star_Z,q,qd,qdd)
                 [Omega(:,ij),Z((ij-1)*6+1:6*ij,dofs_here),gstep((ij-1)*4+1:4*ij,:),T((ij-1)*6+1:6*ij,:),S((ij-1)*6+1:6*ij,dofs_here),...
                  Sd((ij-1)*6+1:6*ij,dofs_here),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),dS_dq_qd((ij-1)*6+1:6*ij,dofs_here),...
-                 dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here),dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)] = SoftJointDifferentialKinematics_Z2_mex(h(ij),Phi_Z,xi_star_Z,q(dofs_here),qd(dofs_here),qdd(dofs_here));
+                 dS_dq_qdd((ij-1)*6+1:6*ij,dofs_here),dSd_dq_qd((ij-1)*6+1:6*ij,dofs_here)] = SoftJointDifferentialKinematics_Z2(h(ij),Phi_Z,xi_star_Z,q(dofs_here),qd(dofs_here),qdd(dofs_here));
                 Adgstepinv((ij-1)*6+1:6*ij,:) = dinamico_Adjoint(ginv(gstep((ij-1)*4+1:4*ij,:)));
             end
            
@@ -489,7 +489,7 @@ if Linkage.nCLj>0
         A(il_start:il_start+nl-1,:) = Phi_p'*diffJAB;
         e(il_start:il_start+nl-1) = Phi_p'*OmegaBA;
 
-        [~,T_RodBA] = variable_expmap_gTg_mex(OmegaBA); %Tangent operator of the twist vector
+        [~,T_RodBA] = variable_expmap_gTg(OmegaBA); %Tangent operator of the twist vector
         if index==1
             %Bringing quantities to B frame (note this step)
             eta_A = Adj_gBA*eta_A;
@@ -697,9 +697,9 @@ for i=N:-1:1 %backwards
                     Phi_Z1 = Linkage.CVRods{i}(j+1).Phi_Z1((ii-1)*6+1:6*ii,:);
                     Phi_Z2 = Linkage.CVRods{i}(j+1).Phi_Z2((ii-1)*6+1:6*ii,:);
         
-                    dSTdq_FC = compute_dSTdqFC_Z4_mex(h(ij),Omega(:,ij),Phi_Z1,Phi_Z2,Z((ij-1)*6+1:6*ij,dofs_here),T((ij-1)*6+1:6*ij,:),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),F_C);
+                    dSTdq_FC = compute_dSTdqFC_Z4(h(ij),Omega(:,ij),Phi_Z1,Phi_Z2,Z((ij-1)*6+1:6*ij,dofs_here),T((ij-1)*6+1:6*ij,:),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),F_C);
                 else
-                    dSTdq_FC = compute_dSTdqFC_Z2R_mex(h(ij),Omega(:,ij),Z((ij-1)*6+1:6*ij,dofs_here),T((ij-1)*6+1:6*ij,:),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),F_C);
+                    dSTdq_FC = compute_dSTdqFC_Z2R(h(ij),Omega(:,ij),Z((ij-1)*6+1:6*ij,dofs_here),T((ij-1)*6+1:6*ij,:),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),F_C);
                 end
 
                 dSTdq_FC_full = zeros(dof_here,ndof);
@@ -782,7 +782,7 @@ for i=N:-1:1 %backwards
         V_S(:,dofs_here) = V_S(:,dofs_here)+N_C*S((ij-1)*6+1:6*ij,dofs_here)+M_C*Y((ij-1)*6+1:6*ij,dofs_here);
         W_S(:,dofs_here) = W_S(:,dofs_here)+M_C*S((ij-1)*6+1:6*ij,dofs_here);
 
-        dSTdq_FC = compute_dSTdqFC_Z2R_mex(dof_here,Omega(:,ij),Z((ij-1)*6+1:6*ij,dofs_here),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),F_C);
+        dSTdq_FC = compute_dSTdqFC_Z2R(dof_here,Omega(:,ij),Z((ij-1)*6+1:6*ij,dofs_here),f(:,ij),fd(:,ij),adjOmegap((ij-1)*24+1:24*ij,:),F_C);
         dSTdq_FC_full = zeros(dof_here,ndof);
         dSTdq_FC_full(:,dofs_here) = dSTdq_FC;
     
