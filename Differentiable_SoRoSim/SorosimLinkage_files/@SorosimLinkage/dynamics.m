@@ -15,6 +15,8 @@ arguments
     dynamicsOptions.Integrator = 'ode15s';
     dynamicsOptions.t_start = 0;
     dynamicsOptions.t_end = 0;
+    dynamicsOptions.save_data = true;
+    dynamicsOptions.video = true;
 end
 
 ndof  = Linkage.ndof;
@@ -175,11 +177,14 @@ switch dynamicsOptions.Integrator
         t=0:dt:tmax;
 end
 
-save('DynamicsSolution.mat','t','qqd');
-
-answer = questdlg('Generate output video of the simulation?','Grapical Output','Yes','No','Yes');
-if strcmp('Yes',answer)
-    plotqt(Linkage,t,qqd);
+if dynamicsOptions.save_data
+    save('DynamicsSolution.mat','t','qqd');
+end
+if dynamicsOptions.video
+    answer = questdlg('Generate output video of the simulation?','Grapical Output','Yes','No','Yes');
+    if strcmp('Yes',answer)
+        plotqt(Linkage,t,qqd);
+    end
 end
 
 
