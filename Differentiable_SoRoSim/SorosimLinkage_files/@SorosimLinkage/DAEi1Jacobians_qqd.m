@@ -30,6 +30,7 @@ else
 end
 
 Fk = zeros(6*nsig,1); %External point force at every significant point
+I_v = diag([0 0 0 1 1 1]);
 
 %% Forward kinematic pass: evaluate kinematic, and derivatives terms at every virtual joint and significant points
 

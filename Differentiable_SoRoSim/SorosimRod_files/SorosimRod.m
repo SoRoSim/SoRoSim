@@ -413,7 +413,7 @@ function UpdateIntegration(R,varargin) %user input is nGauss or nGausse dependin
 
             else  % all local (element) basis
                 
-                n_ele = max(R.Phi_dof);
+                n_ele = max(R.Phi_odr);
                 nipe = (R.nip-1)/n_ele+1;
 
                 [Xse,Wse,~]=GaussQuadrature(nipe-2); %per element

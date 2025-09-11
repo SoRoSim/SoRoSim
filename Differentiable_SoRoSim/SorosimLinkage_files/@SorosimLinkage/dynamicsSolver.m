@@ -240,13 +240,15 @@ for i=1:N
 
             [gstep,Tg,Tgd] = variable_expmap_gTgTgd_mex(Omega_here,Omegad_here); % mex code, C program
 
-            S_here               = zeros(6,ndof);
-            S_here(:,dofs_here)  = Tg*Z_here;
+            S_here  = zeros(6,ndof);
+            Sd_here = zeros(6,ndof);
 
-            Sd_here              = zeros(6,ndof);
-            Sd_here(:,dofs_here) = Tgd*Z_here;
-            if Linkage.Z_order==4
-                Sd_here(:,dofs_here) = Sd_here(:,dofs_here)+Tg*Zd_here;
+            if dof_here>0
+                S_here(:,dofs_here)  = Tg*Z_here;
+                Sd_here(:,dofs_here) = Tgd*Z_here;
+                if Linkage.Z_order==4
+                    Sd_here(:,dofs_here) = Sd_here(:,dofs_here)+Tg*Zd_here;
+                end
             end
             
             %updating g, Jacobian, Jacobian_dot and eta
