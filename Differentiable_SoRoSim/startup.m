@@ -290,7 +290,7 @@ try
 catch ME1
     fprintf('[startup] MEX call failed: %s\n', ME1.message);
     fprintf('[startup] Running convert2MEX.m...\n');
-    wd = pwd; c = onCleanup(@() cd(wd));
+    wd = pwd;
     try
         cd(basicDir);
         run('convert2MEX.m');
@@ -300,6 +300,7 @@ catch ME1
     catch ME2
         warning('%s', sprintf('[startup] Rebuild failed or MEX still not working: %s', ME2.message));
     end
+    cd(pwd)
 end
 
 disp('Welcome to SoRoSim Toolbox')
