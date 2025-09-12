@@ -222,8 +222,8 @@ for ip=1:Linkage.np
         g_here(1:3,4) = zeros(3,1); %only rotational part
         Fp_here = (dinamico_Adjoint(g_here))'*Fp_here; %rotated into the local frame. Adj' = coAdj^-1
     end
-    J_here = g((i_sig-1)*6+1:i_sig*6,:);
-    F=F+J_here*Fp_here;
+    J_here = J((i_sig-1)*6+1:i_sig*6,:);
+    F=F+J_here'*Fp_here;
 end
 %% Closed Chain Constraint
 

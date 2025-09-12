@@ -32,6 +32,10 @@ classdef SorosimRod < handle %pass by reference (no copy of memory is made)
         
         Xadd         %additional integration points (nx1) vector 
     end
+
+    properties (Access = private, Transient)
+        LinkListener
+    end
     
     methods
         
@@ -45,7 +49,7 @@ classdef SorosimRod < handle %pass by reference (no copy of memory is made)
                 
                 Rod.Link = Link;
                 % Attach a listener to the PropertyChanged event of the Link
-                addlistener(Rod.Link, 'PropertyChanged', @(src, event) Rod.Link2RodUpdate());
+                Rod.LinkListener = addlistener(Rod.Link, 'PropertyChanged', @(src, event) Rod.Link2RodUpdate());
                 Rod.div = j;
                 
                 Z1     = 1/2-sqrt(3)/6;          %Zanna quadrature coefficient 4th order
@@ -409,7 +413,7 @@ function UpdateIntegration(R,varargin) %user input is nGauss or nGausse dependin
 
             else  % all local (element) basis
                 
-                n_ele = max(R.Phi_dof);
+                n_ele = max(R.Phi_odr);
                 nipe = (R.nip-1)/n_ele+1;
 
                 [Xse,Wse,~]=GaussQuadrature(nipe-2); %per element
@@ -700,6 +704,7 @@ function UpdateIntegration(R,varargin) %user input is nGauss or nGausse dependin
             Rod.Gs = s.Gs;
             Rod.Xadd = s.Xadd;
             Rod.dof = s.dof;
+            Rod.LinkListener = addlistener(Rod.Link, 'PropertyChanged', @(src, event) Rod.Link2RodUpdate());
         end
     
     end

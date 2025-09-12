@@ -257,6 +257,7 @@
 clc
 clear variables
 
+restoredefaultpath
 addpath(genpath('Basic_functions'))
 addpath('Custom')
 addpath('SorosimLink_files')
