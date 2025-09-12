@@ -1,0 +1,86 @@
+[
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  SoftJointDifferentialKinematics_Z4_data.c -o build/win64/SoftJointDifferentialKinematics_Z4_data.o",
+    "file": "SoftJointDifferentialKinematics_Z4_data.c",
+    "output": "build/win64/SoftJointDifferentialKinematics_Z4_data.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  rt_nonfinite.c -o build/win64/rt_nonfinite.o",
+    "file": "rt_nonfinite.c",
+    "output": "build/win64/rt_nonfinite.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  SoftJointDifferentialKinematics_Z4_initialize.c -o build/win64/SoftJointDifferentialKinematics_Z4_initialize.o",
+    "file": "SoftJointDifferentialKinematics_Z4_initialize.c",
+    "output": "build/win64/SoftJointDifferentialKinematics_Z4_initialize.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  SoftJointDifferentialKinematics_Z4_terminate.c -o build/win64/SoftJointDifferentialKinematics_Z4_terminate.o",
+    "file": "SoftJointDifferentialKinematics_Z4_terminate.c",
+    "output": "build/win64/SoftJointDifferentialKinematics_Z4_terminate.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  SoftJointDifferentialKinematics_Z4.c -o build/win64/SoftJointDifferentialKinematics_Z4.o",
+    "file": "SoftJointDifferentialKinematics_Z4.c",
+    "output": "build/win64/SoftJointDifferentialKinematics_Z4.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  eml_mtimes_helper.c -o build/win64/eml_mtimes_helper.o",
+    "file": "eml_mtimes_helper.c",
+    "output": "build/win64/eml_mtimes_helper.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  mtimes.c -o build/win64/mtimes.o",
+    "file": "mtimes.c",
+    "output": "build/win64/mtimes.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  norm.c -o build/win64/norm.o",
+    "file": "norm.c",
+    "output": "build/win64/norm.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  eye.c -o build/win64/eye.o",
+    "file": "eye.c",
+    "output": "build/win64/eye.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  dinamico_adj.c -o build/win64/dinamico_adj.o",
+    "file": "dinamico_adj.c",
+    "output": "build/win64/dinamico_adj.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_SoftJointDifferentialKinematics_Z4_api.c -o build/win64/_coder_SoftJointDifferentialKinematics_Z4_api.o",
+    "file": "interface/_coder_SoftJointDifferentialKinematics_Z4_api.c",
+    "output": "build/win64/_coder_SoftJointDifferentialKinematics_Z4_api.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_SoftJointDifferentialKinematics_Z4_mex.c -o build/win64/_coder_SoftJointDifferentialKinematics_Z4_mex.o",
+    "file": "interface/_coder_SoftJointDifferentialKinematics_Z4_mex.c",
+    "output": "build/win64/_coder_SoftJointDifferentialKinematics_Z4_mex.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_SoftJointDifferentialKinematics_Z4_info.c -o build/win64/_coder_SoftJointDifferentialKinematics_Z4_info.o",
+    "file": "interface/_coder_SoftJointDifferentialKinematics_Z4_info.c",
+    "output": "build/win64/_coder_SoftJointDifferentialKinematics_Z4_info.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\SoftJointDifferentialKinematics_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=SoftJointDifferentialKinematics_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  \"C:/Program Files/MATLAB/R2024a/extern/version/c_mexapi_version.c\" -o build/win64/c_mexapi_version.o",
+    "file": "C:/Program Files/MATLAB/R2024a/extern/version/c_mexapi_version.c",
+    "output": "build/win64/c_mexapi_version.o"
+  }
+]

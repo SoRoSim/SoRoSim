@@ -1,0 +1,56 @@
+[
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=variable_expmap_gTg_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  variable_expmap_gTg_data.c -o build/win64/variable_expmap_gTg_data.o",
+    "file": "variable_expmap_gTg_data.c",
+    "output": "build/win64/variable_expmap_gTg_data.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=variable_expmap_gTg_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  rt_nonfinite.c -o build/win64/rt_nonfinite.o",
+    "file": "rt_nonfinite.c",
+    "output": "build/win64/rt_nonfinite.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=variable_expmap_gTg_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  variable_expmap_gTg_initialize.c -o build/win64/variable_expmap_gTg_initialize.o",
+    "file": "variable_expmap_gTg_initialize.c",
+    "output": "build/win64/variable_expmap_gTg_initialize.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=variable_expmap_gTg_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  variable_expmap_gTg_terminate.c -o build/win64/variable_expmap_gTg_terminate.o",
+    "file": "variable_expmap_gTg_terminate.c",
+    "output": "build/win64/variable_expmap_gTg_terminate.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=variable_expmap_gTg_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  variable_expmap_gTg.c -o build/win64/variable_expmap_gTg.o",
+    "file": "variable_expmap_gTg.c",
+    "output": "build/win64/variable_expmap_gTg.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=variable_expmap_gTg_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_variable_expmap_gTg_api.c -o build/win64/_coder_variable_expmap_gTg_api.o",
+    "file": "interface/_coder_variable_expmap_gTg_api.c",
+    "output": "build/win64/_coder_variable_expmap_gTg_api.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=variable_expmap_gTg_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_variable_expmap_gTg_mex.c -o build/win64/_coder_variable_expmap_gTg_mex.o",
+    "file": "interface/_coder_variable_expmap_gTg_mex.c",
+    "output": "build/win64/_coder_variable_expmap_gTg_mex.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=variable_expmap_gTg_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_variable_expmap_gTg_info.c -o build/win64/_coder_variable_expmap_gTg_info.o",
+    "file": "interface/_coder_variable_expmap_gTg_info.c",
+    "output": "build/win64/_coder_variable_expmap_gTg_info.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\variable_expmap_gTg\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=variable_expmap_gTg_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  \"C:/Program Files/MATLAB/R2024a/extern/version/c_mexapi_version.c\" -o build/win64/c_mexapi_version.o",
+    "file": "C:/Program Files/MATLAB/R2024a/extern/version/c_mexapi_version.c",
+    "output": "build/win64/c_mexapi_version.o"
+  }
+]

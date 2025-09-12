@@ -1,0 +1,56 @@
+[
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=RigidJointKinematics_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  RigidJointKinematics_data.c -o build/win64/RigidJointKinematics_data.o",
+    "file": "RigidJointKinematics_data.c",
+    "output": "build/win64/RigidJointKinematics_data.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=RigidJointKinematics_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  rt_nonfinite.c -o build/win64/rt_nonfinite.o",
+    "file": "rt_nonfinite.c",
+    "output": "build/win64/rt_nonfinite.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=RigidJointKinematics_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  RigidJointKinematics_initialize.c -o build/win64/RigidJointKinematics_initialize.o",
+    "file": "RigidJointKinematics_initialize.c",
+    "output": "build/win64/RigidJointKinematics_initialize.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=RigidJointKinematics_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  RigidJointKinematics_terminate.c -o build/win64/RigidJointKinematics_terminate.o",
+    "file": "RigidJointKinematics_terminate.c",
+    "output": "build/win64/RigidJointKinematics_terminate.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=RigidJointKinematics_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  RigidJointKinematics.c -o build/win64/RigidJointKinematics.o",
+    "file": "RigidJointKinematics.c",
+    "output": "build/win64/RigidJointKinematics.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=RigidJointKinematics_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_RigidJointKinematics_api.c -o build/win64/_coder_RigidJointKinematics_api.o",
+    "file": "interface/_coder_RigidJointKinematics_api.c",
+    "output": "build/win64/_coder_RigidJointKinematics_api.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=RigidJointKinematics_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_RigidJointKinematics_mex.c -o build/win64/_coder_RigidJointKinematics_mex.o",
+    "file": "interface/_coder_RigidJointKinematics_mex.c",
+    "output": "build/win64/_coder_RigidJointKinematics_mex.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=RigidJointKinematics_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_RigidJointKinematics_info.c -o build/win64/_coder_RigidJointKinematics_info.o",
+    "file": "interface/_coder_RigidJointKinematics_info.c",
+    "output": "build/win64/_coder_RigidJointKinematics_info.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\RigidJointKinematics\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=RigidJointKinematics_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  \"C:/Program Files/MATLAB/R2024a/extern/version/c_mexapi_version.c\" -o build/win64/c_mexapi_version.o",
+    "file": "C:/Program Files/MATLAB/R2024a/extern/version/c_mexapi_version.c",
+    "output": "build/win64/c_mexapi_version.o"
+  }
+]

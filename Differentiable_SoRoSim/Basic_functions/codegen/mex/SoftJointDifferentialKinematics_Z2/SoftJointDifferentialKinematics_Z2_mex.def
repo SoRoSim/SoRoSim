@@ -1,0 +1,9 @@
+LIBRARY SoftJointDifferentialKinematics_Z2_mex.mexw64
+EXPORTS
+mexFunction
+mexfilerequiredapiversion
+emlrtMexFcnProperties
+SoftJointDifferentialKinematics_Z2
+SoftJointDifferentialKinematics_Z2_initialize
+SoftJointDifferentialKinematics_Z2_terminate
+SoftJointDifferentialKinematics_Z2_atexit

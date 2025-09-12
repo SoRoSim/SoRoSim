@@ -1,0 +1,92 @@
+[
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  compute_dSTdqFC_Z4_data.c -o build/win64/compute_dSTdqFC_Z4_data.o",
+    "file": "compute_dSTdqFC_Z4_data.c",
+    "output": "build/win64/compute_dSTdqFC_Z4_data.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  rt_nonfinite.c -o build/win64/rt_nonfinite.o",
+    "file": "rt_nonfinite.c",
+    "output": "build/win64/rt_nonfinite.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  compute_dSTdqFC_Z4_initialize.c -o build/win64/compute_dSTdqFC_Z4_initialize.o",
+    "file": "compute_dSTdqFC_Z4_initialize.c",
+    "output": "build/win64/compute_dSTdqFC_Z4_initialize.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  compute_dSTdqFC_Z4_terminate.c -o build/win64/compute_dSTdqFC_Z4_terminate.o",
+    "file": "compute_dSTdqFC_Z4_terminate.c",
+    "output": "build/win64/compute_dSTdqFC_Z4_terminate.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  compute_dSTdqFC_Z4.c -o build/win64/compute_dSTdqFC_Z4.o",
+    "file": "compute_dSTdqFC_Z4.c",
+    "output": "build/win64/compute_dSTdqFC_Z4.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  mtimes.c -o build/win64/mtimes.o",
+    "file": "mtimes.c",
+    "output": "build/win64/mtimes.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  norm.c -o build/win64/norm.o",
+    "file": "norm.c",
+    "output": "build/win64/norm.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  dinamico_coadjbar.c -o build/win64/dinamico_coadjbar.o",
+    "file": "dinamico_coadjbar.c",
+    "output": "build/win64/dinamico_coadjbar.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_compute_dSTdqFC_Z4_api.c -o build/win64/_coder_compute_dSTdqFC_Z4_api.o",
+    "file": "interface/_coder_compute_dSTdqFC_Z4_api.c",
+    "output": "build/win64/_coder_compute_dSTdqFC_Z4_api.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_compute_dSTdqFC_Z4_mex.c -o build/win64/_coder_compute_dSTdqFC_Z4_mex.o",
+    "file": "interface/_coder_compute_dSTdqFC_Z4_mex.c",
+    "output": "build/win64/_coder_compute_dSTdqFC_Z4_mex.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  mpower.c -o build/win64/mpower.o",
+    "file": "mpower.c",
+    "output": "build/win64/mpower.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  eml_mtimes_helper.c -o build/win64/eml_mtimes_helper.o",
+    "file": "eml_mtimes_helper.c",
+    "output": "build/win64/eml_mtimes_helper.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  compute_dSTdqFC_Z4_emxutil.c -o build/win64/compute_dSTdqFC_Z4_emxutil.o",
+    "file": "compute_dSTdqFC_Z4_emxutil.c",
+    "output": "build/win64/compute_dSTdqFC_Z4_emxutil.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  interface/_coder_compute_dSTdqFC_Z4_info.c -o build/win64/_coder_compute_dSTdqFC_Z4_info.o",
+    "file": "interface/_coder_compute_dSTdqFC_Z4_info.c",
+    "output": "build/win64/_coder_compute_dSTdqFC_Z4_info.o"
+  },
+  {
+    "directory": "D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4",
+    "command": "C:\\ProgramData\\MATLAB\\SupportPackages\\R2024a\\3P.instrset\\mingw_w64.instrset\\bin\\gcc -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\" -I \"D:\\Research\\Soft Robotics Toolbox\\SoRoSim GitHub\\SoRoSim\\Differentiable_SoRoSim\\Basic_functions\\codegen\\mex\\compute_dSTdqFC_Z4\\interface\" -I \"C:\\Program Files\\MATLAB\\R2024a\\extern\\include\" -I \".\" -DMODEL=compute_dSTdqFC_Z4_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning  \"C:/Program Files/MATLAB/R2024a/extern/version/c_mexapi_version.c\" -o build/win64/c_mexapi_version.o",
+    "file": "C:/Program Files/MATLAB/R2024a/extern/version/c_mexapi_version.c",
+    "output": "build/win64/c_mexapi_version.o"
+  }
+]

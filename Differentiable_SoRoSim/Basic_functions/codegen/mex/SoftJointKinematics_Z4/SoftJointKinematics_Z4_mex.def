@@ -1,0 +1,9 @@
+LIBRARY SoftJointKinematics_Z4_mex.mexw64
+EXPORTS
+mexFunction
+mexfilerequiredapiversion
+emlrtMexFcnProperties
+SoftJointKinematics_Z4
+SoftJointKinematics_Z4_initialize
+SoftJointKinematics_Z4_terminate
+SoftJointKinematics_Z4_atexit

@@ -1,0 +1,56 @@
+# CompilerName=mingw64
+# Mode=optim
+ninja_required_version = 1.3
+
+# Basic folders
+root = .
+builddir = $root/build/win64
+matlabdir = C:/Program Files/MATLAB/R2024a
+startdir = D:/Research/Soft Robotics Toolbox/SoRoSim GitHub/SoRoSim/Differentiable_SoRoSim/Basic_functions
+
+# Toolchain information
+cc = C:\ProgramData\MATLAB\SupportPackages\R2024a\3P.instrset\mingw_w64.instrset\bin\gcc
+cxx = C:\ProgramData\MATLAB\SupportPackages\R2024a\3P.instrset\mingw_w64.instrset\bin\g++
+linker = C:\ProgramData\MATLAB\SupportPackages\R2024a\3P.instrset\mingw_w64.instrset\bin\gcc
+linkerxx = C:\ProgramData\MATLAB\SupportPackages\R2024a\3P.instrset\mingw_w64.instrset\bin\g++
+
+cflags =  -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c99 -I "D:\Research\Soft Robotics Toolbox\SoRoSim GitHub\SoRoSim\Differentiable_SoRoSim\Basic_functions\codegen\mex\compute_dSTdqFC_Z2R" -I "D:\Research\Soft Robotics Toolbox\SoRoSim GitHub\SoRoSim\Differentiable_SoRoSim\Basic_functions" -I "D:\Research\Soft Robotics Toolbox\SoRoSim GitHub\SoRoSim\Differentiable_SoRoSim\Basic_functions\codegen\mex\compute_dSTdqFC_Z2R\interface" -I "C:\Program Files\MATLAB\R2024a\extern\include" -I "." -DMODEL=compute_dSTdqFC_Z2R_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning 
+
+cxxflags =  -c -fexceptions -fno-omit-frame-pointer -m64 -DMATLAB_MEX_FILE  -DMATLAB_MEX_FILE -O2 -fwrapv -DNDEBUG -std=c++11 -I "D:\Research\Soft Robotics Toolbox\SoRoSim GitHub\SoRoSim\Differentiable_SoRoSim\Basic_functions\codegen\mex\compute_dSTdqFC_Z2R" -I "D:\Research\Soft Robotics Toolbox\SoRoSim GitHub\SoRoSim\Differentiable_SoRoSim\Basic_functions" -I "D:\Research\Soft Robotics Toolbox\SoRoSim GitHub\SoRoSim\Differentiable_SoRoSim\Basic_functions\codegen\mex\compute_dSTdqFC_Z2R\interface" -I "C:\Program Files\MATLAB\R2024a\extern\include" -I "." -DMODEL=compute_dSTdqFC_Z2R_mex -D__USE_MINGW_ANSI_STDIO=1 -msse2 -fno-predictive-commoning 
+
+ldflags =  -m64 -Wl,--no-undefined -shared -static -L"C:\Program Files\MATLAB\R2024a\extern\lib\win64\mingw64" -llibmx -llibmex -llibmat -lm -llibmwlapack -llibmwblas -o "compute_dSTdqFC_Z2R_mex.mexw64" -L"$matlabdir\extern\lib\win64\mingw64" -llibmwblas -llibemlrt -llibcovrt -llibut -llibmwmathutil  compute_dSTdqFC_Z2R_mex.def
+
+linkobjs = 
+
+# Build Rules
+rule cc
+    command = $cc $cflags $in -o $out
+
+rule cxx
+    command = $cxx $cxxflags $in -o $out
+
+rule link
+    command = $linker @$out.rsp $linkobjs $ldflags
+    rspfile = $out.rsp
+    rspfile_content = $in
+
+rule linkxx
+    command = $linkerxx $in $linkobjs $ldflags
+
+# Build
+build $builddir/compute_dSTdqFC_Z2R_data.o : cc $root/compute_dSTdqFC_Z2R_data.c
+build $builddir/rt_nonfinite.o : cc $root/rt_nonfinite.c
+build $builddir/compute_dSTdqFC_Z2R_initialize.o : cc $root/compute_dSTdqFC_Z2R_initialize.c
+build $builddir/compute_dSTdqFC_Z2R_terminate.o : cc $root/compute_dSTdqFC_Z2R_terminate.c
+build $builddir/compute_dSTdqFC_Z2R.o : cc $root/compute_dSTdqFC_Z2R.c
+build $builddir/norm.o : cc $root/norm.c
+build $builddir/mtimes.o : cc $root/mtimes.c
+build $builddir/dinamico_coadjbar.o : cc $root/dinamico_coadjbar.c
+build $builddir/_coder_compute_dSTdqFC_Z2R_api.o : cc $root/interface/_coder_compute_dSTdqFC_Z2R_api.c
+build $builddir/_coder_compute_dSTdqFC_Z2R_mex.o : cc $root/interface/_coder_compute_dSTdqFC_Z2R_mex.c
+build $builddir/compute_dSTdqFC_Z2R_emxutil.o : cc $root/compute_dSTdqFC_Z2R_emxutil.c
+build $builddir/_coder_compute_dSTdqFC_Z2R_info.o : cc $root/interface/_coder_compute_dSTdqFC_Z2R_info.c
+build $builddir/c_mexapi_version.o : cc $matlabdir/extern/version/c_mexapi_version.c
+
+# Link
+build $root\compute_dSTdqFC_Z2R_mex.mexw64 : link $builddir/compute_dSTdqFC_Z2R_data.o $builddir/rt_nonfinite.o $builddir/compute_dSTdqFC_Z2R_initialize.o $builddir/compute_dSTdqFC_Z2R_terminate.o $builddir/compute_dSTdqFC_Z2R.o $builddir/norm.o $builddir/mtimes.o $builddir/dinamico_coadjbar.o $builddir/_coder_compute_dSTdqFC_Z2R_api.o $builddir/_coder_compute_dSTdqFC_Z2R_mex.o $builddir/compute_dSTdqFC_Z2R_emxutil.o $builddir/_coder_compute_dSTdqFC_Z2R_info.o $builddir/c_mexapi_version.o 

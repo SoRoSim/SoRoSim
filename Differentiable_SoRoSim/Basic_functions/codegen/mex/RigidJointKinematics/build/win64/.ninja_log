@@ -1,0 +1,11 @@
+# ninja log v5
+1	46	7793567478319914	build/win64/rt_nonfinite.o	f34614a8ffff27fd
+3	59	7793567478449912	build/win64/RigidJointKinematics_data.o	ddc8826de4134eb4
+12	73	7793567478579908	build/win64/c_mexapi_version.o	3230861b81cfed1d
+5	77	7793567478629911	build/win64/RigidJointKinematics_initialize.o	a373623bb628ed68
+7	79	7793567478649912	build/win64/RigidJointKinematics_terminate.o	c007ede9337a84aa
+15	84	7793567478699912	build/win64/_coder_RigidJointKinematics_info.o	98b8c20a90f006fb
+21	90	7793567478769908	build/win64/_coder_RigidJointKinematics_mex.o	4953e1990942b516
+18	96	7793567478829978	build/win64/_coder_RigidJointKinematics_api.o	90ebf1866dd0bb1
+9	137	7793567479240004	build/win64/RigidJointKinematics.o	c3fff984efd3e025
+138	188	7793567479735098	RigidJointKinematics_mex.mexw64	5773293a5b381867

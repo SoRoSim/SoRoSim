@@ -1,0 +1,12 @@
+LIBRARY compute_dSTdqFC_Z4_mex.mexw64
+EXPORTS
+mexFunction
+mexfilerequiredapiversion
+emlrtMexFcnProperties
+compute_dSTdqFC_Z4
+compute_dSTdqFC_Z4_initialize
+compute_dSTdqFC_Z4_terminate
+compute_dSTdqFC_Z4_atexit
+emxEnsureCapacity_real_T
+emxFree_real_T
+emxInit_real_T

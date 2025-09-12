@@ -1,0 +1,9 @@
+LIBRARY RigidJointKinematics_mex.mexw64
+EXPORTS
+mexFunction
+mexfilerequiredapiversion
+emlrtMexFcnProperties
+RigidJointKinematics
+RigidJointKinematics_initialize
+RigidJointKinematics_terminate
+RigidJointKinematics_atexit

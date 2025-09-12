@@ -278,8 +278,34 @@ if exist('.\CablePoints.mat','file')
     delete('CablePoints.mat')
 end
 
+
+basicDir  = fullfile('Basic_functions');
+
+% Try the MEX once; if it errors, rebuild then retry once.
+try
+    variable_expmap_g_mex(zeros(6,1));
+    fprintf('[startup] .mex files OK.\n');
+    pause(0.3)
+    clc
+catch ME1
+    fprintf('[startup] MEX call failed: %s\n', ME1.message);
+    fprintf('[startup] Running convert2MEX.m...\n');
+    wd = pwd; c = onCleanup(@() cd(wd));
+    try
+        cd(basicDir);
+        run('convert2MEX.m');
+        rehash;  % refresh path
+        variable_expmap_g_mex(zeros(6,1));
+        fprintf('[startup] Rebuild succeeded. MEX OK.\n');
+    catch ME2
+        warning('%s', sprintf('[startup] Rebuild failed or MEX still not working: %s', ME2.message));
+    end
+end
+
 disp('Welcome to SoRoSim Toolbox')
 disp('Type LinkName=SorosimLink to create the links (joint and body)')
 disp('Type LinkageName=SorosimLinkage(LinkName1,LinkName2,...,LinkNameN) to create linkages by combining links')
 disp('For static equilibrium problem type [q,u]=LinkageName.statics')
 disp('For dynamics problem type [t,qqd] = LinkageName.dynamics')
+
+

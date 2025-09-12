@@ -1,0 +1,9 @@
+LIBRARY variable_expmap_gTgTgd_mex.mexw64
+EXPORTS
+mexFunction
+mexfilerequiredapiversion
+emlrtMexFcnProperties
+variable_expmap_gTgTgd
+variable_expmap_gTgTgd_initialize
+variable_expmap_gTgTgd_terminate
+variable_expmap_gTgTgd_atexit
