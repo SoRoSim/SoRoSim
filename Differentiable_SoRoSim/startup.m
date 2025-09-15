@@ -303,6 +303,27 @@ catch ME1
     cd(pwd)
 end
 
+req = struct( ...
+  'name', {'Image Processing Toolbox','Optimization Toolbox','Symbolic Math Toolbox'}, ...
+  'key',  {'Image_Toolbox','Optimization_Toolbox','Symbolic_Toolbox'}, ...
+  'probe',{'imresize','fmincon','sym'});   % representative functions
+
+missing = false(1,numel(req));
+for i = 1:numel(req)
+    hasLic  = license('test', req(i).key);          % license available?
+    hasFunc = exist(req(i).probe, 'file') == 2;     % function on path?
+    missing(i) = ~(hasLic && hasFunc);
+end
+
+if any(missing)
+    fprintf(2,'[startup] Missing required toolboxes:\n');
+    for i = find(missing)
+        fprintf(2,'  - %s\n', req(i).name);
+    end
+    fprintf(2,'[startup] Install via Home > Add-Ons > Get Add-Ons, then rerun startup.m.\n');
+    return
+end
+
 disp('Welcome to SoRoSim Toolbox')
 disp('Type LinkName=SorosimLink to create the links (joint and body)')
 disp('Type LinkageName=SorosimLinkage(LinkName1,LinkName2,...,LinkNameN) to create linkages by combining links')
