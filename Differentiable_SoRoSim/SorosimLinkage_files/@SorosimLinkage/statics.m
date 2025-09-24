@@ -14,6 +14,7 @@ arguments
     staticsOptions.Algorithm = 'trust-region-dogleg';
     staticsOptions.plot = true;
     staticsOptions.save = true;
+    staticsOptions.fsolve_display = 'iter';
 end
 
 %Actuation input
@@ -84,10 +85,10 @@ if isempty(x0)
 end
 
 if staticsOptions.Jacobian
-    options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display','iter','Jacobian','on','MaxFunctionEvaluations',1e7);
+    options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display', staticsOptions.fsolve_display,'Jacobian','on','MaxFunctionEvaluations',1e7);
     Func    = @(x) Equilibrium(Linkage,x,action,staticsOptions); %two pass RNEA algorithm
 else
-    options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display','iter','MaxFunctionEvaluations',1e7); 
+    options = optimoptions('fsolve','Algorithm',staticsOptions.Algorithm,'Display', staticsOptions.fsolve_display,'MaxFunctionEvaluations',1e7); 
     Func    = @(x) EquilibriumResidue(Linkage,x,action,staticsOptions); %write single pass algorithm only computes Residue
 end
 
