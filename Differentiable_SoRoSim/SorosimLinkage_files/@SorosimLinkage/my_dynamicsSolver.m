@@ -561,7 +561,7 @@ function [y, dynamic_matrices] = my_dynamicsSolver(Linkage, t, qqd, action) %x i
     dynamic_matrices.B = B;
     dynamic_matrices.K = K;
     dynamic_matrices.D = D;
-    dynamic_matrices.G = -gravity_vector;
+    dynamic_matrices.G = - gravity_vector;
     dynamic_matrices.C = coriolis_matrix;
 
 end
