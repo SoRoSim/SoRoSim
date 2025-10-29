@@ -1,4 +1,10 @@
 function Phi = Phi_FEMLike(X,Phi_dof,Phi_odr,SubClass)
+arguments
+    X
+    Phi_dof
+    Phi_odr
+    SubClass = 'Linear'
+end
 
 % X varies from 0 to 1
 % Phi_dof tells which deformation modes are enabled
