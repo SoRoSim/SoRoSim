@@ -3,3 +3,8 @@
 # Ignore video files
 *.mp4
 *.avi
+
+
+# Ignore MEX build files
+*.mex*
+/Differentiable_SoRoSim/BasicFunctions/codegen/
