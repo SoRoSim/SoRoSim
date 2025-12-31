@@ -263,7 +263,20 @@ addpath('Custom')
 addpath('SorosimLink_files')
 addpath(genpath('SorosimRod_files'))
 addpath(genpath('SorosimLinkage_files')) %include subfolders
+addpath('SorosimContact_files')
 addpath('noGUI')
+
+% --- locate repo root ---
+thisFile = mfilename('fullpath');
+thisDir  = fileparts(thisFile);    % Differentiable_SoRoSim
+repoRoot = fileparts(thisDir);     % SoRoSim
+
+% --- iDCOL paths ---
+idcolMex  = fullfile(repoRoot,'external','iDCOL','mex');
+idcolCore = fullfile(repoRoot,'external','iDCOL','core');
+
+addpath(idcolMex);
+addpath(idcolCore);
 
 if exist('.\LinkageProgress.mat','file')
     delete('LinkageProgress.mat')

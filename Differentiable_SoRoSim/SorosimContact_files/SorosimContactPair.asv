@@ -1,0 +1,110 @@
+classdef SorosimContactPair < handle
+    properties
+        id (1,1) double = NaN
+
+        body1 SoRoSimContactBody
+        body2 SoRoSimContactBody
+
+        active (1,1) logical = true
+
+        % Scaling
+        L (1,1) double = 1.0
+        invL (1,1) double = 1.0
+
+        % Cached scaled geometry (solver-ready)
+        shape_id1 (1,1) double = 0
+        shape_id2 (1,1) double = 0
+        params1_s double = []
+        params2_s double = []
+        bounds1_s struct = struct()
+        bounds2_s struct = struct()
+
+
+        % Warm start / guess (store whatever your mex/solver expects)
+        guess struct = struct()   % e.g., guess.x, guess.alpha, guess.lam1, guess.lam2
+
+        % Broad-phase state
+        broadphase_active (1,1) logical = true
+
+        % Options
+        scale_mode char = 'maxRout'   % 'maxRout' or 'sumRout'
+    end
+
+    methods
+        function obj = SoRoSimContactPair(body1, body2, id)
+            if nargin >= 1, obj.body1 = body1; end
+            if nargin >= 2, obj.body2 = body2; end
+            if nargin >= 3, obj.id = id; end
+
+            obj.refreshGeometryCache();
+        end
+
+        function refreshGeometryCache(obj)
+            % Pull ids and compute scaled params when geometry or scale changes.
+            obj.shape_id1 = obj.body1.shape_id;
+            obj.shape_id2 = obj.body2.shape_id;
+
+            % make sure bounds exist
+            bounds1 = obj.body1.getBounds();
+            bounds2 = obj.body2.getBounds();
+
+            % choose scale
+            switch obj.scale_mode
+                case 'maxRout'
+                    obj.L = max(bounds1.Rout, bounds2.Rout);
+                case 'sumRout'
+                    obj.L = bounds1.Rout + bounds2.Rout;
+                otherwise
+                    obj.L = max(bounds1.Rout, bounds2.Rout);
+            end
+            if obj.L <= 0, obj.L = 1; end
+            obj.invL = 1/obj.L;
+
+            % scale params
+            obj.params1_s = idcol_scale_params(obj.shape_id1, obj.body1.params, obj.invL);
+            obj.params2_s = idcol_scale_params(obj.shape_id2, obj.body2.params, obj.invL);
+            % scaled bounds
+            obj.bounds1_s = bounds1;
+            obj.bounds2_s = bounds2;
+            
+            if isfield(obj.bounds1_s,'Rout'), obj.bounds1_s.Rout = obj.invL * bounds1.Rout; end
+            if isfield(obj.bounds2_s,'Rout'), obj.bounds2_s.Rout = obj.invL * bounds2.Rout; end
+            if isfield(obj.bounds1_s,'Rin'),  obj.bounds1_s.Rin  = obj.invL * bounds1.Rin;  end
+            if isfield(obj.bounds2_s,'Rin'),  obj.bounds2_s.Rin  = obj.invL * bounds2.Rin;  end
+            %rest of the fields untouched
+
+            obj.guess = struct(); % invalidate warm start 
+        end
+
+        function tf = broadphase(obj, g1, g2)
+            % Very cheap broad-phase using bounding spheres from Rout.
+            % Returns true if worth running iDCOL narrow-phase.
+
+            bounds1 = obj.body1.getBounds();
+            bounds2 = obj.body2.getBounds();
+
+            % centers in world (using g_JC offsets)
+            g1C = g1 * obj.body1.g_JC;
+            g2C = g2 * obj.body2.g_JC;
+
+            c1 = g1C(1:3,4);
+            c2 = g2C(1:3,4);
+
+            d = norm(c2 - c1);
+            tf = (d <= (bounds1.Rout + bounds2.Rout));
+
+            obj.broadphase_active = tf;
+        end
+
+        function g12_s = relativeScaledTransform(obj, g1, g2)
+            % Returns scaled relative transform g_12 in body1 contact frame,
+            % plus translation r_s.
+
+            g1C = g1 * obj.body1.g_JC;
+            g2C = g2 * obj.body2.g_JC;
+            g12_s = ginv(g1C) * g2C; %relative transformation
+            g12_s(1:3,4) = obj.invL * g12(1:3,4); %scaling
+
+        end
+    end
+end
