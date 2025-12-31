@@ -1,0 +1,3 @@
+[submodule "external/iDCOL"]
+	path = external/iDCOL
+	url = https://github.com/SoRoSim/iDCOL.git
