@@ -11,15 +11,8 @@ classdef SorosimContactPair < handle
         % Scaling
         L (1,1) double = 1.0
         invL (1,1) double = 1.0
-
-        % Cached scaled geometry (solver-ready), pass these and g12_s to solver
-        shape_id1 (1,1) double = 0
-        shape_id2 (1,1) double = 0
-        params1_s double = []
-        params2_s double = []
-        bounds1_s struct = struct()
-        bounds2_s struct = struct()
-
+        
+        S struct = struct() % scaled solver data, contains P, bounds1, bounds2 (in scaled space)
 
         % Warm start / guess
         guess struct = struct()         % guess.x, guess.alpha, guess.lambda1, guess.lambda2, empty means "no warm start"
@@ -30,6 +23,11 @@ classdef SorosimContactPair < handle
 
         % Options
         scale_mode char = 'maxRout'   % 'maxRout' or 'sumRout'
+
+        % Solver options (pair-owned)
+        newton_opt struct = struct('L',1,'max_iters',30,'tol',1e-10,'verbose',false);
+        surrogate_opt struct = struct('fS_values',[1 3 5 7]);
+
     end
 
     methods
@@ -42,15 +40,12 @@ classdef SorosimContactPair < handle
         end
 
         function refreshGeometryCache(obj)
-            % Pull ids and compute scaled params when geometry or scale changes.
-            obj.shape_id1 = obj.body1.shape_id;
-            obj.shape_id2 = obj.body2.shape_id;
 
-            % make sure bounds exist
+            % --- real bounds (for scaling + broadphase) ---
             bounds1 = obj.body1.getBounds();
             bounds2 = obj.body2.getBounds();
-
-            % choose scale
+        
+            % --- choose scale ---
             switch obj.scale_mode
                 case 'maxRout'
                     obj.L = max(bounds1.Rout, bounds2.Rout);
@@ -60,25 +55,41 @@ classdef SorosimContactPair < handle
                     obj.L = max(bounds1.Rout, bounds2.Rout);
             end
             if obj.L <= 0, obj.L = 1; end
-            obj.invL = 1/obj.L;
-
-            % scale params
-            obj.params1_s = idcol_scale_params(obj.shape_id1, obj.body1.params, obj.invL);
-            obj.params2_s = idcol_scale_params(obj.shape_id2, obj.body2.params, obj.invL);
-            % scaled bounds
-            obj.bounds1_s = bounds1;
-            obj.bounds2_s = bounds2;
-            
-            if isfield(obj.bounds1_s,'Rout'), obj.bounds1_s.Rout = obj.invL * bounds1.Rout; end
-            if isfield(obj.bounds2_s,'Rout'), obj.bounds2_s.Rout = obj.invL * bounds2.Rout; end
-            if isfield(obj.bounds1_s,'Rin'),  obj.bounds1_s.Rin  = obj.invL * bounds1.Rin;  end
-            if isfield(obj.bounds2_s,'Rin'),  obj.bounds2_s.Rin  = obj.invL * bounds2.Rin;  end
-            %rest of the fields untouched
-
-            obj.guess = struct(); % invalidate warm start
+            obj.invL = 1 / obj.L;
+        
+            % --- scale params ---
+            params1_s = idcol_scale_params(obj.body1.shape_id, obj.body1.params, obj.invL);
+            params2_s = idcol_scale_params(obj.body2.shape_id, obj.body2.params, obj.invL);
+        
+            % --- scale bounds ---
+            bounds1_s = bounds1;
+            bounds2_s = bounds2;
+        
+            if isfield(bounds1_s,'Rout'), bounds1_s.Rout = obj.invL * bounds1.Rout; end
+            if isfield(bounds2_s,'Rout'), bounds2_s.Rout = obj.invL * bounds2.Rout; end
+            if isfield(bounds1_s,'Rin'),  bounds1_s.Rin  = obj.invL * bounds1.Rin;  end
+            if isfield(bounds2_s,'Rin'),  bounds2_s.Rin  = obj.invL * bounds2.Rin;  end
+        
+            % --- assemble cached S ---
+            P = struct();
+            P.g1 = eye(4);
+            P.g2 = eye(4);  % updated per solve
+            P.shape_id1 = obj.body1.shape_id;
+            P.shape_id2 = obj.body2.shape_id;
+            P.params1   = params1_s;
+            P.params2   = params2_s;
+        
+            obj.S = struct();
+            obj.S.P       = P;
+            obj.S.bounds1 = bounds1_s;
+            obj.S.bounds2 = bounds2_s;
+        
+            % --- reset solver state ---
+            obj.guess = struct();
             obj.warmstart = false;
             obj.contact_active = false;
         end
+
 
         function tf = broadphase(obj, g1, g2)
             % Very cheap broad-phase using bounding spheres from Rout.
@@ -116,5 +127,45 @@ classdef SorosimContactPair < handle
             g12_s(1:3,4) = obj.invL * g12_s(1:3,4); %scaling
 
         end
+
+        function [out, success] = solveNarrowPhase(obj, g1, g2)
+
+            success = false;
+            out = [];
+        
+            % --- guards ---
+            if ~obj.enabled
+                return;
+            end
+        
+            if ~obj.broadphase(g1, g2)
+                obj.contact_active = false;
+                return;
+            end
+        
+            % --- relative scaled transform ---
+            obj.S.P.g2 = obj.relativeScaledTransform(g1, g2);
+            
+            if obj.warmstart && ~isempty(fieldnames(obj.guess))
+                guess_value = obj.guess;
+            else
+                guess_value = [];
+            end
+
+            % call solver
+            out = idcol_solve_mex(obj.S, guess_value, obj.newton_opt, obj.surrogate_opt);
+        
+            % --- interpret result ---
+            success = out.converged;
+        
+            if success
+                obj.guess = out.guess;     % or however your mex exposes it
+                obj.warmstart = true;
+                obj.contact_active = (out.alpha < 1);
+            else
+                obj.warmstart = false;
+            end
+        end
+
     end
 end

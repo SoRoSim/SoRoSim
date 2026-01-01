@@ -2,16 +2,17 @@ classdef SorosimContactPair < handle
     properties
         id (1,1) double = NaN
 
-        body1 SoRoSimContactBody
-        body2 SoRoSimContactBody
+        body1 SorosimContactBody
+        body2 SorosimContactBody
 
-        active (1,1) logical = true
+        enabled (1,1) logical = true   % user enable/disable this pair
+        contact_active (1,1) logical = false % make true if narrow-phase says alpha<1
 
         % Scaling
         L (1,1) double = 1.0
         invL (1,1) double = 1.0
 
-        % Cached scaled geometry (solver-ready)
+        % Cached scaled geometry (solver-ready), pass these and g12_s to solver
         shape_id1 (1,1) double = 0
         shape_id2 (1,1) double = 0
         params1_s double = []
@@ -20,8 +21,9 @@ classdef SorosimContactPair < handle
         bounds2_s struct = struct()
 
 
-        % Warm start / guess (store whatever your mex/solver expects)
-        guess struct = struct()   % e.g., guess.x, guess.alpha, guess.lam1, guess.lam2
+        % Warm start / guess
+        guess struct = struct()         % guess.x, guess.alpha, guess.lambda1, guess.lambda2, empty means "no warm start"
+        warmstart (1,1) logical = false % make true when needed
 
         % Broad-phase state
         broadphase_active (1,1) logical = true
@@ -31,7 +33,7 @@ classdef SorosimContactPair < handle
     end
 
     methods
-        function obj = SoRoSimContactPair(body1, body2, id)
+        function obj = SorosimContactPair(body1, body2, id)
             if nargin >= 1, obj.body1 = body1; end
             if nargin >= 2, obj.body2 = body2; end
             if nargin >= 3, obj.id = id; end
@@ -73,12 +75,20 @@ classdef SorosimContactPair < handle
             if isfield(obj.bounds2_s,'Rin'),  obj.bounds2_s.Rin  = obj.invL * bounds2.Rin;  end
             %rest of the fields untouched
 
-            obj.guess = struct(); % invalidate warm start 
+            obj.guess = struct(); % invalidate warm start
+            obj.warmstart = false;
+            obj.contact_active = false;
         end
 
         function tf = broadphase(obj, g1, g2)
             % Very cheap broad-phase using bounding spheres from Rout.
             % Returns true if worth running iDCOL narrow-phase.
+
+            if ~obj.enabled
+                obj.broadphase_active = false;
+                tf = false;
+                return;
+            end
 
             bounds1 = obj.body1.getBounds();
             bounds2 = obj.body2.getBounds();
@@ -103,8 +113,66 @@ classdef SorosimContactPair < handle
             g1C = g1 * obj.body1.g_JC;
             g2C = g2 * obj.body2.g_JC;
             g12_s = ginv(g1C) * g2C; %relative transformation
-            g12_s(1:3,4) = obj.invL * g12(1:3,4); %scaling
+            g12_s(1:3,4) = obj.invL * g12_s(1:3,4); %scaling
 
         end
+
+        function [out, success] = solveNarrowPhase(obj, g1, g2, opt, sopt)
+
+            success = false;
+            out = [];
+        
+            % --- guards ---
+            if ~obj.enabled
+                return;
+            end
+        
+            if ~obj.broadphase(g1, g2)
+                obj.contact_active = false;
+                return;
+            end
+        
+            % --- relative scaled transform ---
+            g12_s = obj.relativeScaledTransform(g1, g2);
+        
+            % --- assemble P ---
+            P = struct();
+            P.g1 = g12_s;
+            P.shape_id1 = obj.shape_id1;
+            P.shape_id2 = obj.shape_id2;
+            P.params1   = obj.params1_s;
+            P.params2   = obj.params2_s;
+        
+            % --- assemble S ---
+            S = struct();
+            S.P       = P;
+            S.bounds1 = obj.bounds1_s;
+            S.bounds2 = obj.bounds2_s;
+        
+            % --- scaling ---
+            opt.L = obj.L;
+        
+            % --- warm start ---
+            if obj.warmstart && ~isempty(obj.guess)
+                guess = obj.guess;
+            else
+                guess = [];
+            end
+        
+            % --- call solver ---
+            out = idcol_solve_mex(S, opt, guess, sopt);
+        
+            % --- interpret result ---
+            success = out.converged;
+        
+            if success
+                obj.guess = out.guess;     % or however your mex exposes it
+                obj.warmstart = true;
+                obj.contact_active = (out.alpha < 1);
+            else
+                obj.warmstart = false;
+            end
+        end
+
     end
 end

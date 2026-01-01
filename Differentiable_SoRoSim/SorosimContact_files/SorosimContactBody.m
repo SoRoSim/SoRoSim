@@ -44,7 +44,7 @@ classdef SorosimContactBody < handle
             if nargin >= 3 && ~isempty(params), obj.params = params(:); end
 
             obj.computeBounds(false);
-            obj.computeMesh([], false);
+            %obj.computeMesh([], false); % no need to precompute
         end
 
         function setGeometry(obj, shape_id, params, recompute_bounds, recompute_mesh)
