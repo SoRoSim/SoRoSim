@@ -76,6 +76,21 @@ classdef SorosimLinkage
         CA               %logical 1 if custom actation is present 0 if not (default value: 0)
         CAI              %logical 1 to apply a custom actuator strength (default value: 0)
 
+        %Contact Properties
+        % ---------- Geometry graph ----------
+        RobotBodies SorosimContactBody          % robot bodies (1xnb)
+        EnvironmentBodies SorosimContactBody % fixed obstacle (planes, bodies) (1xne)
+        Pairs  SorosimContactPair          % robot-robot pairs (1xncp)
+
+        ActivePairs logical = false(0,1)     % length = ncp
+
+        % ---------- Physics knobs ----------
+        mode char = 'penalty'              % 'penalty'|'lcp'|'ncp'
+        restitution (1,1) double = 0.0     % const for now, change later
+        mu (1,1) double = 0.5              % coefficient of friction. const for now, change later
+        penalty struct = struct('k_n',1e4,'d_n',50)  % minimal need for every pair
+        T_BSC %stabilization time constant, keep global for now
+
         %Pre-computed elastic Properties
         K       %Generalized Stiffness matrix
         Damped  %logical 1 if the soft links are elastically damped logical 0 if not (default value is 1)
@@ -105,6 +120,11 @@ classdef SorosimLinkage
         %VideoResolution          %1 for full screen resolution (higher the better)
 
 
+    end
+    properties (Dependent)
+        nb
+        ne
+        ncp
     end
     %%
     properties (Dependent = true) %Properties called from Link Class
@@ -573,6 +593,9 @@ classdef SorosimLinkage
                 Linkage.CAI = false; %custom actuation strength
 
                 save('LinkageProgress.mat','Linkage')
+                %% Contact
+                
+
                 %% Miscellaneous precomputations
                 
                 %Computational point index precomputations for closed chain joints
@@ -716,6 +739,10 @@ classdef SorosimLinkage
         function v = get.CS(S)
             v=[S.VLinks.CS];
         end
+
+        function v = get.nb(S),  v = numel(S.RobotBodies); end
+        function v = get.ne(S),  v = numel(S.EnvironmentBodies); end
+        function v = get.ncp(S), v = numel(S.Pairs); end
 
         %------------------------------------------------------------------
     end %methods
