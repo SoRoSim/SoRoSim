@@ -67,8 +67,21 @@ else
     set(B2.hT,'Matrix',g2);
 end
 
+% ---------- Video recording ----------
+make_video = true;
+vidfile = 'idcol_contact_demo.mp4';   % or .avi
+fps = 30;
+
+if make_video
+    v = VideoWriter(vidfile, 'MPEG-4');   % use 'Motion JPEG AVI' if MPEG-4 not available
+    v.FrameRate = fps;
+    v.Quality = 95;
+    open(v);
+end
 
 
+
+view(0, 0);
 % ---------- Animate B2 and test broadphase ----------
 N = 120;
 for k = 1:N
@@ -83,10 +96,10 @@ for k = 1:N
     end
 
     %tf = P12.broadphase(g1, g2);
-    [~,tf] = P12.solveNarrowPhase(g1, g2);
-
+    P12.solveNarrowPhase(g1, g2);
+    
     % quick visual feedback in title
-    if tf
+    if P12.contact_active
         title(ax, 'broadphase\_active = true');
     else
         title(ax, 'broadphase\_active = false');
@@ -94,5 +107,16 @@ for k = 1:N
 
     % drawnow limitrate
     drawnow;        % FORCE repaint (not limitrate)
+
+     if make_video
+        frame = getframe(gcf);
+        writeVideo(v, frame);
+     end
+
     pause(0.01);    % tiny delay so you can see it
+end
+
+if make_video
+    close(v);
+    fprintf('Saved video: %s\n', fullfile(pwd, vidfile));
 end
