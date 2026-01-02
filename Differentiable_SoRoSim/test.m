@@ -82,7 +82,8 @@ for k = 1:N
         set(B2.hT,'Matrix',g2);
     end
 
-    tf = P12.broadphase(g1, g2);
+    %tf = P12.broadphase(g1, g2);
+    [~,tf] = P12.solveNarrowPhase(g1, g2);
 
     % quick visual feedback in title
     if tf
