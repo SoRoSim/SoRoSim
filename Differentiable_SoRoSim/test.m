@@ -34,7 +34,10 @@ b2 = [1; 1; 1; 1; 5/3; 5/3; 5/3; 5/3];
 params2 = idcol_make_params(shape_id, beta, A2, b2);
 B2 = SorosimContactBody(2, shape_id, params2);
 
-% ---------- Plot ----------
+% ---------- Create pair ----------
+P12 = SorosimContactPair(B1, B2, 1);
+
+%% ---------- Plot ----------
 figure('Color','w');
 ax = axes; hold(ax,'on'); axis(ax,'equal'); grid(ax,'on'); view(3);
 xlabel('x'); ylabel('y'); zlabel('z');
@@ -64,8 +67,7 @@ else
     set(B2.hT,'Matrix',g2);
 end
 
-% ---------- Create pair ----------
-P12 = SorosimContactPair(B1, B2, 1);
+
 
 % ---------- Animate B2 and test broadphase ----------
 N = 120;

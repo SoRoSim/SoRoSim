@@ -25,7 +25,7 @@ classdef SorosimContactBody < handle
         % Pose
         g_JC (4,4) double = eye(4) % fixed offset: joint -> contact geometry frame
 
-        % ---- Mesh cache (no graphics needed) ----
+        % ---- Mesh cache (compute only during plotting, clear after that)----
         meshV double = []   % (Nv x 3) local vertices
         meshF double = []   % (Nf x 3) triangle faces
         mesh_opt struct = struct('ng', 120, 'margin', 0.25) % defaults for idcol_body_mesh
@@ -133,7 +133,7 @@ classdef SorosimContactBody < handle
 
             if force || isempty(obj.mesh_sig) || ~isequal(sig, obj.mesh_sig)
 
-                [V, F] = idcol_body_mesh(obj.shape_id, obj.params, mesh_opt);
+                [V, F] = idcol_body_mesh(obj.shape_id, obj.params, obj.bounds, mesh_opt);
 
                 obj.meshV = V;
                 obj.meshF = F;

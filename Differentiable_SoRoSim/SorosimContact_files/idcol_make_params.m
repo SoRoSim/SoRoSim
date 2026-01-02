@@ -32,20 +32,25 @@ switch sid
         beta = varargin{1};
         A    = varargin{2};
         b    = varargin{3};
-
-        % optional Lscale
-        if numel(varargin) >= 4 && ~isempty(varargin{4})
-            Lscale = varargin{4};
-        else
-            % simple default: scale by typical size of offsets
-            % (works fine; you can override explicitly if you want)
-            Lscale = max(1, max(abs(b(:))));
-        end
-
+    
         A = reshape(A, [], 3);
         b = b(:);
         m = size(A,1);
-
+    
+        % --- normalize halfspaces: make each row of A a unit normal ---
+        rowNorm = sqrt(sum(A.^2, 2));              % m×1
+    
+        A = A ./ rowNorm;                          % each row unit length
+        b = b ./ rowNorm;                          % keep Ax <= b equivalent
+    
+        % --- optional Lscale (after normalization) ---
+        if numel(varargin) >= 4 && ~isempty(varargin{4})
+            Lscale = varargin{4};
+        else
+            % typical magnitude of offsets
+            Lscale = max(1, max(abs(b)));
+        end
+    
         % pack: [beta; m; Lscale; A(:); b]
         params = [beta; m; Lscale; A(:); b];
 
