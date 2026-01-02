@@ -104,7 +104,7 @@ classdef SorosimContactPair < handle
             obj.S.P.g2 = ginv(g1C) * g2C;
 
             
-            if obj.warmstart && ~isempty(fieldnames(obj.guess))
+            if obj.use_warmstart && obj.warmstart && ~isempty(fieldnames(obj.guess))
                 guess_value = obj.guess;
             else
                 guess_value = [];
