@@ -36,7 +36,7 @@ function dxd_dx = ODEJacobian(Linkage,t,x,dynamicAction,GUI_actionInput)
         action = [];
     end
 
-    [y,C,B_action,action] = dynamicsSolver(Linkage,t,[q;qd],action); %solves for x = [qdd_u; u_u; lambda], for a given t, q, qd, and action
+    [y,C,B_action,action,z_star,J_f] = dynamicsSolver(Linkage,t,[q;qd],action); %solves for x = [qdd_u; u_u; lambda], for a given t, q, qd, and action
     qdd = y(1:ndof);
     u   = action;
     lambda = y(ndof+1:end);
@@ -53,7 +53,7 @@ function dxd_dx = ODEJacobian(Linkage,t,x,dynamicAction,GUI_actionInput)
     end
 
     %[dID_dq,dID_dqd,dtau_dq,dtau_dqd,de_dq,de_dqd,daction_dq,daction_dqd] = DAEJacobians_qqd_i1(Linkage,q,qd,qdd,u,lambda)
-    [dID_dq,dID_dqd,dtau_dq,dtau_dqd,de_dq,de_dqd,daction_dq,daction_dqd] = DAEi1Jacobians_qqd(Linkage,t,q,qd,qdd,u,lambda);
+    [dID_dq,dID_dqd,dtau_dq,dtau_dqd,de_dq,de_dqd,daction_dq,daction_dqd] = DAEi1Jacobians_qqd(Linkage,t,q,qd,qdd,u,lambda,z_star,J_f);
   
     dFD_dq = zeros(ndof,ndof);
     dFD_dqd = zeros(ndof,ndof);

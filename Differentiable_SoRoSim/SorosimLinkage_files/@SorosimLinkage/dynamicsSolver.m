@@ -1,7 +1,9 @@
 %Function to compute [qdd_u (unknown); u_u; lambda] for given q,qd,[u_k,qdd_k]
 %Single pass algorithm using D'Alembert-Kane method
 %Last modified by Anup Teejo Mathew 21.01.2024
-function [y,C,B_action,action] = dynamicsSolver(Linkage,t,qqd,action) %x is [qdd_u (unknown); u_u; lambda], action is [u_k,qdd_k]
+function [y,C,B_action,action,z_star,J_f] = dynamicsSolver(Linkage,t,qqd,action) %x is [qdd_u (unknown); u_u; lambda], action is [u_k,qdd_k]
+
+%z_star is solution for each pair (6xncp), J_f is contact Jacobian (6*ncp,6)
 
 ndof = Linkage.ndof;
 N    = Linkage.N;
@@ -304,6 +306,49 @@ for i=1:N
     psi_tip((i-1)*6+1:i*6,:) = psi_here;
 
 end
+
+%% Contact Forces (make generic later)
+z_star = zeros(6,Linkage.ncp);
+J_f    = zeros(6*Linkage.ncp,6);
+
+for icp = 1:Linkage.ncp
+    i_sig = Linkage.Pairs(icp).body1.i_sig;
+    g1 = g((i_sig-1)*4+1:i_sig*4,:);
+    
+    g2 = eye(4);
+
+    out = Linkage.Pairs(icp).solveNarrowPhase(g1, g2);
+
+    if out.alpha < 1
+
+        Linkage.Pairs(icp).contact_active = true;
+        z_star(:,icp) = [out.x; out.alpha; out.lambda1; out.lambda2];
+        J_f(1+6*(icp-1):6*icp,:) = out.J;
+
+        % relative transform (frame2 expressed in frame1)
+        g_12 = Linkage.Pairs(icp).get_relative(g1, g2);
+        r12  = g_12(1:3,4);                    % frame 1
+
+        % penetration proxy (positive)
+        delta = (1/out.alpha - 1) * norm(r12);
+        fn = Linkage.penalty.k_n * delta^Linkage.penalty.e_n;
+
+        % normal from body1 implicit gradient (frame 1)
+        grad = Linkage.Pairs(icp).body1.get_grad(out.x);
+        n = grad / norm(grad);
+
+        % force on body1 in frame 1
+        fc = - fn * n; %(repulsion)
+
+        % wrench about body frame origin (frame 1)
+        Fc = [dinamico_tilde(out.x)*fc; fc];
+
+        % body Jacobian (frame 1)
+        J1 = J((i_sig-1)*6+1:i_sig*6,:);
+        F = F + J1' * Fc;
+    end
+end
+
 
 %% Point Force
 

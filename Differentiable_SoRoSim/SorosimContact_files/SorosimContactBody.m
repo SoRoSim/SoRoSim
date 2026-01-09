@@ -10,6 +10,7 @@ classdef SorosimContactBody < handle
     properties
         % Identity
         id (1,1) double = NaN % body id, different from Link id
+        i_sig (1,1) double = NaN % corresponding significant point
 
         % iDCOL geometry
         shape_id (1,1) double = 0 % 1: sphere, 2: polytope, 3: superellipsoid, 4: superelliptic cylinder, 5: truncated cone
@@ -80,7 +81,11 @@ classdef SorosimContactBody < handle
             sig = SorosimContactBody.makeBoundsSignature(obj.shape_id, obj.params, obj.bounds_opt);
 
             if force || isempty(obj.bounds_sig) || ~isequal(sig, obj.bounds_sig)
-                obj.bounds = radial_bounds_mex(obj.shape_id, obj.params, obj.bounds_opt);
+                if ~(obj.shape_id==2&&obj.params(2)==1) %not a plane
+                    obj.bounds = radial_bounds_mex(obj.shape_id, obj.params, obj.bounds_opt);
+                else
+                    obj.bounds.Rin2 = 0; obj.bounds.Rout2 = 0; obj.bounds.Rin = 0; obj.bounds.Rout = 0; obj.bounds.xin = NaN(3,1); obj.bounds.xout = NaN(3,1); 
+                end
                 obj.bounds_sig = sig;
             end
         end
@@ -128,6 +133,10 @@ classdef SorosimContactBody < handle
             % computeMesh(mesh_opt=obj.mesh_opt, force=false)
             if nargin < 2 || isempty(mesh_opt), mesh_opt = obj.mesh_opt; end
             if nargin < 3, force = false; end
+
+            if (obj.shape_id==2&&obj.params(2)==1) %plane
+                return; 
+            end
 
             sig = SorosimContactBody.makeMeshSignature(obj.shape_id, obj.params, mesh_opt);
 
@@ -192,10 +201,45 @@ classdef SorosimContactBody < handle
             end
         end
 
+        function grad = get_grad(obj, y)
+
+            out = shape_core_mex('local_phi_grad', y, obj.shape_id, obj.params);
+            grad = out.grad;
+
+        end
+
+        function [grad, H] = get_gradH(obj, y)
+
+            out = shape_core_mex('local', y, obj.shape_id, obj.params);
+            grad = out.grad;
+            H = out.H;
+
+        end
+
         function setPose(obj, g_here)
             % setPose(g_here): updates hgtransform pose if it exists
             if ~isempty(obj.hT) && isgraphics(obj.hT)
-                set(obj.hT, 'Matrix', g_here);
+                T = g_here * obj.g_JC;
+
+                % 1) enforce proper homogeneous form
+                T(4,:) = [0 0 0 1];
+                
+                % 2) guard against NaN/Inf
+                if any(~isfinite(T(:)))
+                    return; % or skip update
+                end
+                
+                % 3) re-orthonormalize rotation (kills numerical drift)
+                R = T(1:3,1:3);
+                [U,~,V] = svd(R);
+                R = U*V.';
+                if det(R) < 0
+                    U(:,3) = -U(:,3);
+                    R = U*V.';
+                end
+                T(1:3,1:3) = R;
+                
+                set(obj.hT,'Matrix',T);
             end
         end
 

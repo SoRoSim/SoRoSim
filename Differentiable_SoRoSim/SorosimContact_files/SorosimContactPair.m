@@ -56,6 +56,11 @@ classdef SorosimContactPair < handle
             obj.contact_active = false;
         end
 
+        function g_12 = get_relative(obj, g1, g2)
+            g1C = g1 * obj.body1.g_JC;
+            g2C = g2 * obj.body2.g_JC;
+            g_12 = ginv(g1C)*g2C;
+        end
 
         function tf = broadphase(obj, g1, g2)
             % Very cheap broad-phase using bounding spheres from Rout.
@@ -70,15 +75,11 @@ classdef SorosimContactPair < handle
             bounds1 = obj.body1.bounds;
             bounds2 = obj.body2.bounds;
 
-            % centers in world (using g_JC offsets)
-            g1C = g1 * obj.body1.g_JC;
-            g2C = g2 * obj.body2.g_JC;
+            g_12 = obj.get_relative(g1, g2);
 
-            c1 = g1C(1:3,4);
-            c2 = g2C(1:3,4);
-
-            d = norm(c2 - c1);
-            tf = (d <= (bounds1.Rout + bounds2.Rout));
+            r = g_12(1:3,4);
+            R = bounds1.Rout + bounds2.Rout;
+            tf = (r.'*r <= R*R);
 
             obj.broadphase_active = tf;
         end
@@ -95,14 +96,16 @@ classdef SorosimContactPair < handle
         
             if ~obj.broadphase(g1, g2)
                 obj.contact_active = false;
+                out.x = [NaN NaN NaN];
+                out.alpha = NaN;
+                out.lambda1 = NaN;
+                out.lambda2 = NaN;
+                success = true;
                 return;
             end
         
             % --- relative center to center transform ---
-            g1C = g1 * obj.body1.g_JC;
-            g2C = g2 * obj.body2.g_JC;
-            obj.S.P.g2 = ginv(g1C) * g2C;
-
+            obj.S.P.g2 = obj.get_relative(g1, g2);
             
             if obj.use_warmstart && obj.warmstart && ~isempty(fieldnames(obj.guess))
                 guess_value = obj.guess;

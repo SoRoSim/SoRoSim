@@ -48,7 +48,13 @@ switch sid
             Lscale = varargin{4};
         else
             % typical magnitude of offsets
-            Lscale = max(1, max(abs(b)));
+            max_abs_b = max(abs(b));
+            if max_abs_b==0
+                Lscale = 1;
+            else
+                Lscale = max_abs_b;
+            end
+            
         end
     
         % pack: [beta; m; Lscale; A(:); b]

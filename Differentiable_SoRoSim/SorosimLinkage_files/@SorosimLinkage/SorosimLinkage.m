@@ -82,13 +82,17 @@ classdef SorosimLinkage
         EnvironmentBodies SorosimContactBody % fixed obstacle (planes, bodies) (1xne)
         Pairs  SorosimContactPair          % robot-robot pairs (1xncp)
 
-        ActivePairs logical = false(0,1)     % length = ncp
+        tol_alpha (1,1) double = 1e-4
+        tol_vel   (1,1) double = 1e-4
+
+        ActivePairs logical = false(0,1)     % if alpha is < tol_alpha, length = ncp !!!!!!!!!!!!wont work as sorosimlinkage is not pass by ref
+        ImplusePairs logical = false(0,1)    % if normal velocity is < -tol_vel, length = ncp
 
         % ---------- Physics knobs ----------
         mode char = 'penalty'              % 'penalty'|'lcp'|'ncp'
-        restitution (1,1) double = 0.0     % const for now, change later
+        restitution (1,1) double = 1.0     % const for now, change later
         mu (1,1) double = 0.5              % coefficient of friction. const for now, change later
-        penalty struct = struct('k_n',1e4,'d_n',50)  % minimal need for every pair
+        penalty struct = struct('k_n',1e4, 'e_n',1.5, 'd_n',50)  % minimal need for every pair, f = k*pen^n-d*vel (if normal vel is negative)
         T_BSC %stabilization time constant, keep global for now
 
         %Pre-computed elastic Properties
@@ -594,7 +598,7 @@ classdef SorosimLinkage
 
                 save('LinkageProgress.mat','Linkage')
                 %% Contact
-                
+
 
                 %% Miscellaneous precomputations
                 
