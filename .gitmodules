@@ -1,3 +1,6 @@
 [submodule "external/iDCOL"]
 	path = external/iDCOL
 	url = https://github.com/SoRoSim/iDCOL.git
+[submodule "external/Soft_OptimTraj"]
+	path = external/Soft_OptimTraj
+	url = https://github.com/Elektron97/Soft_OptimTraj
