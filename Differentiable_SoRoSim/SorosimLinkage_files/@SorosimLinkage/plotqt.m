@@ -11,7 +11,7 @@ arguments
     options.video_path = "."
     options.record = true
     % options.video_ext = ".mp4"
-    options.az_el = [];
+    options.view = [];
 end
 
 close all
@@ -65,6 +65,9 @@ hold on
 xlabel('x (m)')
 ylabel('y (m)')
 zlabel('z (m)')
+if ~isempty(options.view)
+    view(options.view)
+end
 
 % Set all text elements to use LaTeX interpreter
 set(get(gca, 'Title'), 'Interpreter', 'latex');
