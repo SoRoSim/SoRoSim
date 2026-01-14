@@ -11,6 +11,7 @@ arguments
     options.video_path = "."
     options.record = true
     % options.video_ext = ".mp4"
+    options.az_el = [];
 end
 
 close all
@@ -312,6 +313,10 @@ for tt=0:1/FrameRate:tmax
         end
         g_tip((i-1)*4+1:i*4,:) = g_here;
 
+    end
+    
+    if ~isempty(options.az_el)
+        view(options.az_el)
     end
     
     drawnow limitrate nocallbacks;
