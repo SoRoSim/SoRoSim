@@ -318,9 +318,9 @@ for tt=0:1/FrameRate:tmax
 
     end
     
-    if ~isempty(options.az_el)
-        view(options.az_el)
-    end
+    % if ~isempty(options.az_el)
+    %     view(options.az_el)
+    % end
     
     drawnow limitrate nocallbacks;
     if options.record
