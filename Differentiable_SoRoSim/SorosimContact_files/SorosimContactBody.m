@@ -160,12 +160,21 @@ classdef SorosimContactBody < handle
             F = obj.meshF;
         end
 
-        function attachHandles(obj, ax, mesh_opt, style)
+        function attachHandles(obj, ax, mesh_opt, style, delete_old)
             % attachHandles(ax, mesh_opt=obj.mesh_opt, style=struct())
-            if nargin < 3 || isempty(mesh_opt), mesh_opt = obj.mesh_opt; end
-            if nargin < 4, style = struct(); end
+             if nargin < 3 || isempty(mesh_opt), mesh_opt = obj.mesh_opt; end
+             if nargin < 4 || isempty(style), style = struct(); end
+             if nargin < 5 || isempty(delete_old), delete_old = true; end
 
             [V, F] = obj.getMesh(mesh_opt);
+
+            if delete_old
+                obj.invalidateGraphicsOnly();   % deletes old handles
+            else
+                % do NOT delete old figure graphics; just detach this object from them
+                obj.hGeom = [];
+                obj.hT = [];
+            end
 
             obj.invalidateGraphicsOnly();
 

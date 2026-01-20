@@ -3,11 +3,10 @@ load("RigidBodies.mat")
 S1.penalty.k_n = 2e5;
 
 dynamicsOptions.dt = 0.01;
-dynamicsOptions.Jacobian = false;
+dynamicsOptions.Jacobian = true;
 dynamicsOptions.displayTime = false; %display time
-dynamicsOptions.plotProgress = false; %to plot robot configuration as simulation progresses
 dynamicsOptions.save_data = false;
-dynamicsOptions.video = false;
+dynamicsOptions.video = true;
 dt = dynamicsOptions.dt;
 tmax = 5;
 

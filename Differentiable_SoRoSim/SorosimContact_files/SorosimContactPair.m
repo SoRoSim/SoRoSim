@@ -137,5 +137,48 @@ classdef SorosimContactPair < handle
 
         end
 
+        function [out, success] = solveContact(obj, g1, g2) %no narrow phase
+
+            success = false;
+            out = [];
+        
+            % --- guards ---
+            if ~obj.enabled
+                return;
+            end
+        
+            % --- relative center to center transform ---
+            obj.S.P.g2 = obj.get_relative(g1, g2);
+            
+            if obj.use_warmstart && obj.warmstart && ~isempty(fieldnames(obj.guess))
+                guess_value = obj.guess;
+            else
+                guess_value = [];
+            end
+
+            % call solver
+            out = idcol_solve_mex(obj.S, guess_value, obj.newton_opt, obj.surrogate_opt);
+        
+            % --- interpret result ---
+            success = out.converged;
+        
+            if success
+                obj.contact_active = (out.alpha <= 1 + obj.alpha_tol);
+                if obj.use_warmstart
+                    obj.guess.x = out.x;
+                    obj.guess.alpha = out.alpha;
+                    obj.guess.lambda1 = out.lambda1;
+                    obj.guess.lambda2 = out.lambda2;
+                    obj.warmstart = true;
+                else
+                    obj.warmstart = false;
+                    obj.guess = struct();
+                end
+            else
+                obj.warmstart = false;
+            end
+
+        end
+
     end
 end
