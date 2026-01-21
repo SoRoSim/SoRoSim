@@ -12,7 +12,7 @@ startup
 
 ## Paper and How to cite
 Find the overview of the toolbox, validation, and examples of problems that can be analyzed using SoRoSim in our IEEE Robotics and Automation Magazine paper, ["SoRoSim: A MATLAB Toolbox for Hybrid Rigid-Soft Robots Based on the Geometric Variable-Strain Approach"](https://doi.org/10.1109/MRA.2022.3202488).
-The Theory behind the toolbox can be found in our IJRR papers ["Reduced order modeling of hybrid soft-rigid robots using global, local, and state-dependent strain parameterization"](https://journals.sagepub.com/doi/10.1177/02783649241262333) and ["Analytical derivatives of strain-based dynamic model for hybrid soft-rigid robots"]([https://journals.sagepub.com/doi/10.1177/02783649241262333](https://journals.sagepub.com/doi/10.1177/02783649251346209)
+The Theory behind the toolbox can be found in our IJRR papers ["Reduced order modeling of hybrid soft-rigid robots using global, local, and state-dependent strain parameterization"](https://journals.sagepub.com/doi/10.1177/02783649241262333) and ["Analytical derivatives of strain-based dynamic model for hybrid soft-rigid robots"](https://journals.sagepub.com/doi/10.1177/02783649251346209)
 
 To cite, please refer to
 ```tex
