@@ -176,8 +176,6 @@ classdef SorosimContactBody < handle
                 obj.hT = [];
             end
 
-            obj.invalidateGraphicsOnly();
-
             obj.hT = hgtransform('Parent', ax);
             obj.hGeom = patch('Parent', obj.hT, 'Faces', F, 'Vertices', V);
 
