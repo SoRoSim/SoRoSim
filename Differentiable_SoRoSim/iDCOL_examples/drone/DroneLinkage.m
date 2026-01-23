@@ -73,19 +73,19 @@ shape_id = 3;
 Rb=1; Rt=1; a=3; b=3;
 params = idcol_make_params(shape_id, beta, Rb, Rt, a, b);
 S1.EnvironmentBodies(6) = SorosimContactBody(6, shape_id, params);
-S1.EnvironmentBodies(6).g_JC = [roty(-90)*rotz(-15) [9.5;-1;0]; I4];
+S1.EnvironmentBodies(6).g_JC = [roty(-90)*rotz(-15) [7;1;0]; I4];
 
 % (7) Cylinder (roty(-90)*rotz(15))
 params = idcol_make_params(shape_id, beta, Rb, Rt, a, b);
 S1.EnvironmentBodies(7) = SorosimContactBody(7, shape_id, params);
-S1.EnvironmentBodies(7).g_JC = [roty(-90)*rotz(15) [9.5;-1;0]; I4];
+S1.EnvironmentBodies(7).g_JC = [roty(-90)*rotz(15) [9;-1;0]; I4];
 
 % (8) Big cube
 shape_id = 2;
 bA = 2*[1 1 1 1 1 1]';
 params = idcol_make_params(shape_id, beta, A_box, bA);
 S1.EnvironmentBodies(8) = SorosimContactBody(8, shape_id, params);
-S1.EnvironmentBodies(8).g_JC = T(eul2rotm([0,0,0]), [12; 0; -1]);
+S1.EnvironmentBodies(8).g_JC = T(eul2rotm([0,0,0]), [13; 0; -1]);
 
 
 %% ------------------------ Pairs: drone vs each environment body ------------------------

@@ -22,7 +22,7 @@ L    = S1.VLinks.L;                      % physical length scale (as used in you
 n_rod_bodies = nip - 2;
 
 %% ----------------------- RobotBodies: frusta along the rod -----------------------
-shape_id_rod = 5;  % frustum/cylinder primitive in your code
+shape_id_rod = 3;  % frustum/cylinder primitive in your code
 S1.RobotBodies = SorosimContactBody.empty(n_rod_bodies,0);
 
 for ii = 2:(nip-1)
@@ -74,7 +74,7 @@ S1.EnvironmentBodies(1) = SorosimContactBody(env_id, shape_id, params);
 S1.EnvironmentBodies(1).g_JC = [eye(3) [0.3; 0; -0.4]; 0 0 0 1];
 
 % (2) Cylinder
-shape_id = 5;
+shape_id = 3;
 Rb = 0.05; Rt = 0.05; a = 0.15; b = 0.15;
 params = idcol_make_params(shape_id, beta, Rb, Rt, a, b);
 

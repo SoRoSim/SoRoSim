@@ -15,7 +15,7 @@ nb = S1.N;  % number of robot bodies you define below
 S1.RobotBodies = SorosimContactBody.empty(nb,0);
 
 % 1) Cone (frustum with Rt ~ 0)
-shape_id = 5;
+shape_id = 3;
 Rb = 1; Rt = 1e-3; a = 0.5; b = 1.5;
 params = idcol_make_params(shape_id, beta, Rb, Rt, a, b);
 S1.RobotBodies(1) = SorosimContactBody(1, shape_id, params);
@@ -38,21 +38,21 @@ S1.RobotBodies(3) = SorosimContactBody(3, shape_id, params);
 S1.RobotBodies(3).i_sig = 6;
 
 % 4) Cylinder (special case of frustum)
-shape_id = 5;
+shape_id = 3;
 Rb = 0.15; Rt = 0.15; a = 1.5; b = 1.5;
 params = idcol_make_params(shape_id, beta, Rb, Rt, a, b);
 S1.RobotBodies(4) = SorosimContactBody(4, shape_id, params);
 S1.RobotBodies(4).i_sig = 8;
 
 % 5) Ellipsoid
-shape_id = 3;
+shape_id = 4;
 a = 1.5; b = 1; c = 0.5; n = 1;
 params = idcol_make_params(shape_id, n, a, b, c);
 S1.RobotBodies(5) = SorosimContactBody(5, shape_id, params);
 S1.RobotBodies(5).i_sig = 10;
 
 % 6) Frustum
-shape_id = 5;
+shape_id = 3;
 Rb = 1; Rt = 0.5; a = 0.7857; b = 2-0.7857;
 params = idcol_make_params(shape_id, beta, Rb, Rt, a, b);
 S1.RobotBodies(6) = SorosimContactBody(6, shape_id, params);
@@ -84,6 +84,7 @@ bA = [ 1.5; 1.5; 1.5; 1.5; 0.5 ];
 params = idcol_make_params(shape_id, beta, A, bA);
 S1.RobotBodies(8) = SorosimContactBody(8, shape_id, params);
 S1.RobotBodies(8).i_sig = 16;
+S1.RobotBodies(8).mesh_opt.margin=0.75;
 
 % 9) Sphere
 shape_id = 1;

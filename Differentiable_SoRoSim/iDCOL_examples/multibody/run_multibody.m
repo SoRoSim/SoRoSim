@@ -80,7 +80,7 @@ if opts.video
 end
 
 if opts.save_data
-    save('Multibody_rollout.mat', 't', 'qqd');
+    save('MultibodyDynamics.mat', 't', 'qqd');
 end
 
 %% ========================= Helper functions =========================
