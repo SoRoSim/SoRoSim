@@ -38,8 +38,7 @@ classdef SorosimContactPair < handle
             % --- assemble cached S ---
 
             P = struct();
-            P.g1 = eye(4);
-            P.g2 = eye(4);  % updated per solve
+            P.g = eye(4);  % updated per solve
             P.shape_id1 = obj.body1.shape_id;
             P.shape_id2 = obj.body2.shape_id;
             P.params1   = obj.body1.params;
@@ -105,7 +104,7 @@ classdef SorosimContactPair < handle
             end
         
             % --- relative center to center transform ---
-            obj.S.P.g2 = obj.get_relative(g1, g2);
+            obj.S.P.g = obj.get_relative(g1, g2);
             
             if obj.use_warmstart && obj.warmstart && ~isempty(fieldnames(obj.guess))
                 guess_value = obj.guess;
@@ -148,7 +147,7 @@ classdef SorosimContactPair < handle
             end
         
             % --- relative center to center transform ---
-            obj.S.P.g2 = obj.get_relative(g1, g2);
+            obj.S.P.g = obj.get_relative(g1, g2);
             
             if obj.use_warmstart && obj.warmstart && ~isempty(fieldnames(obj.guess))
                 guess_value = obj.guess;

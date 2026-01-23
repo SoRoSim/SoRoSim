@@ -16,7 +16,7 @@ beta = 20;
 
 % Drone body (ellipsoid)
 n = 1;
-shape_id = 3;
+shape_id = 4;
 a = 0.15; b = 0.15; c = 0.05;
 
 %% ------------------------ RobotBodies (1 body) ------------------------
@@ -36,8 +36,8 @@ T  = @(R,p) [R p(:); I4];
 A_box = [ eye(3); -eye(3) ];
 
 % (1) Cylinder (long)
-shape_id = 5;
-Rb=1; Rt=1; a=3; b=3;
+shape_id = 3;
+Rb=0.75; Rt=0.75; a=3; b=3;
 params = idcol_make_params(shape_id, beta, Rb, Rt, a, b);
 S1.EnvironmentBodies(1) = SorosimContactBody(1, shape_id, params);
 S1.EnvironmentBodies(1).g_JC = T(eul2rotm([0, pi/2, 0]), [1.25; 0; 0]);
@@ -61,7 +61,7 @@ S1.EnvironmentBodies(4) = SorosimContactBody(4, shape_id, params);
 S1.EnvironmentBodies(4).g_JC = T(eul2rotm([0,0,0]), [3; 0; 0]);
 
 % (5) Frustum
-shape_id = 5;
+shape_id = 3;
 Rb=0.5; Rt=1; a=1; b=4;
 params = idcol_make_params(shape_id, beta, Rb, Rt, a, b);
 S1.EnvironmentBodies(5) = SorosimContactBody(5, shape_id, params);
@@ -69,7 +69,7 @@ S1.EnvironmentBodies(5).g_JC = T(eul2rotm([0, -pi/2, 0]), [5.0; 0; -2]);
 S1.EnvironmentBodies(5).mesh_opt.margin = 2;
 
 % (6) Cylinder (roty(-90)*rotz(-15))
-shape_id = 5;
+shape_id = 3;
 Rb=1; Rt=1; a=3; b=3;
 params = idcol_make_params(shape_id, beta, Rb, Rt, a, b);
 S1.EnvironmentBodies(6) = SorosimContactBody(6, shape_id, params);
