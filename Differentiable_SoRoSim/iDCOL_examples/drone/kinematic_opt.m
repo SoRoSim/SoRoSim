@@ -117,7 +117,7 @@ P_opt = P;
 save('OptimalPath.mat','P_rrt','P_opt');   % use MAT, not M, unless you truly need an .m script
 
 %% plot video
-plotvideo = true;
+plotvideo = false;
 if plotvideo
     plotqt_drone(Linkage, P, 10, 'traj.mp4'); %10 is frame rate
 end

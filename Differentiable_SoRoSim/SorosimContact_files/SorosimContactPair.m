@@ -96,7 +96,7 @@ classdef SorosimContactPair < handle
             if ~obj.broadphase(g1, g2)
                 obj.contact_active = false;
                 out.x = [NaN NaN NaN];
-                out.alpha = NaN;
+                out.alpha = 1e6;
                 out.lambda1 = NaN;
                 out.lambda2 = NaN;
                 success = true;
