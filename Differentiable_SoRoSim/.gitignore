@@ -3,5 +3,3 @@
 # Ignore video files
 *.mp4
 *.avi
-# Ignore Precomputation
-*.mexw64
