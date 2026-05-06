@@ -13,7 +13,7 @@ arguments
     % options.video_ext = ".mp4"
 end
 
-close all
+% close all
 
 % Video Settings
 video_ext = ".mp4";
@@ -41,7 +41,8 @@ end
 
 %Plot options
 
-fh=figure(1);
+% fh=figure(1);
+fh=figure;
 fh.Units='normalized';
 FigScale = PlotParameters.VideoResolution;
 FigScale(FigScale<0.1)=0.5;
