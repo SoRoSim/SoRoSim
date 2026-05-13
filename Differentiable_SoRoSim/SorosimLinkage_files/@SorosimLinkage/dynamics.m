@@ -54,7 +54,7 @@ else
     
     if Linkage.Actuated
         n_k = Linkage.ActuationPrecompute.n_k;
-        [action,q_k,qd_k] = dynamicAction(t_start);
+        [action,q_k,qd_k] = dynamicAction(t_start,x0);
         if ~(length(q_k)==n_k&&length(qd_k)==n_k&&length(action)==Linkage.nact)
             error('Output dimension mismatch for dynamicActionInput(t_start)');
         end
@@ -114,7 +114,7 @@ if Linkage.Actuated
             q0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact))  = dynamicAction{ia}{1}(t_start);
             qd0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact)) = dynamicAction{ia}{2}(t_start);
         else
-            [~,q_k0,qd_k0] = dynamicAction(0);
+            [~,q_k0,qd_k0] = dynamicAction(0,x0);
             q0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact))  = q_k0(ia-Linkage.nact+n_k);
             qd0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact)) = qd_k0(ia-Linkage.nact+n_k);
         end
