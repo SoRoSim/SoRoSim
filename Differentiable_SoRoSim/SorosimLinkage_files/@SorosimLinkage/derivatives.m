@@ -38,7 +38,7 @@ function qdqdd = derivatives(Linkage,t,qqd,dynamicAction,GUI_actionInput,dynamic
             end
 
         else %if action input is from a file
-            [action,q_k,qd_k] = dynamicAction(t);
+            [action,q_k,qd_k] = dynamicAction(t,qqd);
         end
 
         q(Linkage.ActuationPrecompute.index_q_k)  = q_k;

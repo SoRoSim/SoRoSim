@@ -27,7 +27,7 @@ function dxd_dx = ODEJacobian(Linkage,t,x,dynamicAction,GUI_actionInput)
             end
 
         else %if action input is from a file
-            [action,q_k,qd_k] = dynamicAction(t);
+            [action,q_k,qd_k] = dynamicAction(t,x);
         end
 
         q(Linkage.ActuationPrecompute.index_q_k)  = q_k;

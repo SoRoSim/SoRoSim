@@ -54,7 +54,8 @@ else
     
     if Linkage.Actuated
         n_k = Linkage.ActuationPrecompute.n_k;
-        [action,q_k,qd_k] = dynamicAction(t_start,x0);
+        x_dummy = zeros(Linkage.ndof*2,1);
+        [action,q_k,qd_k] = dynamicAction(t_start,x_dummy);
         if ~(length(q_k)==n_k&&length(qd_k)==n_k&&length(action)==Linkage.nact)
             error('Output dimension mismatch for dynamicActionInput(t_start)');
         end
@@ -108,13 +109,13 @@ if Linkage.Actuated
 
     q0  = q0_pass;
     qd0 = qd0_pass;
-
+    q0(Linkage.ActuationPrecompute.index_q_k) = [0; -pi/3; 2*pi/3; -5*pi/6; -pi/2; 0]; %% this is hack fix later
     for ia=Linkage.nact-n_k+1:Linkage.nact
         if GUI_actionInput
             q0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact))  = dynamicAction{ia}{1}(t_start);
             qd0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact)) = dynamicAction{ia}{2}(t_start);
         else
-            [~,q_k0,qd_k0] = dynamicAction(0,x0);
+            [~,q_k0,qd_k0] = dynamicAction(0,[q0;qd0]);
             q0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact))  = q_k0(ia-Linkage.nact+n_k);
             qd0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact)) = qd_k0(ia-Linkage.nact+n_k);
         end
