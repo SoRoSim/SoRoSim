@@ -1,14 +1,14 @@
 %Function to compute [qdd_u (unknown); u_u; lambda] for given q,qd,[u_k,qdd_k]
 %Single pass algorithm using D'Alembert-Kane method
 %Last modified by Anup Teejo Mathew 21.01.2024
-function [y,C,B_action,action] = dynamicsSolver(Linkage,t,qqd,action) %x is [qdd_u (unknown); u_u; lambda], action is [u_k,qdd_k]
+function [y,C,B_action,action] = dynamicsSolver(Linkage,t,qqd,action,qdes, qdesd, qdesdd) %x is [qdd_u (unknown); u_u; lambda], action is [u_k,qdd_k]
 
 ndof = Linkage.ndof;
 N    = Linkage.N;
 nsig = Linkage.nsig;
 
 if Linkage.CAI
-    action = CustomActuatorInput(Linkage,qqd,t); %x is qqd here
+    action = CustomActuatorInput(Linkage,qqd,t); 
 end
 
 q  = qqd(1:Linkage.ndof);
@@ -493,8 +493,9 @@ end
 %% Custom Soft Actuation
 
 if Linkage.CA
-    Fact = CustomActuation(Linkage,q,g,J,t,qd,Jd);
-    tauC = CustomActuation_Qspace(Linkage,Fact,dFact_dq);
+    tauC = Torque_compute(Linkage, t, M, F, q, qd, qdes, qdesd, qdesdd);
+    % Fact = CustomActuation(Linkage,q,g,J,t,qd,Jd);
+    % tauC = CustomActuation_Qspace(Linkage,Fact,dFact_dq);
     tau = tau+tauC;
 end
 
