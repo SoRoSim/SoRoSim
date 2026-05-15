@@ -109,7 +109,6 @@ if Linkage.Actuated
 
     q0  = q0_pass;
     qd0 = qd0_pass;
-    q0(Linkage.ActuationPrecompute.index_q_k) = [0; -pi/3; 2*pi/3; -5*pi/6; -pi/2; 0]; %% this is hack fix later
     for ia=Linkage.nact-n_k+1:Linkage.nact
         if GUI_actionInput
             q0(Linkage.ActuationPrecompute.index_q_k(ia+n_k-Linkage.nact))  = dynamicAction{ia}{1}(t_start);
