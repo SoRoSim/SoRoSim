@@ -8,7 +8,6 @@ function [y, dynamic_matrices] = my_dynamicsSolver(Linkage, t, qqd, action) %x i
         qqd
         action
     end
-
     ndof = Linkage.ndof;
     N    = Linkage.N;
     nsig = Linkage.nsig;
@@ -478,11 +477,31 @@ function [y, dynamic_matrices] = my_dynamicsSolver(Linkage, t, qqd, action) %x i
         %cable actuation %combine with FwdKinematics
         if Linkage.n_sact>0
             dof_start = 1;
+            
+            % Setup friction tracking if requested via Linkage properties
+            use_friction = isprop(Linkage, 'use_friction') && Linkage.use_friction;
+            if use_friction
+                mu = Linkage.mu;
+                phi_sum = zeros(Linkage.n_sact, 1);
+                f_prev  = cell(Linkage.n_sact, 1);
+                r_prev  = cell(Linkage.n_sact, 1);
+                R_prev  = cell(Linkage.n_sact, 1);
+                d_prev  = cell(Linkage.n_sact, 1);
+            end
+            
+            i_sig = 1; % Global tracking for precomputed g matrix
+            
             for i = 1:N
                 dof_here = Linkage.CVRods{i}(1).dof;
                 if ~Linkage.OneBasis
                     dof_start=dof_start+dof_here;
                 end
+                
+                i_sig = i_sig + 1; % Skip Joint DoF frame in g
+                if Linkage.VLinks(Linkage.LinkIndex(i)).linktype == 'r'
+                    i_sig = i_sig + 1; % Skip rigid link CM frame in g
+                end
+                
                 for j=1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1
                     na_here = length(Linkage.i_sact{i}{j});
                     dof_here = Linkage.CVRods{i}(j+1).dof;
@@ -490,11 +509,25 @@ function [y, dynamic_matrices] = my_dynamicsSolver(Linkage, t, qqd, action) %x i
                     if ~Linkage.OneBasis
                         dof_start=dof_start+dof_here;
                     end
-                    if na_here>0
-                        Ws = Linkage.CVRods{i}(j+1).Ws;
-                        B_here = zeros(dof_here,na_here);
-                        for ii=1:nip
-                            if Ws(ii)>0
+                    
+                    Ws = Linkage.CVRods{i}(j+1).Ws;
+                    nip = Linkage.CVRods{i}(j+1).nip;
+                    B_here = zeros(dof_here,na_here);
+                    
+                    % Must iterate all points to keep i_sig synced with g matrix
+                    for ii=1:nip
+                        if Ws(ii)>0
+                            
+                            % 1. Extract current global pose if friction is used
+                            % using the ALREADY COMPUTED g matrix from the first loop
+                            if use_friction && mu > 0
+                                current_g = g((i_sig-1)*4 + 1 : i_sig*4, :);
+                                r_curr = current_g(1:3, 4);
+                                R_curr = current_g(1:3, 1:3);
+                            end
+                            
+                            % 2. Only compute mechanics if there are actuators
+                            if na_here>0
                                 Phi = Linkage.CVRods{i}(j+1).Phi((ii-1)*6+1:ii*6,:);
                                 xi  = Phi*q(dofs_here)+Linkage.CVRods{i}(j+1).xi_star((ii-1)*6+1:ii*6,1);
                                 Phi_a = zeros(6,na_here);
@@ -503,12 +536,45 @@ function [y, dynamic_matrices] = my_dynamicsSolver(Linkage, t, qqd, action) %x i
                                 for ia =Linkage.i_sact{i}{j}
                                     dc = Linkage.dc{ia,i}{j}(:,ii);
                                     dcp = Linkage.dcp{ia,i}{j}(:,ii);
-                                    Phi_a(:,ia_here) = SoftActuator_FD(dc,dcp,xihat_123);
+                                    
+                                    Phi_a_col = SoftActuator_FD(dc,dcp,xihat_123);
+                                    
+                                    friction_weight = 1.0;
+                                    
+                                    if use_friction && mu > 0
+                                        if isempty(r_prev{ia})
+                                            r_prev{ia} = r_curr;
+                                            R_prev{ia} = R_curr;
+                                            d_prev{ia} = dc;
+                                        else
+                                            p_curr = (r_curr - r_prev{ia}) + (R_curr * dc) - (R_prev{ia} * d_prev{ia});
+                                            p_norm = norm(p_curr);
+                                            
+                                            if p_norm > 1e-12
+                                                f_curr = p_curr / p_norm;
+                                                if ~isempty(f_prev{ia})
+                                                    cos_phi = max(min(f_prev{ia}' * f_curr, 1), -1);
+                                                    phi_l = acos(cos_phi);
+                                                    phi_sum(ia) = phi_sum(ia) + phi_l;
+                                                end
+                                                f_prev{ia} = f_curr;
+                                            end
+                                            r_prev{ia} = r_curr;
+                                            R_prev{ia} = R_curr;
+                                            d_prev{ia} = dc;
+                                        end
+                                        friction_weight = exp(-mu * phi_sum(ia));
+                                    end
+                                    
+                                    Phi_a(:,ia_here) = Phi_a_col * friction_weight;
                                     ia_here = ia_here+1;
                                 end
                                 B_here = B_here+Ws(ii)*Phi'*Phi_a;
                             end
                         end
+                        i_sig = i_sig + 1; % Increment integration point tracker
+                    end
+                    if na_here>0
                         B(dofs_here,n_jact+Linkage.i_sact{i}{j}) = B_here;
                     end
                 end
@@ -563,5 +629,4 @@ function [y, dynamic_matrices] = my_dynamicsSolver(Linkage, t, qqd, action) %x i
     dynamic_matrices.D = D;
     dynamic_matrices.G = - gravity_vector;
     dynamic_matrices.C = coriolis_matrix;
-
 end

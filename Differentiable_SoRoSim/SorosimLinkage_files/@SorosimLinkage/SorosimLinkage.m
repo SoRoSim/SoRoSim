@@ -104,6 +104,9 @@ classdef SorosimLinkage
         %CameraRotationSpeed      %For a cinematic rotation of the scene (default 0)
         %VideoResolution          %1 for full screen resolution (higher the better)
 
+        % --- Friction Properties ---
+        use_friction = false;
+        mu = 0.0;
 
     end
     %%

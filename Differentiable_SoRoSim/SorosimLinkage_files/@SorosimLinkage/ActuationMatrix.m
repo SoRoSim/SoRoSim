@@ -1,11 +1,9 @@
 %Function that calculates the generalized actuation matrix (Bq)
 %Inspired by dynamicsSolver and updated to match SorosimLinkage properties
 function Bq = ActuationMatrix(Linkage,q)
-
     if isrow(q)
         q = q';
     end
-
     if Linkage.Actuated
         
         J    = Linkage.Jacobian(q);
@@ -57,12 +55,30 @@ function Bq = ActuationMatrix(Linkage,q)
         %% 2. Soft/Cable Actuation
         if Linkage.n_sact > 0
             dof_start = 1;
+            
+            % Setup friction tracking if requested via Linkage properties
+            use_friction = isprop(Linkage, 'use_friction') && Linkage.use_friction;
+            if use_friction
+                mu = Linkage.mu;
+                gs = Linkage.FwdKinematics(q); % Fetch global poses
+                
+                phi_sum = zeros(Linkage.n_sact, 1);
+                f_prev  = cell(Linkage.n_sact, 1);
+                r_prev  = cell(Linkage.n_sact, 1);
+                R_prev  = cell(Linkage.n_sact, 1);
+                d_prev  = cell(Linkage.n_sact, 1);
+            end
+            
+            i_sig = 1; % Global integration point tracker for gs matrix
+            
             for i = 1:Linkage.N
                 
                 dof_here = Linkage.CVRods{i}(1).dof;
                 if ~Linkage.OneBasis
                     dof_start = dof_start + dof_here;
                 end
+                
+                i_sig = i_sig + 1; % Skip Joint DoF frame in gs
                 
                 for j = 1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1
                     na_here   = length(Linkage.i_sact{i}{j});
@@ -73,13 +89,24 @@ function Bq = ActuationMatrix(Linkage,q)
                         dof_start = dof_start + dof_here;
                     end
                     
-                    if na_here > 0
-                        Ws  = Linkage.CVRods{i}(j+1).Ws;
-                        nip = Linkage.CVRods{i}(j+1).nip; % Defining nip locally!
-                        B_here = zeros(dof_here, na_here);
-                        
-                        for ii = 1:nip
-                            if Ws(ii) > 0
+                    Ws  = Linkage.CVRods{i}(j+1).Ws;
+                    nip = Linkage.CVRods{i}(j+1).nip; % Defining nip locally!
+                    B_here = zeros(dof_here, na_here);
+                    
+                    % We MUST iterate through all nip points to keep i_sig synced 
+                    % with the FwdKinematics gs matrix, even if na_here == 0.
+                    for ii = 1:nip
+                        if Ws(ii) > 0
+                            
+                            % 1. Extract current global pose if friction is used
+                            if use_friction && mu > 0
+                                current_g = gs((i_sig-1)*4 + 1 : i_sig*4, :);
+                                r_curr = current_g(1:3, 4);
+                                R_curr = current_g(1:3, 1:3);
+                            end
+                            
+                            % 2. Only compute mechanics if there are actuators
+                            if na_here > 0
                                 Phi = Linkage.CVRods{i}(j+1).Phi((ii-1)*6+1:ii*6,:);
                                 xi  = Phi*q(dofs_here) + Linkage.CVRods{i}(j+1).xi_star((ii-1)*6+1:ii*6,1);
                                 
@@ -90,13 +117,61 @@ function Bq = ActuationMatrix(Linkage,q)
                                 for ia = Linkage.i_sact{i}{j}
                                     dc  = Linkage.dc{ia,i}{j}(:,ii);
                                     dcp = Linkage.dcp{ia,i}{j}(:,ii);
-                                    Phi_a(:,ia_here) = SoftActuator_FD(dc, dcp, xihat_123);
+                                    
+                                    % Base spatial actuation matrix column
+                                    Phi_a_col = SoftActuator_FD(dc, dcp, xihat_123);
+                                    
+                                    % Friction Calculation (Model 2: Configuration-Dependent)
+                                    friction_weight = 1.0;
+                                    
+                                    if use_friction && mu > 0
+                                        if isempty(r_prev{ia})
+                                            % First point initialization
+                                            r_prev{ia} = r_curr;
+                                            R_prev{ia} = R_curr;
+                                            d_prev{ia} = dc;
+                                        else
+                                            % Compute cable force direction vector (p)
+                                            p_curr = (r_curr - r_prev{ia}) + (R_curr * dc) - (R_prev{ia} * d_prev{ia});
+                                            p_norm = norm(p_curr);
+                                            
+                                            if p_norm > 1e-12
+                                                % Normalize to get direction (f)
+                                                f_curr = p_curr / p_norm;
+                                                
+                                                if ~isempty(f_prev{ia})
+                                                    % Compute angle between consecutive directions
+                                                    cos_phi = max(min(f_prev{ia}' * f_curr, 1), -1); % Clamp to prevent acos(NaN)
+                                                    phi_l = acos(cos_phi);
+                                                    phi_sum(ia) = phi_sum(ia) + phi_l;
+                                                end
+                                                f_prev{ia} = f_curr;
+                                            end
+                                            
+                                            % Update trackers for the next Gauss point
+                                            r_prev{ia} = r_curr;
+                                            R_prev{ia} = R_curr;
+                                            d_prev{ia} = dc;
+                                        end
+                                        
+                                        % Apply exponential decay based on cumulative angle
+                                        friction_weight = exp(-mu * phi_sum(ia));
+                                    end
+                                    
+                                    % Apply friction weight to spatial actuation column
+                                    Phi_a(:,ia_here) = Phi_a_col * friction_weight;
                                     ia_here = ia_here + 1;
                                 end
                                 B_here = B_here + Ws(ii) * Phi' * Phi_a;
                             end
+                            
+                            % 3. Increment global integration point tracker
+                            i_sig = i_sig + 1; 
                         end
-                        % Map B_here into the full Bq matrix using n_jact offset
+                    end
+                    
+                    % Map B_here into the full Bq matrix using n_jact offset
+                    if na_here > 0
                         Bq(dofs_here, n_jact + Linkage.i_sact{i}{j}) = B_here;
                     end
                 end
