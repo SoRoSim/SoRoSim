@@ -8,7 +8,6 @@ function [y, dynamic_matrices] = my_dynamicsSolver(Linkage, t, qqd, action) %x i
         qqd
         action
     end
-
     ndof = Linkage.ndof;
     N    = Linkage.N;
     nsig = Linkage.nsig;
@@ -135,8 +134,8 @@ function [y, dynamic_matrices] = my_dynamicsSolver(Linkage, t, qqd, action) %x i
             M = M+Qtemp*J_here;
             F = F-Qtemp*psi_here-J_here'*dinamico_coadj(eta_here)*M_here*eta_here; %Centripetal and Coriolis
     
-            % Redundant Computation
-            coriolis_matrix = coriolis_matrix + Qtemp*psi_here + J_here'*dinamico_coadj(eta_here)*M_here*eta_here;
+            % CORRECTED: Analytical Coriolis Matrix (Rigid Link)
+            coriolis_matrix = coriolis_matrix + Qtemp*Jd_here + J_here'*dinamico_coadj(eta_here)*M_here*J_here;
             
             % bringing all quantities to the end of rigid link
             gf        = Linkage.VLinks(Linkage.LinkIndex(i)).gf;
@@ -199,8 +198,8 @@ function [y, dynamic_matrices] = my_dynamicsSolver(Linkage, t, qqd, action) %x i
                 M = M+Qtemp*J_here;
                 F = F-Qtemp*psi_here-J_here'*dinamico_coadj(eta_here)*M_here*eta_here; %Centripetal and Coriolis
     
-                % Redundant Computation
-                coriolis_matrix = coriolis_matrix + Qtemp*psi_here + J_here'*dinamico_coadj(eta_here)*M_here*eta_here;
+                % CORRECTED: Analytical Coriolis Matrix (Soft Link Base)
+                coriolis_matrix = coriolis_matrix + Qtemp*Jd_here + J_here'*dinamico_coadj(eta_here)*M_here*J_here;
             end
             i_sig    = i_sig+1;
     
@@ -302,8 +301,8 @@ function [y, dynamic_matrices] = my_dynamicsSolver(Linkage, t, qqd, action) %x i
                     M = M+Qtemp*J_here;
                     F = F-Qtemp*psi_here-J_here'*dinamico_coadj(eta_here)*M_here*eta_here; %Centripetal and Coriolis
     
-                    % Redundant Computation
-                    coriolis_matrix = coriolis_matrix + Qtemp*psi_here + J_here'*dinamico_coadj(eta_here)*M_here*eta_here;
+                    % CORRECTED: Analytical Coriolis Matrix (Soft Link Integration Loop)
+                    coriolis_matrix = coriolis_matrix + Qtemp*Jd_here + J_here'*dinamico_coadj(eta_here)*M_here*J_here;
                 end
                 i_sig    = i_sig+1;
     
@@ -563,5 +562,4 @@ function [y, dynamic_matrices] = my_dynamicsSolver(Linkage, t, qqd, action) %x i
     dynamic_matrices.D = D;
     dynamic_matrices.G = - gravity_vector;
     dynamic_matrices.C = coriolis_matrix;
-
 end
