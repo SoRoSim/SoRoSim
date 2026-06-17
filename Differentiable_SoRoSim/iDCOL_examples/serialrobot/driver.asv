@@ -1,0 +1,712 @@
+%% ===== Setup =====
+clc; clear; close all;
+robot = loadrobot("universalUR10");
+robot.DataFormat = 'column';
+load("UR_10_linkage.mat");
+
+%% ===== Build robot collision bodies =====
+robotbodies = SorosimContactBody.empty(0,0);
+counter = 1;
+
+opts_multi = vhacdOptions("IndividualMesh","MaxNumConvexHulls",3, ...
+    "MaxNumVerticesPerHull",30,"VoxelResolution",128000);
+[robotbodies, counter] = addRobotBodies(robot, 4:5, opts_multi, robotbodies, counter, false);
+
+opts_single = vhacdOptions("IndividualMesh","MaxNumConvexHulls",1, ...
+    "MaxNumVerticesPerHull",30,"VoxelResolution",128000);
+[robotbodies, counter] = addRobotBodies(robot, 6, opts_single, robotbodies, counter, false);
+[robotbodies, ~]       = addCombinedRobotBody(robot, 7:8, 7, opts_single, robotbodies, counter);
+
+close all
+%% ===== Build environment =====
+EnvironmentBodies = buildSimpleEnvironment();
+
+%% ===== Endpoint poses (IK from seeds) =====
+q_start_seed = [ 0.4 -0.4 0.3 0 0 0]';
+q_end_seed   = [-0.6 -0.3 0.3 0 0 0]';
+
+ik = inverseKinematics('RigidBodyTree', robot, 'SolverAlgorithm','BFGSGradientProjection');
+weights = [1 1 1 1 1 1];
+
+g_init  = getTransform(robot, q_start_seed, "ee_link");
+g_final = getTransform(robot, q_end_seed,   "ee_link");
+[q_start, info_s] = ik('ee_link', g_init,  weights, q_start_seed);
+[q_end,   info_e] = ik('ee_link', g_final, weights, q_end_seed);
+
+assert(info_s.ExitFlag == 1 && info_s.PoseErrorNorm < 1e-6, 'IK failed at start');
+assert(info_e.ExitFlag == 1 && info_e.PoseErrorNorm < 1e-6, 'IK failed at end');
+q_start = q_start(:);  q_end = q_end(:);
+
+%% ===== Build collision pairs =====
+Pairs = build_pairs(robotbodies, EnvironmentBodies);
+
+%% ===== Problem setup =====
+prob.N         = 10;
+prob.q_init    = q_start;
+prob.q_des     = q_end;
+prob.Linkage   = robot;
+prob.Pairs     = Pairs;
+prob.w_smooth  = 1;
+prob.w_length  = 10;
+prob.eps_clear = 5e-2;
+
+% Cache the unique body names appearing in Pairs (one per robot body)
+% This lets nl_con compute FK/J per-body, not per-pair.
+names = arrayfun(@(p) string(p.body1.bodyName), Pairs);
+[prob.uBodyNames, ~, prob.pair2bodyIdx] = unique(names);
+prob.nBodies = numel(prob.uBodyNames);
+
+%% ===== RRT initial guess and Traj Opt =====
+rrt.maxIter  = 5000;
+rrt.stepSize = 0.30;
+rrt.goalBias = 0.30;
+rrt.goalTol  = 0.50;
+rrt.lb = min(q_start, q_end) - 1.0;
+rrt.ub = max(q_start, q_end) + 1.0;
+
+assert(config_feasible(q_start, prob), 'q_start infeasible');
+assert(config_feasible(q_end,   prob), 'q_end infeasible');
+
+[path_rrt, ok] = rrt_plan(q_start, q_end, prob, rrt);
+assert(ok, 'RRT failed');
+q_path = resample_path(path_rrt, prob.N);
+x0 = q_path(:);
+
+[c0, ~] = nl_con(x0, prob);
+fprintf('RRT init: max(c) = %.3e, violated = %d/%d\n', max(c0), sum(c0 > 0), numel(c0));
+
+% ===== Trajectory optimization =====
+opts = optimoptions('fmincon', ...
+    'Algorithm','interior-point', ...
+    'Display','iter', ...
+    'MaxFunctionEvaluations',2e5, ...
+    'MaxIterations',1000, ...
+    'SpecifyObjectiveGradient',true, ...
+    'SpecifyConstraintGradient',true, ...
+    'ConstraintTolerance',1e-6, ...
+    'OptimalityTolerance',1e-4, ...
+    'StepTolerance',1e-6, ...
+    'ScaleProblem',true);
+
+tic;
+% profile on
+sol = solve_kinematic_fmincon(prob, x0, opts);
+% profile off
+% profile viewer
+toc;
+
+save('solution.mat');
+
+%%%% ===== Gradient-mode benchmark =====
+nRuns = 5;
+results = struct('seed',{}, 'with_grad_time',{}, 'with_grad_fval',{}, 'with_grad_maxc',{}, ...
+                 'no_grad_time',{},   'no_grad_fval',{},   'no_grad_maxc',{});
+
+for r = 1:nRuns
+    seed = r;
+    rng(seed);
+    fprintf('\n=== Run %d/%d (seed=%d) ===\n', r, nRuns, seed);
+
+    % Same RRT init for both modes
+    [path_rrt, ok] = rrt_plan(q_start, q_end, prob, rrt);
+    assert(ok, 'RRT failed at seed %d', seed);
+    q_path = resample_path(path_rrt, prob.N);
+    x0_r = q_path(:);
+
+    % --- WITH analytical gradients ---
+    opts_g = optimoptions('fmincon', ...
+        'Algorithm','interior-point', ...
+        'Display','off', ...
+        'MaxFunctionEvaluations',2e5, ...
+        'MaxIterations',1000, ...
+        'SpecifyObjectiveGradient',true, ...
+        'SpecifyConstraintGradient',true, ...
+        'ConstraintTolerance',1e-6, ...
+        'OptimalityTolerance',1e-4, ...
+        'StepTolerance',1e-6, ...
+        'ScaleProblem',true);
+
+    t0 = tic;
+    sol_g = solve_kinematic_fmincon(prob, x0_r, opts_g);
+    t_g = toc(t0);
+
+    % --- WITHOUT analytical gradients (FD by fmincon) ---
+    opts_nog = optimoptions(opts_g, ...
+        'SpecifyObjectiveGradient',false, ...
+        'SpecifyConstraintGradient',false);
+
+    t0 = tic;
+    sol_nog = solve_kinematic_fmincon(prob, x0_r, opts_nog);
+    t_nog = toc(t0);
+
+    results(r).seed           = seed;
+    results(r).with_grad_time = t_g;
+    results(r).with_grad_fval = sol_g.fval;
+    results(r).with_grad_maxc = sol_g.max_c;
+    results(r).no_grad_time   = t_nog;
+    results(r).no_grad_fval   = sol_nog.fval;
+    results(r).no_grad_maxc   = sol_nog.max_c;
+
+    fprintf('  with grads: %.2fs  fval=%.3f  max_c=%.2e\n', t_g, sol_g.fval, sol_g.max_c);
+    fprintf('  no grads:   %.2fs  fval=%.3f  max_c=%.2e (speedup = %.1fx)\n', ...
+        t_nog, sol_nog.fval, sol_nog.max_c, t_nog/t_g);
+end
+
+% Summary
+tg  = [results.with_grad_time];
+tng = [results.no_grad_time];
+fprintf('\n========== Summary over %d runs ==========\n', nRuns);
+fprintf('With grads:  mean = %.2f s, std = %.2f s\n', mean(tg),  std(tg));
+fprintf('No grads:    mean = %.2f s, std = %.2f s\n', mean(tng), std(tng));
+fprintf('Speedup ratio: %.1fx (mean) [%.1fx — %.1fx]\n', ...
+    mean(tng./tg), min(tng./tg), max(tng./tg));
+
+save('benchmark_grad_vs_fd.mat', 'results');
+
+%% ===== Visualizations =====
+q_rrt = q_path;
+q_opt = [prob.q_init, reshape(sol.x, 6, prob.N), prob.q_des];
+
+% Final stitched visualization with EE traces
+visualize_solution(robot, EnvironmentBodies, q_rrt, q_opt, prob);
+
+%% ===== Animation =====
+% animate_trajectory(robot, EnvironmentBodies, q_rrt, q_opt, prob, ...
+%     'ur10_rrt_vs_opt.mp4');
+
+%% ====================================================================
+%% Local functions
+%% ====================================================================
+
+function Pairs = build_pairs(robotbodies, envBodies)
+    nP = numel(robotbodies) * numel(envBodies);
+    Pairs = SorosimContactPair.empty(nP, 0);
+    idx = 1;
+    for i = 1:numel(robotbodies)
+        for j = 1:numel(envBodies)
+            Pairs(idx) = SorosimContactPair(robotbodies(i), envBodies(j), idx);
+            Pairs(idx).use_warmstart = false;
+            % Cache body name for fast access in nl_con (avoid property dispatch)
+            Pairs(idx).body1.bodyName = robotbodies(i).bodyName;
+            idx = idx + 1;
+        end
+    end
+end
+
+function [bodies, counter] = addRobotBodies(robot, bodyIdx, opts, bodies, counter, attach_at_eye)
+    for k = bodyIdx
+        currBody = robot.Bodies{k};
+        clearCollision(currBody);
+        vizData = getVisual(currBody);
+        if isempty(vizData), continue; end
+        collisionArray = collisionVHACD(vizData(1).Triangulation, opts);
+        g = getTransform(robot, robot.homeConfiguration, currBody.Name);
+        for i = 1:numel(collisionArray)
+            V = collisionArray{i}.Vertices;
+            K = convhull(V);
+            [A, c] = MinVolEllipse(V(unique(K(:)), :)', 1e-1, 1.1);
+            cb = OurFormEllipsoid(A, c);
+            cb.id = counter; cb.bodyName = currBody.Name;
+            bodies(counter) = cb; counter = counter + 1;
+            cb.attachHandles(gca);
+            if attach_at_eye, cb.setPose(eye(4)); else, cb.setPose(g); end
+        end
+        for j = 1:numel(collisionArray), addCollision(currBody, collisionArray{j}); end
+    end
+end
+
+function [bodies, counter] = addCombinedRobotBody(robot, bodyIdx, attachIdx, opts, bodies, counter)
+    V = [];
+    for k = bodyIdx
+        currBody = robot.Bodies{k};
+        clearCollision(currBody);
+        vizData = getVisual(currBody);
+        if isempty(vizData), continue; end
+        collisionArray = collisionVHACD(vizData(1).Triangulation, opts);
+        for i = 1:numel(collisionArray)
+            V = [V; collisionArray{i}.Vertices]; %#ok<AGROW>
+        end
+    end
+    if isempty(V), return; end
+    K = convhull(V);
+    [A, c] = MinVolEllipse(V(unique(K(:)), :)', 1e-1, 1.1);
+    cb = OurFormEllipsoid(A, c);
+    cb.id = counter; cb.bodyName = robot.Bodies{attachIdx}.Name;
+    bodies(counter) = cb; counter = counter + 1;
+    cb.attachHandles(gca); cb.setPose(eye(4));
+end
+
+function E = buildSimpleEnvironment()
+    g_center = eul2tform([0 -pi/2 0]);
+    g_center(1:3,4) = [1; 0; 0.25];
+    beta = 20;
+    A_box = [eye(3); -eye(3)]; bA = 0.25 * ones(6,1);
+    E(1) = SorosimContactBody(1, 2, idcol_make_params(2, beta, A_box, bA));
+    E(1).g_JC = g_center;
+    E(2) = SorosimContactBody(2, 3, idcol_make_params(3, beta, 0.15, 0.15, 0.1, 0.1));
+    g_cyl = g_center; g_cyl(3,4) = g_center(3,4) + 0.35;
+    E(2).g_JC = g_cyl;
+    E(3) = SorosimContactBody(3, 3, idcol_make_params(3, beta, 0.1, 0.1, 0.25, 0.35));
+    g_cyl = g_center; g_cyl(1,4) = g_cyl(1,4) - 0.35; g_cyl(2,4) = g_cyl(2,4) + 0.1;
+    E(3).g_JC = g_cyl;
+end
+
+function cb = OurFormEllipsoid(A, center)
+    [Q, lambda] = eig(A);
+    lambda = diag(lambda);
+    [lambda, idx] = sort(lambda, 'descend');
+    Q = Q(:, idx);
+    if det(Q) < 0, Q(:,3) = -Q(:,3); end
+    if max(lambda)/min(lambda) < 1.05, Q = eye(3); end
+    axes_lengths = 1 ./ sqrt(lambda);
+    g = rotm2tform(Q); g(1:3,4) = center;
+    params = idcol_make_params(4, 1, axes_lengths(1), axes_lengths(2), axes_lengths(3));
+    cb = SorosimContactBody(1, 4, params);
+    cb.g_JC = g;
+end
+
+function sol = solve_kinematic_fmincon(prob, x0, opts)
+    [x_end, fval, exitflag, out, singWarn] = run_once(prob, x0, opts);
+    x = pick_bestfeasible(x_end, out);
+    [c, ~] = nl_con(x, prob);
+    max_c = max(c);
+
+    sol = pack_solution(x, fval, exitflag, out, opts.Algorithm, ...
+                        "primary", max_c, singWarn);
+
+    if max_c <= 0
+        sol.status = "ok";
+    else
+        sol.status = "infeasible";
+        warning('Optimization returned infeasible: max(c)=%.3e', max_c);
+    end
+end
+
+function [x_end, fval, exitflag, out, singWarn] = run_once(prob, x0, opts)
+    ids = {'MATLAB:nearlySingularMatrix','MATLAB:singularMatrix','MATLAB:illConditionedMatrix'};
+    saved = cellfun(@(id) warning('off', id), ids, 'uni', false);
+    cleanup = onCleanup(@() cellfun(@(s) warning(s.state, s.identifier), saved));
+    lastwarn('');
+    [x_end, fval, exitflag, out] = fmincon( ...
+        @(x) obj_fun(x, prob), x0, [],[],[],[], [],[], ...
+        @(x) nl_con(x, prob), opts);
+    [~, wid] = lastwarn;
+    singWarn = any(strcmp(wid, ids));
+end
+
+function x = pick_bestfeasible(x_end, out)
+    x = x_end;
+    if isfield(out,'bestfeasible') && isstruct(out.bestfeasible) && ...
+            isfield(out.bestfeasible,'x') && ~isempty(out.bestfeasible.x)
+        x = out.bestfeasible.x;
+    end
+end
+
+function sol = pack_solution(x, fval, exitflag, out, alg, tag, max_c, singWarn)
+    sol = struct('x',x,'fval',fval,'exitflag',exitflag,'out',out, ...
+                 'alg',alg,'tag',tag,'max_c',max_c,'singularWarn',singWarn,'status',"unset");
+end
+
+function [J, dJdx] = obj_fun(x, prob)
+    N = prob.N;
+    P = [prob.q_init, reshape(x, 6, N), prob.q_des];
+
+    J_s = 0; J_l = 0;
+    needGrad = (nargout > 1);
+    if needGrad
+        dJs = zeros(size(P));
+        dJl = zeros(size(P));
+    end
+
+    for k = 2:N+1
+        a = P(:,k+1) - 2*P(:,k) + P(:,k-1);
+        J_s = J_s + (a.'*a);
+        if needGrad
+            dJs(:,k+1) = dJs(:,k+1) + 2*a;
+            dJs(:,k)   = dJs(:,k)   - 4*a;
+            dJs(:,k-1) = dJs(:,k-1) + 2*a;
+        end
+    end
+
+    for k = 1:N+1
+        b = P(:,k+1) - P(:,k);
+        J_l = J_l + (b.'*b);
+        if needGrad
+            dJl(:,k+1) = dJl(:,k+1) + 2*b;
+            dJl(:,k)   = dJl(:,k)   - 2*b;
+        end
+    end
+
+    J = prob.w_smooth*J_s + prob.w_length*J_l;
+    if needGrad
+        dJ_full = prob.w_smooth*dJs + prob.w_length*dJl;
+        dJdx = reshape(dJ_full(:, 2:N+1), [], 1);
+    end
+end
+
+function [c, ceq, dc, dceq] = nl_con(x, prob)
+    N     = prob.N;
+    robot = prob.Linkage;
+    Pairs = prob.Pairs;
+    ncp   = numel(Pairs);
+    P     = reshape(x, 6, N);
+
+    ceq = [];
+    needGrad = (nargout > 2);
+    if needGrad, dceq = []; end
+
+    c = zeros((ncp+1)*N, 1);
+    if needGrad
+        dc = zeros(6*N, (ncp+1)*N);
+    end
+
+    nB    = prob.nBodies;
+    names = prob.uBodyNames;
+    map   = prob.pair2bodyIdx;
+
+    % Floor constraints
+    for i = 1:N
+        g = getTransform(robot, P(:,i), "ee_link");
+        c(i) = -g(3,4);
+        if needGrad
+            Jee = geometricJacobian(robot, P(:,i), "ee_link");
+            dc(6*i-5:6*i, i) = -Jee(6,:).';
+        end
+    end
+
+    % Collision constraints
+    idx = N;
+    for k = 1:N
+        pk  = P(:,k);
+        row = (6*(k-1)+1):(6*k);
+
+        gB = cell(1, nB);
+        if needGrad, JB = cell(1, nB); end
+        for b = 1:nB
+            gB{b} = getTransform(robot, pk, names{b});
+            if needGrad
+                JB{b} = geometricJacobian(robot, pk, names{b});
+            end
+        end
+
+        for icp = 1:ncp
+            idx = idx + 1;
+            b   = map(icp);
+            g1  = gB{b};
+
+            out = Pairs(icp).solveContact(g1, eye(4));
+            c(idx) = -out.alpha + 1 + prob.eps_clear;
+
+            if needGrad
+                J1raw = JB{b};
+                R1  = g1(1:3,1:3);
+                J1  = [R1.' * J1raw(1:3,:); R1.' * J1raw(4:6,:)];
+                J1  = dinamico_Adjoint(ginv(Pairs(icp).body1.g_JC)) * J1;
+                g12 = Pairs(icp).get_relative(g1, eye(4));
+                R12 = g12(1:3,1:3);
+                r12 = g12(1:3,4);
+                J12 = -dinamico_Adjoint(ginv(g12)) * J1;
+                alpha   = out.alpha;
+                lambda2 = out.lambda2;
+                y       = R12.' * (out.x - r12) / alpha;
+                y_t     = dinamico_tilde(y);
+                [grad2, H2] = Pairs(icp).body2.get_gradH(y);
+                invA   = 1/alpha;
+                block  = [y_t, -invA*eye(3)];
+                dphi2_dq    = grad2.' * block * J12;
+                d2phi2_dxdq = invA * R12 * [H2*y_t - dinamico_tilde(grad2), -invA*H2] * J12;
+                d2phi2_dadq = -invA * (grad2 + H2*y).' * block * J12;
+                dF_dq = [ zeros(1,6);
+                          dphi2_dq;
+                          lambda2 * d2phi2_dxdq;
+                          lambda2 * d2phi2_dadq ];
+                dz_dq     = -out.J \ dF_dq;
+                dalpha_dq = dz_dq(4, :);
+                dc(row, idx) = (-dalpha_dq).';
+            end
+        end
+    end
+end
+
+function [path, ok] = rrt_plan(q_start, q_end, prob, cfg)
+    nodes = q_start; parent = 0; ok = false;
+    for it = 1:cfg.maxIter
+        if rand < cfg.goalBias
+            q_rand = q_end;
+        else
+            q_rand = cfg.lb + (cfg.ub - cfg.lb) .* rand(6,1);
+        end
+        d = vecnorm(nodes - q_rand, 2, 1);
+        [~, iNear] = min(d);
+        delta = q_rand - nodes(:, iNear); nrm = norm(delta);
+        if nrm < 1e-9, continue; end
+        q_new = nodes(:, iNear) + (min(cfg.stepSize, nrm) / nrm) * delta;
+        if ~edge_feasible(nodes(:, iNear), q_new, prob), continue; end
+        nodes(:, end+1) = q_new;        %#ok<AGROW>
+        parent(end+1)   = iNear;        %#ok<AGROW>
+        if norm(q_new - q_end) < cfg.goalTol && edge_feasible(q_new, q_end, prob)
+            nodes(:, end+1) = q_end;            %#ok<AGROW>
+            parent(end+1)   = size(nodes,2)-1;  %#ok<AGROW>
+            ok = true; break;
+        end
+    end
+    if ~ok, path = []; return; end
+    idx = size(nodes, 2); path = nodes(:, idx);
+    while parent(idx) > 0
+        idx = parent(idx); path = [nodes(:, idx), path]; %#ok<AGROW>
+    end
+end
+
+function tf = edge_feasible(qa, qb, prob)
+    nSub = max(2, ceil(norm(qb - qa) / 0.05));
+    for k = 1:nSub
+        if ~config_feasible(qa + (qb-qa)*((k-1)/(nSub-1)), prob)
+            tf = false; return;
+        end
+    end
+    tf = true;
+end
+
+function tf = config_feasible(q, prob)
+    robot = prob.Linkage;
+    Pairs = prob.Pairs;
+    g_ee = getTransform(robot, q, "ee_link");
+    if -g_ee(3,4) > 0, tf = false; return; end
+    for icp = 1:numel(Pairs)
+        g1  = getTransform(robot, q, Pairs(icp).body1.bodyName);
+        out = Pairs(icp).solveContact(g1, eye(4));
+        if (-out.alpha + 1 + prob.eps_clear) > 0, tf = false; return; end
+    end
+    tf = true;
+end
+
+function q_out = resample_path(path_in, N)
+    M = size(path_in, 2);
+    if M == 1, q_out = repmat(path_in, 1, N); return; end
+    seg = vecnorm(diff(path_in, 1, 2), 2, 1);
+    s = [0, cumsum(seg)];
+    s_q = linspace(0, s(end), N);
+    q_out = zeros(6, N);
+    for j = 1:6, q_out(j, :) = interp1(s, path_in(j, :), s_q, 'linear'); end
+end
+
+function visualize_solution(robot, EnvBodies, q_rrt, q_opt, prob)
+    figure('Color','w'); hold on; ax = gca;
+    nO = size(q_opt, 2);
+    for i = 1:nO
+        show(robot, q_opt(:,i), 'Frames','off','PreservePlot',true, ...
+             'FastUpdate',false,'Visuals','on','Parent',ax);
+    end
+    patches_opt = flipud(findall(ax, 'Type', 'patch'));
+    nPO = numel(patches_opt);
+    for k = 1:nPO
+        t = (k-1)/max(nPO-1, 1);
+        set(patches_opt(k), 'FaceColor',[1.0 0.5 0.0], ...
+            'FaceAlpha',0.30+0.5*t, 'EdgeColor','none');
+    end
+
+    % EE traces
+    ee_rrt = ee_trace(robot, q_rrt);
+    ee_opt = ee_trace(robot, q_opt);
+    plot3(ax, ee_rrt(1,:), ee_rrt(2,:), ee_rrt(3,:), '-o', ...
+        'Color','b','LineWidth',3,'MarkerSize',8,'MarkerEdgeColor','b');
+    plot3(ax, ee_opt(1,:), ee_opt(2,:), ee_opt(3,:), '-o', ...
+        'Color','r','LineWidth',3,'MarkerSize',8,'MarkerEdgeColor','r');
+
+    % Endpoint frames
+    drawFrame(getTransform(robot, prob.q_init, "ee_link"), 'framesize',0.2,'linewidth',3);
+    drawFrame(getTransform(robot, prob.q_des,  "ee_link"), 'framesize',0.2,'linewidth',3);
+
+    % Environment
+    for i = 1:numel(EnvBodies)
+        EnvBodies(i).attachHandles(ax);
+        EnvBodies(i).setPose(eye(4));
+    end
+    env_patches = setdiff(findall(ax, 'Type', 'patch'), patches_opt, 'stable');
+    for k = 1:numel(env_patches)
+        set(env_patches(k), 'FaceColor',[0.55 0.55 0.60], 'FaceAlpha',1.0, 'EdgeColor','none');
+    end
+
+    % Checker plane
+    draw_checker_plane(ax, [-0.5 1.5 -1 1 0 1.5]);
+
+    axis tight; axis equal; grid off; view(45, 25);
+    camlight headlight; lighting gouraud; material dull;
+    xlim([-0.5 1.5]); ylim([-1 1]); zlim([0 1.5]);
+    set(ax, ...
+        'Units','normalized', ...
+        'Position',[0.02 0.02 0.96 0.96], ...
+        'OuterPosition',[0.00 0.00 1.00 1.00], ...
+        'LooseInset',[0 0 0 0], ...
+        'FontSize',18, ...
+        'TickLabelInterpreter','latex');
+    xlabel(ax,'$x$','Interpreter','latex','FontSize',24);
+    ylabel(ax,'$y$','Interpreter','latex','FontSize',24);
+    zlabel(ax,'$z$','Interpreter','latex','FontSize',24);
+end
+
+function ee = ee_trace(robot, Q)
+    n = size(Q,2); ee = zeros(3,n);
+    for i = 1:n
+        g = getTransform(robot, Q(:,i), "ee_link");
+        ee(:,i) = g(1:3,4);
+    end
+end
+
+function draw_checker_plane(ax, axlim)
+    R = max([diff(axlim(1:2)), diff(axlim(3:4)), diff(axlim(5:6))]);
+    S = 2*R; pitch = R/20;
+    cDark  = [0.15 0.25 0.45]; cLight = [0.25 0.45 0.75];
+    s = linspace(-S, S, 81); [Sg, Tg] = meshgrid(s, s);
+    X = Sg; Y = Tg; Z = zeros(size(Sg));
+    chk = mod(round(Sg/pitch) + round(Tg/pitch), 2);
+    C = zeros([size(chk), 3]);
+    for k = 1:3, C(:,:,k) = cDark(k).*(chk==0) + cLight(k).*(chk==1); end
+    srf = surf(ax, X, Y, Z, C, 'EdgeColor','none', 'FaceAlpha',0.5);
+    srf.SpecularStrength = 0.9;
+    srf.DiffuseStrength  = 0.7;
+    srf.AmbientStrength  = 0.5;
+end
+
+function animate_trajectory(robot, EnvBodies, q_rrt, q_opt, prob, videoName)
+    fps           = 30;
+    interpPerSeg  = 15;
+    holdSeconds   = 2;
+    rotDegPerSec  = 12;
+    eeName        = "ee_link";
+
+    v = VideoWriter(videoName, 'MPEG-4');
+    v.FrameRate = fps; v.Quality = 100;
+    open(v);
+
+    set(groot,'defaultTextInterpreter','latex');
+    set(groot,'defaultAxesTickLabelInterpreter','latex');
+    set(groot,'defaultLegendInterpreter','latex');
+
+    % Figure
+    fig = figure('Color','w','Units','pixels');
+    ax = axes(fig); hold(ax,'on');
+    set(ax, 'Units','normalized','Position',[0.02 0.02 0.96 0.96], ...
+        'OuterPosition',[0 0 1 1],'LooseInset',[0 0 0 0], ...
+        'FontSize',18,'TickLabelInterpreter','latex');
+
+    axis(ax,'manual'); axis(ax,'vis3d'); daspect(ax,[1 1 1]);
+    xlim(ax,[-0.5 1.5]); ylim(ax,[-1 1]); zlim(ax,[0 1.5]);
+
+    camTarget = [0.5 0 0.75]; elFixed = 25; azStart = 45;
+    view(ax, azStart, elFixed); camtarget(ax, camTarget); camva(ax, 11);
+    grid(ax,'off'); box(ax,'on');
+    xlabel(ax,'$x$','FontSize',22); ylabel(ax,'$y$','FontSize',22); zlabel(ax,'$z$','FontSize',22);
+    camlight(ax,'headlight'); lighting(ax,'gouraud'); material(ax,'dull');
+
+    % Precompute checker plane data
+    [Xp, Yp, Zp, Cp] = checker_data([-0.5 1.5 -1 1 -0.25 1.5]);
+
+    % Robot color
+    robotOrange = [1.0 0.5 0.0];
+
+    % Endpoint EE frames
+    T_start = getTransform(robot, prob.q_init, eeName);
+    T_end   = getTransform(robot, prob.q_des,  eeName);
+
+    % RRT EE trace
+    ee_rrt = ee_trace(robot, q_rrt);
+
+    % Interpolate q_opt in joint space for smooth animation
+    nO = size(q_opt, 2);
+    nDense = (nO-1)*interpPerSeg + 1;
+    tDense = linspace(1, nO, nDense);
+    q_dense = zeros(6, nDense);
+    for j = 1:6
+        q_dense(j,:) = interp1(1:nO, q_opt(j,:), tDense, 'linear');
+    end
+
+    % Precompute dense EE trace + transforms
+    ee_dense = zeros(3, nDense);
+    T_dense  = cell(1, nDense);
+    for i = 1:nDense
+        g = getTransform(robot, q_dense(:,i), eeName);
+        T_dense{i}    = g;
+        ee_dense(:,i) = g(1:3,4);
+    end
+
+    nHold  = round(holdSeconds * fps);
+    nTotal = nDense + nHold;
+
+    for i = 1:nTotal
+        if i <= nDense
+            qi = q_dense(:,i); Tcur = T_dense{i}; kEnd = i;
+        else
+            qi = q_dense(:,end); Tcur = T_dense{end}; kEnd = nDense;
+        end
+
+        azNow = azStart + rotDegPerSec * (i-1) / fps;
+
+        cla(ax); hold(ax,'on');
+
+        % Environment
+        for j = 1:numel(EnvBodies)
+            EnvBodies(j).attachHandles(ax);
+            EnvBodies(j).setPose(eye(4));
+        end
+        env_patches = findall(ax,'Type','patch');
+        for k = 1:numel(env_patches)
+            set(env_patches(k), 'FaceColor',[0.55 0.55 0.60], ...
+                'FaceAlpha',1.0,'EdgeColor','none');
+        end
+
+        % Checker plane
+        srf = surf(ax, Xp, Yp, Zp, Cp, 'EdgeColor','none','FaceAlpha',0.5);
+        srf.SpecularStrength = 0.9; srf.DiffuseStrength = 0.7; srf.AmbientStrength = 0.5;
+
+        % Traces
+        plot3(ax, ee_rrt(1,:), ee_rrt(2,:), ee_rrt(3,:), ...
+            '--','Color',[0.85 0.10 0.10],'LineWidth',2.0);
+        plot3(ax, ee_dense(1,1:kEnd), ee_dense(2,1:kEnd), ee_dense(3,1:kEnd), ...
+            '-','Color','b','LineWidth',2.0);
+
+        % Robot
+        show(robot, qi, 'Frames','off','PreservePlot',true, ...
+            'FastUpdate',false,'Visuals','on','Parent',ax);
+        delete(findall(fig, 'Tag', 'CornerCoordinateFrame'));
+
+        % Recolor robot patches
+        all_patches   = findall(ax,'Type','patch');
+        robot_patches = setdiff(all_patches, env_patches, 'stable');
+        for k = 1:numel(robot_patches)
+            set(robot_patches(k), 'FaceColor', robotOrange, ...
+                'FaceAlpha', 1.0, 'EdgeColor','none');
+        end
+
+        % Frames
+        drawFrame(T_start, 'framesize',0.2,'linewidth',3);
+        drawFrame(T_end,   'framesize',0.2,'linewidth',3);
+        drawFrame(Tcur,    'framesize',0.15,'linewidth',2);
+
+        % Camera + limits
+        xlim(ax,[-0.5 1.5]); ylim(ax,[-1 1]); zlim(ax,[0 1.5]);
+        axis(ax,'manual'); axis(ax,'vis3d'); daspect(ax,[1 1 1]);
+        view(ax, azNow, elFixed); camtarget(ax, camTarget); camva(ax, 11);
+        grid(ax,'off'); box(ax,'on');
+        camlight(ax,'headlight'); lighting(ax,'gouraud'); material(ax,'dull');
+
+        drawnow;
+        writeVideo(v, getframe(fig));
+    end
+
+    close(v);
+    fprintf('Saved animation to %s\n', videoName);
+end
+
+function [X, Y, Z, C] = checker_data(axlim)
+    R = max([diff(axlim(1:2)), diff(axlim(3:4)), diff(axlim(5:6))]);
+    S = 2*R; pitch = R/20;
+    cDark  = [0.15 0.25 0.45]; cLight = [0.25 0.45 0.75];
+    s = linspace(-S, S, 81); [Sg, Tg] = meshgrid(s, s);
+    X = Sg; Y = Tg; Z = zeros(size(Sg));
+    chk = mod(round(Sg/pitch) + round(Tg/pitch), 2);
+    C = zeros([size(chk), 3]);
+    for k = 1:3
+        C(:,:,k) = cDark(k).*(chk==0) + cLight(k).*(chk==1);
+    end
+end

@@ -263,7 +263,50 @@ addpath('Custom')
 addpath('SorosimLink_files')
 addpath(genpath('SorosimRod_files'))
 addpath(genpath('SorosimLinkage_files')) %include subfolders
+addpath('SorosimContact_files')
 addpath('noGUI')
+
+% --- locate repo root ---
+thisFile = mfilename('fullpath');
+thisDir  = fileparts(thisFile);    % Differentiable_SoRoSim
+repoRoot = fileparts(thisDir);     % SoRoSim
+
+% % --- iDCOL paths ---
+% idcolMex  = fullfile(repoRoot,'external','iDCOL','mex');
+% idcolCore = fullfile(repoRoot,'external','iDCOL','core');
+
+% --- iDCOL automatic MEX build (run once if needed) ---
+
+idcolRoot = fullfile(repoRoot,'external','iDCOL');
+idcolMex  = fullfile(idcolRoot,'mex');
+
+mexFile = fullfile(idcolMex, ['idcol_solve_mex.' mexext]);
+
+if ~exist(mexFile,'file')
+    fprintf('[SoRoSim] iDCOL MEX not found. Building now...\n');
+
+    buildScript = fullfile(idcolRoot,'build_mex.m');
+    if ~exist(buildScript,'file')
+        error('[SoRoSim] build_mex.m not found in iDCOL.');
+    end
+
+    oldDir = pwd;
+    try
+        cd(idcolRoot);
+        build_mex;
+        fprintf('[SoRoSim] iDCOL MEX build complete.\n');
+    catch ME
+        cd(oldDir);
+        error('[SoRoSim] iDCOL MEX build failed:\n%s', ME.message);
+    end
+    cd(oldDir);
+else
+    % Optional: quiet success message
+    % fprintf('[SoRoSim] iDCOL MEX found.\n');
+end
+
+addpath(idcolMex);
+%addpath(idcolCore);
 
 if exist('.\LinkageProgress.mat','file')
     delete('LinkageProgress.mat')

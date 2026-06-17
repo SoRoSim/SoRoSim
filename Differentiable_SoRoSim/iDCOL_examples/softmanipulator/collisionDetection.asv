@@ -1,0 +1,110 @@
+function [activePairs,delta,x,n,ddelta_dq,dx_dq,dn_dq] = collisionDetection(Linkage,g,J)
+
+    ndof = Linkage.ndof;
+    activePairs = false(Linkage.ncp,1);
+    x = zeros(3,Linkage.ncp);
+    n = zeros(3,Linkage.ncp);
+    delta = zeros(1,Linkage.ncp);
+
+    dx_dq = zeros(3,ndof,Linkage.ncp);
+    dn_dq = zeros(3,ndof,Linkage.ncp);
+    ddelta_dq = zeros(1,ndof,Linkage.ncp);
+    
+    for icp = 1:Linkage.ncp
+        % ensure pair structure exists
+        pair = Linkage.Pairs(icp);
+        if isempty(pair)
+            continue;
+        end
+
+        i_sig1 = pair.body1.i_sig;
+        g1 = g((i_sig1-1)*4+1:i_sig1*4,:);
+        
+        i_sig2 = pair.body2.i_sig;
+        g2 = g((i_sig2-1)*4+1:i_sig2*4,:);
+    
+        out = pair.solveNarrowPhase(g1, g2);
+        if isempty(out) || ~isfield(out,'alpha')
+            continue;
+        end
+    
+        if out.alpha < 1
+            % mark active
+            pair.contact_active = true;
+            z_star = [out.x; out.alpha; out.lambda1; out.lambda2];
+            x_icp = z_star(1:3);
+            df_dz = out.J;
+            alpha = out.alpha;
+            lambda2 = out.lambda2;
+    
+            % retrieve Jacobians
+            J1 = J((i_sig1-1)*6+1:i_sig1*6,:);
+            J2 = J((i_sig2-1)*6+1:i_sig2*6,:);
+    
+            % relative transform (frame2 expressed in frame1)
+            g12 = pair.get_relative(g1, g2);
+            R12 = g12(1:3,1:3);
+            r12  = g12(1:3,4); % frame 1
+            r12_norm = norm(r12);
+    
+            % penetration proxy (positive)
+            delta_icp = (1/alpha - 1) * r12_norm;
+
+            % normal from body1 implicit gradient (frame 1)
+            [grad1, H1] = pair.body1.get_gradH(x_icp);
+            grad1_norm = norm(grad1);
+            if grad1_norm == 0
+                n_icp = zeros(3,1);
+            else
+                n_icp = grad1 / grad1_norm;
+            end
+
+            % prepare terms for dz_dq = -J_f \ dF_dq
+            y = R12'*(x_icp - r12)/alpha;
+            y_tilde = dinamico_tilde(y);
+            [grad2, H2] = pair.body2.get_gradH(y);
+
+            % relative Jacobian of body2 w.r.t body1 expressed in frame2
+            J12 = J2 - dinamico_Adjoint(ginv(g12)) * J1;
+
+            % compute partial derivatives robustly, handle empty or zero dims
+            dphi2_dq = grad2' * [y_tilde, -1/alpha*eye(3)] * J12;
+            d2phi2_dxdq = (1/alpha) * R12 * ([H2 * y_tilde - dinamico_tilde(grad2), -1/alpha*H2] * J12);
+            d2phi2_dadq = -1/alpha * (grad2 + H2 * y)' * [y_tilde, -1/alpha*eye(3)] * J12;
+
+            % assemble df_dq matching df_dz rows: [phi1; phi2; dphi2_dx*lambda2; dphi2_da*lambda2]
+            df_dq = [zeros(1,ndof); dphi2_dq; lambda2 * d2phi2_dxdq; lambda2 * d2phi2_dadq];
+
+            % guard against singular df_dz
+            if rcond(df_dz) < eps
+                dz_dq = zeros(size(df_dq));
+            else
+                dz_dq = -df_dz \ df_dq;
+            end
+
+            dx_dq_icp = dz_dq(1:3,:);
+            % derivative of delta: -1/alpha^2 * |r12| * d(alpha)/dq + (1/alpha -1)/|r12| * r12' * d(r12)/dq
+            % d(r12)/dq = R12 * J12(4:6,:)
+            ddelta_dq_icp = -1/alpha^2 * r12_norm * dz_dq(4,:) + (1/alpha - 1) / max(r12_norm,eps) * (r12' * (R12 * J12(4:6,:)));
+            dn_dq_icp = zeros(3,ndof);
+            if grad1_norm ~= 0
+                % dn/dq = (I - n n')/||grad1|| * d(grad1)/dq ; using skew representation for compactness
+                dn_dq_icp = -(1/grad1_norm) * dinamico_tilde(n_icp)^2 * H1 * dx_dq_icp;
+            end
+
+            activePairs(icp) = true;
+            delta(icp) = delta_icp;
+            x(:, icp) = x_icp;
+            n(:, icp) = n_icp;
+            dx_dq(:, :, icp) = dx_dq_icp;
+            ddelta_dq(:, :, icp) = ddelta_dq_icp;
+            dn_dq(:, :, icp) = dn_dq_icp;
+
+            % write back modified pair
+            Linkage.Pairs(icp).contact_active = true;
+        else
+            % ensure contact flag is false if not active
+            Linkage.Pairs(icp).contact_active = false;
+        end
+    end
+end

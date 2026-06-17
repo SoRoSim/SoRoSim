@@ -1,4 +1,4 @@
-function [dID_dq,dID_dqd,dtau_dq,dtau_dqd,de_dq,de_dqd,daction_dq,daction_dqd] = DAEi1Jacobians_qqd(Linkage,t,q,qd,qdd,u,lambda)
+function [dID_dq,dID_dqd,dtau_dq,dtau_dqd,de_dq,de_dqd,daction_dq,daction_dqd] = DAEi1Jacobians_qqd(Linkage,t,q,qd,qdd,u,lambda,z_star,J_f)
 %only Jacobians
 %For index 1 DAE e=e(q,qd,qdd)
 
@@ -356,6 +356,70 @@ for i=1:N
     L_Btip((i-1)*6+1:i*6,:) = L_Bhere;
     Q_Btip((i-1)*6+1:i*6,:) = Q_Bhere;
 
+end
+
+%% Contact Forces (make generic later)
+
+for icp = 1:Linkage.ncp
+
+    if Linkage.Pairs(icp).contact_active
+
+        x = z_star(1:3,icp);
+        alpha = z_star(4,icp);
+        lambda2 = z_star(6,icp);
+
+        i_sig = Linkage.Pairs(icp).body1.i_sig;
+        g1 = g((i_sig-1)*4+1:i_sig*4,:);
+        J1 = J((i_sig-1)*6+1:i_sig*6,:);
+
+        g2 = eye(4);
+
+        % relative transform (frame2 expressed in frame1)
+        g12 = Linkage.Pairs(icp).get_relative(g1, g2);
+        R12 = g12(1:3,1:3);
+        r12  = g12(1:3,4);                    % frame 1
+        r12_norm = norm(r12);
+
+        % penetration proxy (positive)
+        delta = (1/alpha - 1) * norm(r12);
+        k = Linkage.penalty.k_n; p = Linkage.penalty.e_n;
+        fn = k * delta^p;
+
+        % normal from body1 implicit gradient (frame 1)
+        [grad1, H1] = Linkage.Pairs(icp).body1.get_gradH(x);
+        grad1_norm = norm(grad1);
+        n = grad1 / grad1_norm;
+
+        % force on body1 in frame 1
+        fc = - fn * n; %(repulsion)
+
+        % wrench about body frame origin (frame 1)
+        Fc = [dinamico_tilde(x)*fc; fc];
+        
+        %to compute dz_dq = -J_f\dF_dq
+        y = R12'*(x-r12)/alpha;
+        y_tilde = dinamico_tilde(y);
+        [grad2, H2] = Linkage.Pairs(icp).body2.get_gradH(y);
+        J12 = -dinamico_Adjoint(ginv(g12))*J1; %relative Jacobian of 2 wrt 1 in frame of 2. J2-(Ad_g12^-1)*J1, J2 = 0 (fixed)
+        dphi2_dq = grad2'*[y_tilde, -1/alpha*eye(3)]*J12;
+        d2phi2_dxdq = 1/alpha*R12*[H2*y_tilde-dinamico_tilde(grad2), -1/alpha*H2]*J12;
+        d2phi2_dadq = -1/alpha*(grad2+H2*y)'*[y_tilde, -1/alpha*eye(3)]*J12;
+        dF_dq = [zeros(1,ndof);dphi2_dq;lambda2*d2phi2_dxdq;lambda2*d2phi2_dadq];
+
+        Jficp = J_f(1+6*(icp-1):6*icp,:);
+        dz_dq = -Jficp\dF_dq;
+
+        %to find dFc_dq
+        ddelta_dq = -1/alpha^2*r12_norm*dz_dq(4,:)+(1/alpha - 1)/r12_norm*r12'*R12*J12(4:6,:); %check this part dr/dq
+        dfn_dq = k * p * delta^(p-1) * ddelta_dq;
+        df_dq = fn / grad1_norm * dinamico_tilde(n)^2 * H1 * dz_dq(1:3,:) - n * dfn_dq;
+        dFc_dq = [- dinamico_tilde(fc) * dz_dq(1:3,:) + dinamico_tilde(x) * df_dq; df_dq];
+        dID_dq = dID_dq-J1'*dFc_dq; %external force hence negative
+
+        % body Jacobian (frame 1)
+        Fk((i_sig-1)*6+1:i_sig*6) = Fk((i_sig-1)*6+1:i_sig*6)+Fc;
+    end
+    
 end
 
 %% Point Wrench 

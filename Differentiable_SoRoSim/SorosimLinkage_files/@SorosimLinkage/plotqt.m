@@ -78,6 +78,7 @@ set(gcf, 'Renderer', 'OpenGL');
 
 axis ([PlotParameters.XLim PlotParameters.YLim PlotParameters.ZLim]);
 
+view(0,0)
 drawnow
 
 

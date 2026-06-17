@@ -1,0 +1,117 @@
+% ======================================================================
+% Nonlinear constraints: collision constraints at every knot
+% c(x) <= 0, ceq = []
+% Provide gradients dc/dx
+% ======================================================================
+function [c, ceq, dc, dceq] = nl_con(x,prob)
+    N = prob.N;
+    q_des = prob.q_des;
+    q_init = prob.q_init;
+    robot = prob.Linkage;
+    Pairs = prob.Pairs;
+    P = reshape(x,6,N);
+    
+    % ceq  = P(:,N) - q_des;  
+    % ceq =  [P(:,1) - q_init;
+    %     P(:,N) - q_des];
+
+    % dceq = zeros(6*N, 12);
+    % dceq(1:6, 1:6) = eye(6);
+    % dceq(end-5:end,7:12) = eye(6);
+
+    ceq = [];
+    dceq = [];
+    ncp = length(prob.Pairs);
+    c  = zeros((ncp+1)*N ,1); %% will have all the contacts and also above z=0
+    dc = zeros(6*N, (ncp+1)*N);
+    
+    for i = 1:N
+        g = getTransform(robot, P(:,i), "ee_link");
+        J = geometricJacobian(robot, P(:,i), "ee_link");
+            
+        R = g(1:3,1:3);
+        J = [R' * J(1:3,:);
+        R' * J(4:6,:)];
+        
+        z = g(3,4);
+        c(i) = -z;
+        % Compute the gradient of the collision constraints
+        V = -R*
+        dc(6*i-5:6*i,i) = -R*J(4:);  % Gradient of the z constraint
+    end
+    % translation-only twist Jacobian Tg1: maps pdot -> twist [w; v]
+    % Tg1 = [zeros(3,3); eye(3)];   % 6x3
+
+    idx = 0;
+    for k = 1:N
+        pk = P(:,k);
+        
+        
+
+        row = (6*(k-1)+1):(6*k);
+
+        for icp = 1:ncp
+            idx = idx + 1;
+            g1 = getTransform(robot,pk,Pairs(icp).body1.bodyName);
+            g2 = eye(4);
+            
+            % -------- solve contact --------
+            out = Pairs(icp).solveContact(g1, g2);
+
+            % constraint: c = -alpha + 1 + eps
+            c(idx) = -out.alpha + 1 + prob.eps_clear;
+
+            % -------- analytic gradient via your IFT pipeline --------
+            % relative pose
+            g12 = Pairs(icp).get_relative(g1, g2);
+            R12 = g12(1:3,1:3);
+            r12 = g12(1:3,4);
+
+            % J1: body1 twist Jacobian wrt translation
+            % J1 = dinamico_Adjoint(ginv(g1)) * Tg1;   % 6x3
+            J1 = geometricJacobian(robot,pk,Pairs(icp).body1.bodyName);
+            
+            R = g1(1:3,1:3);
+            J1 = [R.' * J1(1:3,:);
+            R.' * J1(4:6,:)];
+            J1 = dinamico_Adjoint(ginv(Pairs(icp).body1.g_JC))*J1;
+
+            % J1 = [zeros(3,3); eye(3)]; 
+
+            alpha   = out.alpha;
+            lambda2 = out.lambda2;
+
+            % y = R12'*(x - r12)/alpha
+            y = R12'*(out.x - r12)/alpha;
+            y_tilde = dinamico_tilde(y);
+
+            [grad2, H2] = Pairs(icp).body2.get_gradH(y);
+
+            % relative Jacobian of 2 wrt 1 in frame of 2 (J2 = 0 for fixed env)
+            J12 = -dinamico_Adjoint(ginv(g12)) * J1;  % 6x3
+
+            dphi2_dq    = grad2' * [y_tilde, -1/alpha*eye(3)] * J12;  % 1x3
+
+            d2phi2_dxdq = (1/alpha) * R12 * ...
+                [H2*y_tilde - dinamico_tilde(grad2), -1/alpha*H2] * J12; % 3x3
+
+            d2phi2_dadq = -(1/alpha) * (grad2 + H2*y)' * ...
+                [y_tilde, -1/alpha*eye(3)] * J12; % 1x3
+
+            % IMPORTANT: dF_dq must match out.J size (typically 6x6)
+            % Here q has size 3 (translation only)
+            dF_dq = [zeros(1,6);
+                     dphi2_dq;
+                     lambda2 * d2phi2_dxdq;
+                     lambda2 * d2phi2_dadq]; % 6x3
+
+            dz_dq = - out.J \ dF_dq;     % 6x3
+
+            % alpha index: you used row 4 in your code
+            dalpha_dq = dz_dq(4,:);      % 1x3
+
+            % c = -alpha + const => dc/dq = -dalpha/dq
+            dc(row, idx) = (-dalpha_dq).';
+        end
+    end
+end

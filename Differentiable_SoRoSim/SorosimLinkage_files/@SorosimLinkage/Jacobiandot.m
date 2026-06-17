@@ -23,13 +23,13 @@ if nargin==5
     if j_here==0
         nsig = 1;
     else
-        nsig = Linkage.CVTwists{i_here}(j_here+1).nip; %j_here>1 is allowed only for soft links
+        nsig = Linkage.CVRods{i_here}(j_here+1).nip; %j_here>1 is allowed only for soft links
     end
 elseif nargin==4
     if Linkage.VLinks(Linkage.LinkIndex(i_here)).linktype=='s'
         nsig = 1;
         for j=1:Linkage.VLinks(Linkage.LinkIndex(i_here)).npie-1
-            nsig = nsig+Linkage.CVTwists{i_here}(j+1).nip;
+            nsig = nsig+Linkage.CVRods{i_here}(j+1).nip;
         end
     else
         nsig = 2; %joint and CM
@@ -58,11 +58,11 @@ for i = 1:N
     end
     
     %Joint
-    dof_here = Linkage.CVTwists{i}(1).dof;
+    dof_here = Linkage.CVRods{i}(1).dof;
     q_here   = q(dof_start:dof_start+dof_here-1);
     qd_here  = qd(dof_start:dof_start+dof_here-1);
-    Phi_here = Linkage.CVTwists{i}(1).Phi;
-    xi_star  = Linkage.CVTwists{i}(1).xi_star;
+    Phi_here = Linkage.CVRods{i}(1).Phi;
+    xi_star  = Linkage.CVRods{i}(1).xi_star;
     
     if dof_here == 0 %fixed joint (N)
         g_joint = eye(4);
@@ -116,14 +116,14 @@ for i = 1:N
     
     for j = 1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1 %will run only if soft link
         
-        dof_here = Linkage.CVTwists{i}(j+1).dof;
+        dof_here = Linkage.CVRods{i}(j+1).dof;
         q_here   = q(dof_start:dof_start+dof_here-1);
         qd_here  = qd(dof_start:dof_start+dof_here-1);
-        xi_star  = Linkage.CVTwists{i}(j+1).xi_star;
+        xi_star  = Linkage.CVRods{i}(j+1).xi_star;
         gi       = Linkage.VLinks(Linkage.LinkIndex(i)).gi{j};
-        ld       = Linkage.VLinks(Linkage.LinkIndex(i)).lp{j};
-        Xs       = Linkage.CVTwists{i}(j+1).Xs;
-        nip      = Linkage.CVTwists{i}(j+1).nip;
+        ld       = Linkage.VLinks(Linkage.LinkIndex(i)).ld{j};
+        Xs       = Linkage.CVRods{i}(j+1).Xs;
+        nip      = Linkage.CVRods{i}(j+1).nip;
         
         
         %updating g, Jacobian, Jacobian_dot and eta at X=0
@@ -147,8 +147,8 @@ for i = 1:N
                 xi_Z1here = xi_star(6*(ii-2)+1:6*(ii-1),2); 
                 xi_Z2here = xi_star(6*(ii-2)+1:6*(ii-1),3);
                     
-                Phi_Z1here  = Linkage.CVTwists{i}(j+1).Phi_Z1(6*(ii-2)+1:6*(ii-1),:);%note this step
-                Phi_Z2here  = Linkage.CVTwists{i}(j+1).Phi_Z2(6*(ii-2)+1:6*(ii-1),:);
+                Phi_Z1here  = Linkage.CVRods{i}(j+1).Phi_Z1(6*(ii-2)+1:6*(ii-1),:);%note this step
+                Phi_Z2here  = Linkage.CVRods{i}(j+1).Phi_Z2(6*(ii-2)+1:6*(ii-1),:);
 
                 if dof_here>0
                     xi_Z1here = Phi_Z1here*q_here+xi_Z1here;
@@ -180,7 +180,7 @@ for i = 1:N
                 
                 xi_Zhere = xi_star(6*(ii-2)+1:6*(ii-1),4);
                     
-                Phi_Zhere  = Linkage.CVTwists{i}(j+1).Phi_Z(6*(ii-2)+1:6*(ii-1),:);%note this step
+                Phi_Zhere  = Linkage.CVRods{i}(j+1).Phi_Z(6*(ii-2)+1:6*(ii-1),:);%note this step
 
                 if dof_here>0
                     xi_Zhere = Phi_Zhere*q_here+xi_Zhere;

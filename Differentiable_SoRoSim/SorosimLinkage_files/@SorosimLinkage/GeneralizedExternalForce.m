@@ -1,8 +1,8 @@
 %Computes the generalized external force
 %Last modified by Anup Teejo Mathew - 24/05/2021
-function F = GeneralizedExternalForce(Tr,q,t,qd)
+function F = GeneralizedExternalForce(Linkage,q,t,qd)
 
-ndof    = Tr.ndof;
+ndof    = Linkage.ndof;
 if nargin==1
     t=0;
     qd = zeros(ndof,1);
@@ -14,11 +14,11 @@ if isrow(q)
     q=q';
 end
 
-N       = Tr.N;
-nsig    = Tr.nsig;
-G       = Tr.G;
-g_ini   = Tr.g_ini; %initial configuration of all link wrt its previous link
-iLpre   = Tr.iLpre;
+N       = Linkage.N;
+nsig    = Linkage.nsig;
+G       = Linkage.G;
+g_ini   = Linkage.g_ini; %initial configuration of all link wrt its previous link
+iLpre   = Linkage.iLpre;
 g_Ltip  = repmat(eye(4),N,1);
 J_Ltip  = repmat(zeros(6,ndof),N,1);
 g       = zeros(4*nsig,4);
@@ -45,37 +45,37 @@ for i=1:N
     end
 
     %Joint
-    dof_here = Tr.CVTwists{i}(1).dof;
+    dof_here = Linkage.CVRods{i}(1).dof;
     q_here   = q(dof_start:dof_start+dof_here-1);
     qd_here  = q(dof_start:dof_start+dof_here-1);
-    B_here   = Tr.CVTwists{i}(1).B;
-    xi_star  = Tr.CVTwists{i}(1).xi_star;
+    Phi_here   = Linkage.CVRods{i}(1).Phi;
+    xi_star  = Linkage.CVRods{i}(1).xi_star;
 
     if dof_here==0 %fixed joint (N)
         g_joint   = eye(4);
-        TgB_here  = zeros(6,ndof);
+        S_here  = zeros(6,ndof);
     else
-        xi           = B_here*q_here+xi_star;
+        xi           = Phi_here*q_here+xi_star;
         [g_joint,Tg] = variable_expmap_gTg(xi);
 
-        TgB_here                                    = zeros(6,ndof);
-        TgB_here(:,dof_start:dof_start+dof_here-1)  = Tg*B_here;
+        S_here                                    = zeros(6,ndof);
+        S_here(:,dof_start:dof_start+dof_here-1)  = Tg*Phi_here;
     end
 
     %updating g, Jacobian, Jacobian_dot and eta
     g_here         = g_here*g_joint;
     Ad_g_joint_inv = dinamico_Adjoint(ginv(g_joint));
-    J_here         = Ad_g_joint_inv*(J_here+TgB_here);
-    eta_here       = Ad_g_joint_inv*(eta_here+TgB_here(:,dof_start:dof_start+dof_here-1)*qd_here);
+    J_here         = Ad_g_joint_inv*(J_here+S_here);
+    eta_here       = Ad_g_joint_inv*(eta_here+S_here(:,dof_start:dof_start+dof_here-1)*qd_here);
 
     g((i_sig-1)*4+1:i_sig*4,:) = g_here;
     J((i_sig-1)*6+1:i_sig*6,:) = J_here;
     eta((i_sig-1)*6+1:i_sig*6) = eta_here;
 
     i_sig = i_sig+1;
-    if Tr.VLinks(Tr.LinkIndex(i)).linktype=='r'
+    if Linkage.VLinks(Linkage.LinkIndex(i)).linktype=='r'
 
-        gi     = Tr.VLinks(Tr.LinkIndex(i)).gi;
+        gi     = Linkage.VLinks(Linkage.LinkIndex(i)).gi;
         g_here = g_here*gi;
         J_here = dinamico_Adjoint(ginv(gi))*J_here;
         Ad_gi_inv = dinamico_Adjoint(ginv(gi));
@@ -86,13 +86,13 @@ for i=1:N
         J((i_sig-1)*6+1:i_sig*6,:) = J_here;
         eta((i_sig-1)*6+1:i_sig*6)  = eta_here;
 
-        M_here=Tr.VLinks(Tr.LinkIndex(i)).M;
-        if Tr.Gravity
+        M_here=Linkage.VLinks(Linkage.LinkIndex(i)).M;
+        if Linkage.Gravity
             F = F+J_here'*M_here*dinamico_Adjoint(ginv(g_here))*G;
         end
 
         % bringing all quantities to the end of rigid link
-        gf         = Tr.VLinks(Tr.LinkIndex(i)).gf;
+        gf         = Linkage.VLinks(Linkage.LinkIndex(i)).gf;
         g_here     = g_here*gf;
         Ad_gf_inv = dinamico_Adjoint(ginv(gf));
         J_here    = Ad_gf_inv*J_here;
@@ -105,19 +105,19 @@ for i=1:N
 
     dof_start=dof_start+dof_here;
 
-    for j=1:Tr.VLinks(Tr.LinkIndex(i)).npie-1 %will run only if soft link
+    for j=1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1 %will run only if soft link
 
-        dof_here   = Tr.CVTwists{i}(j+1).dof;
+        dof_here   = Linkage.CVRods{i}(j+1).dof;
         q_here     = q(dof_start:dof_start+dof_here-1);
         qd_here    = qd(dof_start:dof_start+dof_here-1);
 
-        xi_star = Tr.CVTwists{i}(j+1).xi_star;
-        gi      = Tr.VLinks(Tr.LinkIndex(i)).gi{j};
-        lpf     = Tr.VLinks(Tr.LinkIndex(i)).lp{j};
-        Ms      = Tr.CVTwists{i}(j+1).Ms;
-        Xs      = Tr.CVTwists{i}(j+1).Xs;
-        Ws      = Tr.CVTwists{i}(j+1).Ws;
-        nip     = Tr.CVTwists{i}(j+1).nip;
+        xi_star = Linkage.CVRods{i}(j+1).xi_star;
+        gi      = Linkage.VLinks(Linkage.LinkIndex(i)).gi{j};
+        lpf     = Linkage.VLinks(Linkage.LinkIndex(i)).lp{j};
+        Ms      = Linkage.CVRods{i}(j+1).Ms;
+        Xs      = Linkage.CVRods{i}(j+1).Xs;
+        Ws      = Linkage.CVRods{i}(j+1).Ws;
+        nip     = Linkage.CVRods{i}(j+1).nip;
 
         %updating g, Jacobian, Jacobian_dot and eta at X=0
         g_here    = g_here*gi;
@@ -143,7 +143,7 @@ for i=1:N
             %scaling
             Ms_here(1:3,:) = Ms_here(1:3,:)/Lscale;
             Ms_here(4:6,:) = Ms_here(4:6,:)*Lscale;
-            if Tr.Gravity
+            if Linkage.Gravity
                 F = F+W_here*J_here'*Ms_here*dinamico_Adjoint(ginv(g_here))*G*Lscale^2; %rescale
             end
         end
@@ -155,15 +155,15 @@ for i=1:N
 
             H = Xs(ii)-Xs(ii-1);
 
-            if Tr.Z_order==4
+            if Linkage.Z_order==4
 
                 xi_Z1here = xi_star(6*(ii-2)+1:6*(ii-1),2); 
                 xi_Z2here = xi_star(6*(ii-2)+1:6*(ii-1),3);
                 xi_Z1here(1:3) = xi_Z1here(1:3)*Lscale; %scaling
                 xi_Z2here(1:3) = xi_Z2here(1:3)*Lscale;
 
-                B_Z1here  = Tr.CVTwists{i}(j+1).B_Z1(6*(ii-2)+1:6*(ii-1),:);%note this step
-                B_Z2here  = Tr.CVTwists{i}(j+1).B_Z2(6*(ii-2)+1:6*(ii-1),:);
+                B_Z1here  = Linkage.CVRods{i}(j+1).Phi_Z1(6*(ii-2)+1:6*(ii-1),:);%note this step
+                B_Z2here  = Linkage.CVRods{i}(j+1).Phi_Z2(6*(ii-2)+1:6*(ii-1),:);
 
                 if dof_here>0
 
@@ -192,7 +192,7 @@ for i=1:N
                 xi_Zhere = xi_star(6*(ii-2)+1:6*(ii-1),4);
                 xi_Zhere(1:3) = xi_Zhere(1:3)*Lscale; %scaling
                 
-                B_Zhere  = Tr.CVTwists{i}(j+1).B_Z(6*(ii-2)+1:6*(ii-1),:);%note this step
+                B_Zhere  = Linkage.CVRods{i}(j+1).Phi_Z(6*(ii-2)+1:6*(ii-1),:);%note this step
 
                 if dof_here>0
                     xi_Zhere = B_Zhere*q_here+xi_Zhere;
@@ -208,14 +208,14 @@ for i=1:N
 
             [gh,TGamma_here] = variable_expmap_gTg(Gamma_here);
 
-            TBGamma_here                                   = zeros(6,ndof);
-            TBGamma_here(:,dof_start:dof_start+dof_here-1) = TGamma_here*BGamma_here;
+            S_here                                   = zeros(6,ndof);
+            S_here(:,dof_start:dof_start+dof_here-1) = TGamma_here*BGamma_here;
 
             %updating g, Jacobian, Jacobian_dot and eta
             g_here     = g_here*gh;
             Ad_gh_inv  = dinamico_Adjoint(ginv(gh));
-            J_here     = Ad_gh_inv*(J_here+TBGamma_here);
-            eta_here   = Ad_gh_inv*(eta_here+TBGamma_here(:,dof_start:dof_start+dof_here-1)*qd_here);
+            J_here     = Ad_gh_inv*(J_here+S_here);
+            eta_here   = Ad_gh_inv*(eta_here+S_here(:,dof_start:dof_start+dof_here-1)*qd_here);
 
 
             g((i_sig-1)*4+1:i_sig*4,:)  = g_here;
@@ -230,7 +230,7 @@ for i=1:N
                 %scaling
                 Ms_here(1:3,:) = Ms_here(1:3,:)/Lscale;
                 Ms_here(4:6,:) = Ms_here(4:6,:)*Lscale;
-                if Tr.Gravity
+                if Linkage.Gravity
                     F = F+W_here*J_here'*Ms_here*dinamico_Adjoint(ginv(g_here))*G*Lscale^2; %rescale
                 end
  
@@ -247,7 +247,7 @@ for i=1:N
         G              = G*Lscale;
 
         %updating g, Jacobian, Jacobian_dot and eta at X=L
-        gf        = Tr.VLinks(Tr.LinkIndex(i)).gf{j};
+        gf        = Linkage.VLinks(Linkage.LinkIndex(i)).gf{j};
         g_here    = g_here*gf;
         Ad_gf_inv = dinamico_Adjoint(ginv(gf));
         J_here    = Ad_gf_inv*J_here;
@@ -261,12 +261,12 @@ for i=1:N
 
 end
 %% Point Force
-if Tr.PointForce
-    F = F+ComputePointForce(Tr,J,g,t);
+if Linkage.PointForce
+    F = F+ComputePointForce(Linkage,J,g,t);
 end
 
 %scale g, J, and eta
-if Tr.CEFP||Tr.CAP
+if Linkage.CEFP||Linkage.CAP
 
     i_sig    = 1;
     g_act    = g;
@@ -275,12 +275,12 @@ if Tr.CEFP||Tr.CAP
 
     for i=1:N
         i_sig = i_sig+1;
-        if Tr.VLinks(Tr.LinkIndex(i)).linktype=='r'
+        if Linkage.VLinks(Linkage.LinkIndex(i)).linktype=='r'
             i_sig = i_sig+1;
         end
-        for j=1:Tr.VLinks(Tr.LinkIndex(i)).npie-1
-            Lscale = Tr.VLinks(Tr.LinkIndex(i)).lp{j};
-            for ii=1:Tr.CVTwists{i}(j+1).nip
+        for j=1:Linkage.VLinks(Linkage.LinkIndex(i)).npie-1
+            Lscale = Linkage.VLinks(Linkage.LinkIndex(i)).lp{j};
+            for ii=1:Linkage.CVRods{i}(j+1).nip
                 g_here        = g((i_sig-1)*4+1:i_sig*4,:);
                 g_here(1:3,4) = g_here(1:3,4)*Lscale;
                 g_act((i_sig-1)*4+1:i_sig*4,:) = g_here;
@@ -298,15 +298,15 @@ if Tr.CEFP||Tr.CAP
         end
     end
 
-    if Tr.CEFP
-        Fext = CustomExtForce(Tr,q,g_act,J_act,t,qd,eta_act,[]);%Jd not included
-        FextP = CustomExtPointForce(Tr,q,g_act,J_act,t,qd,eta_act,[]);
-        F_custom = CustomExtForce_Qspace(Tr,J,Fext,FextP);
+    if Linkage.CEFP
+        Fext = CustomExtForce(Linkage,q,g_act,J_act,t,qd,eta_act,[]);%Jd not included
+        FextP = CustomExtPointForce(Linkage,q,g_act,J_act,t,qd,eta_act,[]);
+        F_custom = CustomExtForce_Qspace(Linkage,J,Fext,FextP);
         F = F+F_custom;
     end
-    if Tr.CAP
-        Fact = CustomActuation(Tr,q,g_act,J_act,t,qd,eta_act,[]);%Jd not included
-        TauC = CustomActuation_Qspace(Tr,Fact,q,t);
+    if Linkage.CAP
+        Fact = CustomActuation(Linkage,q,g_act,J_act,t,qd,eta_act,[]);%Jd not included
+        TauC = CustomActuation_Qspace(Linkage,Fact,q,t);
         F    = F+TauC; %added with F
     end
 
