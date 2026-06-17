@@ -11,6 +11,7 @@ classdef SorosimContactBody < handle
         % Identity
         id (1,1) double = NaN % body id, different from Link id
         i_sig (1,1) double = NaN % corresponding significant point
+        bodyName
 
         % iDCOL geometry
         shape_id (1,1) double = 0 % 1: sphere, 2: polytope, 3: superellipsoid, 4: superelliptic cylinder, 5: truncated cone

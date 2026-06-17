@@ -66,7 +66,7 @@ lb(idx_goal)  = pT;  ub(idx_goal)  = pT;
 
 alg = 'interior-point';   % primary attempt
 dispMode = 'iter';  % 'iter' or 'final' or 'off'
-useGrads = true;    % true: analytical gradients, false: finite-difference baseline
+useGrads = false;    % true: analytical gradients, false: finite-difference baseline
 
 opts = optimoptions('fmincon', ...
     'Algorithm', alg, ...

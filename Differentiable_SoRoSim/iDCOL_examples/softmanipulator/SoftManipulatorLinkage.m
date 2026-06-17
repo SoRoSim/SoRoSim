@@ -66,12 +66,13 @@ S1.EnvironmentBodies = SorosimContactBody.empty(n_env,0);
 % (1) Box used as a "plane" (top face effectively used)
 shape_id = 2;
 A = [ eye(3); -eye(3) ];
-bA = 0.3 * ones(6,1);
-params = idcol_make_params(shape_id, beta, A, bA);
+halflength = 0.5;
+bA = halflength * ones(6,1);
+params = idcol_make_params(shape_id, beta*2, A, bA); %sharper
 
 env_id = n_rod_bodies + 1;
 S1.EnvironmentBodies(1) = SorosimContactBody(env_id, shape_id, params);
-S1.EnvironmentBodies(1).g_JC = [eye(3) [0.3; 0; -0.4]; 0 0 0 1];
+S1.EnvironmentBodies(1).g_JC = [eye(3) [0.3; 0; -halflength-0.1]; 0 0 0 1];
 
 % (2) Cylinder
 shape_id = 3;

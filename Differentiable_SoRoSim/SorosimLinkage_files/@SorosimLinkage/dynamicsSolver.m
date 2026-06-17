@@ -226,7 +226,7 @@ for i=1:N
             else % order 2
                 
                 xi_Zhere = xi_star(6*(ii-2)+1:6*(ii-1),4);
-                Phi_Zhere = Linkage.CVRods{i}(j+1).B_Z(6*(ii-2)+1:6*(ii-1),:);%note this step
+                Phi_Zhere = Linkage.CVRods{i}(j+1).Phi_Z(6*(ii-2)+1:6*(ii-1),:);%note this step
 
                 if dof_here>0
                     xi_Zhere = Phi_Zhere*q_here+xi_Zhere;

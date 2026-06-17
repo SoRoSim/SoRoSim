@@ -85,9 +85,6 @@ classdef SorosimLinkage
         tol_alpha (1,1) double = 1e-4
         tol_vel   (1,1) double = 1e-4
 
-        ActivePairs logical = false(0,1)     % if alpha is < tol_alpha, length = ncp !!!!!!!!!!!!wont work as sorosimlinkage is not pass by ref
-        ImplusePairs logical = false(0,1)    % if normal velocity is < -tol_vel, length = ncp
-
         % ---------- Physics knobs ----------
         mode char = 'penalty'              % 'penalty'|'lcp'|'ncp'
         restitution (1,1) double = 1.0     % const for now, change later

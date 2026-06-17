@@ -1,6 +1,6 @@
 %Function for the plot of dynamic simulation
 %Last modified by Anup Teejo Mathew - 25/05/2021
-function plotqt_temp(Linkage, t, qqd, options)
+function plotqt_softmanipulator(Linkage, t, qqd, options)
 
 arguments
     Linkage
@@ -87,10 +87,10 @@ set(gcf, 'Renderer', 'OpenGL');
 Linkage.EnvironmentBodies(2).setPose(eye(4));
 Linkage.EnvironmentBodies(3).setPose(eye(4));
 
-Linkage.EnvironmentBodies(2).hGeom.FaceAlpha = 1;
+Linkage.EnvironmentBodies(2).hGeom.FaceAlpha = 0.5;
 Linkage.EnvironmentBodies(2).hGeom.FaceColor = [0.7 0.7 0.7];
 
-Linkage.EnvironmentBodies(3).hGeom.FaceAlpha = 1;
+Linkage.EnvironmentBodies(3).hGeom.FaceAlpha = 0.5;
 Linkage.EnvironmentBodies(3).hGeom.FaceColor = [0.7 0.7 0.7];
 
 hText = findobj(gca, 'Type', 'Text');
@@ -148,11 +148,29 @@ axis ([PlotParameters.XLim PlotParameters.YLim PlotParameters.ZLim]);
 
 
 set(gcf,'Renderer','opengl');
-set(gcf,'GraphicsSmoothing','on');   % optional
+% set(gcf,'GraphicsSmoothing','on');   % optional
 set(ax,'SortMethod','depth');   % important with transparency
 
 drawnow
 % view(0,0);
+
+% Camera orbit settings
+rxy = norm(PlotParameters.CameraPosition(1:2) - PlotParameters.CameraTarget(1:2));
+camHeight = PlotParameters.CameraPosition(3) - PlotParameters.CameraTarget(3);
+
+theta0 = atan2(PlotParameters.CameraPosition(2) - PlotParameters.CameraTarget(2), ...
+              PlotParameters.CameraPosition(1) - PlotParameters.CameraTarget(1));
+
+camTarget0 = PlotParameters.CameraTarget(:).';
+camUp0     = PlotParameters.CameraUpVector(:).';
+
+nRot = 0.5;
+
+delete(findall(ax,'Type','light'));   % remove existing duplicate lights
+
+hLight = camlight(ax, 'headlight');
+lighting(ax, 'phong');
+material(ax, 'shiny');
 
 for tt=0:1/FrameRate:tmax
 
@@ -461,16 +479,16 @@ for tt=0:1/FrameRate:tmax
                             xw = R*out.x + p;
                             
                             % force vector in world frame
-                            fcw = R*fc*0.03;
+                            fcw = R*fc*0.1;
 
-                            quiver3( ...
-                                xw(1), xw(2), xw(3), ...
-                                fcw(1), fcw(2), fcw(3), ...
-                                0, ...                         % no autoscaling
-                                'k', ...
-                                'MaxHeadSize', 1.0, ...
-                                'LineWidth', 1.5, ...
-                                'Tag', 'contact_force' );
+                            % quiver3( ...
+                            %     xw(1), xw(2), xw(3), ...
+                            %     fcw(1), fcw(2), fcw(3), ...
+                            %     0, ...                         % no autoscaling
+                            %     'k', ...
+                            %     'MaxHeadSize', 1.0, ...
+                            %     'LineWidth', 1.5, ...
+                            %     'Tag', 'contact_force' );
 
 
                             
@@ -501,12 +519,30 @@ for tt=0:1/FrameRate:tmax
 
     end
     
+    % drawnow limitrate nocallbacks;
+    % if options.record
+    %     frm = getframe(gcf);   % or getframe(ax)
+    %     writeVideo(vid, frm);
+    %     %frame.cdata = imresize(frame.cdata, [ceil(size(frame.cdata,1)/2)*2, ceil(size(frame.cdata,2)/2)*2]);
+    %     %writeVideo(v,frame);
+    % end
+    % Rotate camera around the target
+    theta = theta0 + 2*pi*nRot*(tt/tmax);
+
+    camPos = camTarget0 + [rxy*cos(theta), rxy*sin(theta), camHeight];
+    
+    set(ax, ...
+        'CameraPosition', camPos, ...
+        'CameraTarget', camTarget0, ...
+        'CameraUpVector', camUp0);
+    
+    camlight(hLight, 'headlight');   % update existing light, do not create new one
+    
     drawnow limitrate nocallbacks;
+    
     if options.record
-        frm = getframe(gcf);   % or getframe(ax)
+        frm = getframe(gcf);
         writeVideo(vid, frm);
-        %frame.cdata = imresize(frame.cdata, [ceil(size(frame.cdata,1)/2)*2, ceil(size(frame.cdata,2)/2)*2]);
-        %writeVideo(v,frame);
     end
 end
 

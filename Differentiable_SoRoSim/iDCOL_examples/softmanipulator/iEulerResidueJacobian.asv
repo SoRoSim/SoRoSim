@@ -1,0 +1,39 @@
+function [R, JR] = iEulerResidueJacobian(qd_next, Linkage, q, qd, dt, u)
+% Implicit Euler residual and Jacobian
+%
+% R  = ID(q_next, qd_next, qdd_next) - tau = 0
+% JR = dR/dqd_next
+%
+% where q_next   = q + dt*qd_next
+%       qdd_next = (qd_next - qd)/dt
+%
+% Inputs:
+%   qd_next : current Newton iterate qd* (ndof x 1)
+%   Linkage : robot model
+%   q       : current position q_n (ndof x 1)
+%   qd      : current velocity qd_n (ndof x 1)
+%   dt      : time step h
+%   action  : actuation input u_{n+1} (nact x 1)
+%
+% Outputs:
+%   R  : residual (ndof x 1)
+%   JR : Jacobian dR/dqd_next (ndof x ndof)
+
+q_next   = q + dt*qd_next;
+qdd_next = (qd_next - qd)/dt;
+
+[ID, tau, ~, dID_dq, dID_dqd, dID_dqdd, ~, dtau_dq, dtau_dqd, ~, ~, ~, ~, ~, ~] = ...
+    DAEJacobians(Linkage, 0, q_next, qd_next, qdd_next, u, zeros(0,1), 3);
+
+[ID,tau,dID_dq,dID_dqd,dID_dqdd,dtau_dq,dtau_dqd,dtau_du,g,J] = dRNEA(Linkage,t,q_next, qd_next, qdd_next,u)
+
+%% Residual
+R = ID - tau;
+
+%% Jacobian
+% chain rule through q_next = q + dt*qd_next  =>  dt * dID_dq
+% chain rule through qdd_next = (qd_next-qd)/dt  =>  (1/dt) * dID_dqdd
+% direct qd_next dependence  =>  dID_dqd
+JR = dID_dqdd/dt + dID_dqd + dt*dID_dq - dtau_dqd - dt*dtau_dq;
+
+end

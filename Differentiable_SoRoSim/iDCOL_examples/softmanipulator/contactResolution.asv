@@ -1,0 +1,4 @@
+function qd_next = contactResolution(Linkage)
+    [~,~,~,~,M,~,~,g,J] = dRNEA("getlast");
+    A = M+dt*S1.D+dt^2*S1.K;
+end
